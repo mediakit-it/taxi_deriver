@@ -65,8 +65,6 @@ Route::group(['middleware' => ['auth:api']], function () {
     // Route::get('/product/{slug}', '\App\Http\Controllers\ProductController@getProduct');//получение одного продукта
 
 
-    // Route::get('/getWishlistUser', '\App\Http\Controllers\WishlistController@getWishlistUser');
-    // Route::post('/updateWishlistProduct', '\App\Http\Controllers\WishlistController@updateWishlistProduct');
 
 
 

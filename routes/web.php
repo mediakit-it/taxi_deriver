@@ -53,13 +53,8 @@ Route::middleware(['guest:web'])->group(function () {
     //     return view('site.auth.login');
     // });
 
-    Route::get('/forgot-password', 'App\Http\Controllers\admin\AuthController@forgoutPasswordIndex')->name('forgout-password');
-    Route::post('/forgout-password-send', 'App\Http\Controllers\admin\AuthController@forgoutPassword');
 
 
-    //страница регистрации
-    Route::get('/registration', 'App\Http\Controllers\admin\AuthController@registration')->name('registration');
-    Route::post('/registrationUser', 'App\Http\Controllers\admin\AuthController@registrationUser')->name('registrationUser');
 
 
 
@@ -72,19 +67,11 @@ Route::middleware(['guest:web'])->group(function () {
 Route::middleware(['auth:web'])->group(function () {
 
 
-    Route::get('/profile', function(){
-        return view('site.auth.profile');
-    })->name('profile');
 
-    Route::post('/change-password', 'App\Http\Controllers\admin\AuthController@changePassword')->name('changePassword');
-    Route::post('/update-profile', 'App\Http\Controllers\admin\AuthController@updateProfile')->name('updateProfile');
 
     Route::get('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout');
 
-    Route::post('/add-edit-wishlist', 'App\Http\Controllers\site\WishlistController@updateWishlistProduct');
 
-    Route::post('/new_reviews_user', 'App\Http\Controllers\site\ReviewsController@newReviews')->name('new_reviews_user');
-    Route::get('/list-orders', 'App\Http\Controllers\site\ProfileController@listOrders')->name('list_orders');
 
 
 });
