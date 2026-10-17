@@ -156,10 +156,6 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
 
     //выход из аккаунта
     // Route::get('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout');
-    Route::get('/import', 'App\Http\Controllers\admin\ImportController@index')->name('import');
-
-    Route::post('/importProduct', 'App\Http\Controllers\admin\ImportController@importProduct')->name('importFile');
-
 
     // Route::resource('redactor', 'App\Http\Controllers\admin\RedactorController');
     
