@@ -13,8 +13,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        // $schedule->command('import:check-file')->everyMinute();
-        // $schedule->command('import:discount-users')->everyMinute();
         $schedule->command('driver-locations:cleanup')->everyMinute();
    
         // РАСКОММЕНТИТЬ КАК ТОЛЬКО ОБНОВЯТ ПРИЛОЖЕНИЕ! RAY
