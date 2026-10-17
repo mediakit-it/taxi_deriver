@@ -17,9 +17,6 @@ use App\Http\Controllers\api\CostOfTripController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
 Route::prefix('v1')->group(function () {
     Route::get('/cost-of-trip', [CostOfTripController::class, 'index']);
@@ -56,17 +53,11 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
 
 Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/check-token-validity', '\App\Http\Controllers\AuthController@checkTokenValidity');
-    // Route::get('/shops', '\App\Http\Controllers\ShopController@index');
-
-    // Route::get('/categoryes', '\App\Http\Controllers\CategoryController@index');
 
 
-    // Route::get('/products-main', '\App\Http\Controllers\ProductController@indexMain');
-    // Route::get('/product/{slug}', '\App\Http\Controllers\ProductController@getProduct');//получение одного продукта
 
 
-    // Route::get('/getWishlistUser', '\App\Http\Controllers\WishlistController@getWishlistUser');
-    // Route::post('/updateWishlistProduct', '\App\Http\Controllers\WishlistController@updateWishlistProduct');
+
 
 
 
@@ -75,49 +66,25 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/updatePassword', '\App\Http\Controllers\ProfileController@updatePassword');
 
     Route::post('/deleteProfile', '\App\Http\Controllers\ProfileController@deleteProfile');
-    // Route::post('/deleteAddress', '\App\Http\Controllers\ProfileController@deleteAddress');//---
-
-    // Route::post('/newReviews', '\App\Http\Controllers\ReviewController@newReviews');
 
 
-    // Route::get('/getAllProduct', '\App\Http\Controllers\ProductController@getAllProduct');
-    // Route::get('/getAllProductCategory/{slug}', '\App\Http\Controllers\ProductController@getAllProductCategory');
-    // Route::get('/searchProduct', '\App\Http\Controllers\ProductController@searchProduct');
-    // Route::get('/searchViewProduct', '\App\Http\Controllers\ProductController@searchViewProduct');
 
-    // Route::get('/productsAndBrandInCategory', '\App\Http\Controllers\ProductController@productsAndBrandInCategory');
-    // Route::get('/getMetkasInProduct', '\App\Http\Controllers\ProductController@metkasInProduct');//Получение на главной странице меток с продуктами
+
 
     // //получение брендов
-    // Route::get('/getBrandsCount', '\App\Http\Controllers\BrandController@getBrandsCount');
-    // Route::get('/getBrandsAll', '\App\Http\Controllers\BrandController@getBrandsAll');
-    // Route::get('/getAllProductBrand/{slug}', '\App\Http\Controllers\BrandController@getAllProductBrand');
     
     
     // //Работа с акциями
-    // Route::get('/getActionAll', '\App\Http\Controllers\DiscountController@getActionAll');//Получение всех акций
 
 
     // //Работа с адресами пользователя
-    // Route::get('/getUserAddressAll', '\App\Http\Controllers\AddressController@getUserAddressAll');//получение всех адресов пользователя
-    // Route::get('/getUserAddressCountry', '\App\Http\Controllers\AddressController@getUserAddressCountry');//получение всех адресов пользователя его выбранной страны
-    // Route::post('/addNewUserAddres', '\App\Http\Controllers\AddressController@addNewUserAddres');//создание нового адреса пользователя
-    // Route::post('/editUserAddress', '\App\Http\Controllers\AddressController@editUserAddress');//изменение адреса пользователя
     
 
-    // Route::post('/addCartUser', '\App\Http\Controllers\CartController@addCartUser');
-    // Route::get('/getCartsUser', '\App\Http\Controllers\CartController@getCartsUser');
-    // Route::get('/getCountCartUser', '\App\Http\Controllers\CartController@getCountCartUser');
-    // Route::post('/cartUserPlus', '\App\Http\Controllers\CartController@cartUserPlus');//Увеличение количества
-    // Route::post('/cartUserMinus', '\App\Http\Controllers\CartController@cartUserMinus');//Уменьшение количества
 
     // //Создание заказа
-    // Route::post('/newOrder', '\App\Http\Controllers\BasketController@newOrder');
-    // Route::get('/getOrdersUser', '\App\Http\Controllers\BasketController@getOrdersUser');
 
 
     // //Получение баннеров на главной 
-    // Route::get('/getBanners', '\App\Http\Controllers\BanerController@getBanners');
 
 
     // // работа с смс 
@@ -186,4 +153,3 @@ Route::get('/suggest', function (Request $request) {
 
 
 
-// Route::apiResource('institutions','\App\Http\Controllers\API\InstitutionController')->middleware('auth:api');

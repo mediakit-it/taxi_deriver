@@ -46,20 +46,11 @@ Route::get('/manual-action', function () {
 
 
 
-// Route::get('/{any}','App\Http\Controllers\MainController@index')->where('any','.*');
 Route::middleware(['guest:web'])->group(function () {
 
-    // Route::get('/login', function(){
-    //     return view('site.auth.login');
-    // });
-
-    Route::get('/forgot-password', 'App\Http\Controllers\admin\AuthController@forgoutPasswordIndex')->name('forgout-password');
-    Route::post('/forgout-password-send', 'App\Http\Controllers\admin\AuthController@forgoutPassword');
 
 
-    //страница регистрации
-    Route::get('/registration', 'App\Http\Controllers\admin\AuthController@registration')->name('registration');
-    Route::post('/registrationUser', 'App\Http\Controllers\admin\AuthController@registrationUser')->name('registrationUser');
+
 
 
 
@@ -72,19 +63,11 @@ Route::middleware(['guest:web'])->group(function () {
 Route::middleware(['auth:web'])->group(function () {
 
 
-    Route::get('/profile', function(){
-        return view('site.auth.profile');
-    })->name('profile');
 
-    Route::post('/change-password', 'App\Http\Controllers\admin\AuthController@changePassword')->name('changePassword');
-    Route::post('/update-profile', 'App\Http\Controllers\admin\AuthController@updateProfile')->name('updateProfile');
 
     Route::get('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout');
 
-    Route::post('/add-edit-wishlist', 'App\Http\Controllers\site\WishlistController@updateWishlistProduct');
 
-    Route::post('/new_reviews_user', 'App\Http\Controllers\site\ReviewsController@newReviews')->name('new_reviews_user');
-    Route::get('/list-orders', 'App\Http\Controllers\site\ProfileController@listOrders')->name('list_orders');
 
 
 });
@@ -105,17 +88,6 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::get('/yandex-suggest', [YandexController::class, 'suggest']);
     
 
-    // Route::get('/proxy/yandex-suggest', function () {
-    //     $query = request('text');
-    //     $lang = request('lang', 'ru');
-    //     $results = request('results', 5);
-    //     $highlight = request('highlight', 1);
-    //     $types = request('types');
-    //     $print_address = request('print_address');
-    //     $attrs = request('attrs');
-    //     $ll = request('ll'); // координаты центра карты
-    //     $spn = request('spn'); // ширина и высота
-    //     $bbox = request('bbox'); // координаты прямоугольника
     
     //     $params = [
     //         'text' => $query,
@@ -155,32 +127,13 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     
 
     //выход из аккаунта
-    // Route::get('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout');
 
-    // Route::resource('redactor', 'App\Http\Controllers\admin\RedactorController');
     
-    // Route::resource('category', 'App\Http\Controllers\admin\CategoryController');
-    // // Route::resource('tag', 'App\Http\Controllers\admin\TagController');
-    // Route::resource('attribute', 'App\Http\Controllers\admin\AttributeController');
-    // Route::resource('methodDelivery', 'App\Http\Controllers\admin\MethodDeliveryController');
-    // Route::resource('variant', 'App\Http\Controllers\admin\VariantController');
-    // Route::resource('brand', 'App\Http\Controllers\admin\BrandController');
-    // Route::resource('product', 'App\Http\Controllers\admin\ProductController');
-    // Route::resource('shop', 'App\Http\Controllers\admin\ShopController');
-    // Route::post('product-variant', 'App\Http\Controllers\admin\ProductController@productVariant');
-    // Route::post('productCreateImages', 'App\Http\Controllers\admin\ProductController@productCreateImages');
-    // Route::post('deleteImage', 'App\Http\Controllers\admin\ProductController@deleteImage');
 
-    // Route::resource('discount', 'App\Http\Controllers\admin\DiscountController');
 
-    // Route::resource('metka', 'App\Http\Controllers\admin\MetkaController');
 
-    // Route::resource('shopProduct', 'App\Http\Controllers\admin\ShopAndProductController');
-    // Route::post('shopCountryReturn', 'App\Http\Controllers\admin\ShopAndProductController@shopCountryReturn');
 
-    // Route::resource('ordersBasket', 'App\Http\Controllers\admin\OrdersBasketController');
 
-    // Route::resource('banner', 'App\Http\Controllers\admin\BannerController');
 
 
     Route::get('mainPage', 'App\Http\Controllers\admin\MainPageController@index')->name('mainPage');
@@ -205,9 +158,7 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
 
     //getMessagesUser
 
-    // Route::resource('seo', 'App\Http\Controllers\admin\SeoPageController');
 
-    // Route::post('/ajaxSaveProduct', 'App\Http\Controllers\admin\SeoPageController@ajaxSaveProduct');
 
 });
 
