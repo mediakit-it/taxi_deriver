@@ -1,1125 +1,708 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="ru">
-<!--<![endif]-->
+<html lang="ru">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Ridek Online Taxi Booking HTML5 Template">
-    <meta name="author" content="DynamicLayers">
+    <meta name="description" content="СитиТакси - заказ такси в вашем городе по короткому номеру 7777. Поездки по городу и за город, трансферы, корпоративные поездки. Заказ по телефону и в приложении.">
+    <title>СитиТакси - заказ такси в вашем городе</title>
 
-    <title>ОК Такси - заказ такси в Быхове</title>
-
-    <link rel="shortcut icon" type="image/x-icon" href="{{asset('assetsSite2/img/favicon.png')}}">
-	
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/animate.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/fontawesome.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/line-awesome.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/keyframe-animation.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/jquery.datetimepicker.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/nice-select.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/venobox.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/swiper.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/elements.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/header.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/slider.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/blog.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/main.css')}}">
-    <link rel="stylesheet" href="{{asset('assetsSite2/css/responsive.css')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assetsSite2/img/favicon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assetsSite2/css/landing.css') }}">
 </head>
 
 <body>
-   <div class="site-preloader">
-        <div class="car">
-            <div class="strike"></div>
-            <div class="strike strike2"></div>
-            <div class="strike strike3"></div>
-            <div class="strike strike4"></div>
-            <div class="strike strike5"></div>
-            <div class="car-detail spoiler"></div>
-            <div class="car-detail back"></div>
-            <div class="car-detail center"></div>
-            <div class="car-detail center1"></div>
-            <div class="car-detail front"></div>
-            <div class="car-detail wheel"></div>
-            <div class="car-detail wheel wheel2"></div>
-        </div>
-    </div><!--/.site-preloader-->
+    <header class="site-header" id="top">
+        <div class="container header-inner">
+            <a class="logo" href="/" aria-label="СитиТакси - на главную">
+                <span class="logo-pin">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span class="logo-text">Сити<span class="logo-accent">Такси</span></span>
+            </a>
 
-    <header class="main-header" id="main">
-        <!-- <div class="top-header">
-            <div class="container">
-                <div class="top-header-wrap">
-                    <div class="top-left">
-                        <p>Reliable Taxi Service & Transport Solutions!</p>
-                    </div>
-                    <div class="top-right">
-                        <ul class="top-header-nav">
-                            <li><a href="faqs.html">помощь</a></li>
-                            <li><a href="contact.html">Support</a></li>
-                            <li><a href="faqs.html">Вопросы</a></li>
-                        </ul>
-                        <ul class="header-social-share">
-                            <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-                            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!--/.top-header-->
-        <div class="mid-header">
-            <div class="container">
-                <div class="mid-header-wrap">
-                    <div class="site-logo">
-                        <a href="/"><img src="{{asset('assetsSite2/img/logo-dark.png')}}" width="75" alt="Logo"></a>
-                    </div><!--/.site-logo-->
-                    <ul class="header-info">
-                        <li>
-                            <div class="header-info-icon">
-                                <i class="las la-phone-volume"></i>
-                            </div>
-                            <div class="header-info-text">
-                                <h3><span>Закажите такси</span><a href="tel:7668">7668</a></h3>
-                            </div>
-                        </li>
-                        <!-- <li>
-                            <div class="header-info-icon">
-                                <i class="las la-envelope-open"></i>
-                            </div>
-                            <div class="header-info-text">
-                                <h3><span>Email now</span>Info.ridek@mail.com</h3>
-                            </div>
-                        </li> -->
-                        <li>
-                            <div class="header-info-icon">
-                                <i class="las la-map-marked-alt"></i>
-                            </div>
-                            <div class="header-info-text">
-                                <h3><span>Беларусь,</span>Быхов</h3>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div><!--/.mid-header-->
-        <div class="nav-menu-wrapper">
-            <div class="container">
-                <div class="nav-menu-inner">
-                    <div class="site-logo">
-                        <a href="/"><img src="{{asset('assetsSite2/img/logo-dark.png')}}" width="75" alt="Logo"></a>
-                    </div><!--/.site-logo-->
-                    <div class="header-menu-wrap">
-                        <ul class="nav-menu">
-                            <li class="dropdown_menu">
-                                <a href="/#">Главная</a>
-                                <!-- <ul>
-                                    <li><a href="index.html">Home Default</a></li>
-                                    <li><a href="index-2.html">Home Modern</a></li>
-                                </ul> -->
-                            </li>
-                            <li class="dropdown_menu">
-                                <a href="/#about-link">О нас</a>
-                                <!-- <ul>
-                                    <li><a href="about-us.html">About Us</a></li>
-                                    <li><a href="about-company.html">About Company</a></li>
-                                    <li><a href="our-services.html">Our Services</a></li>
-                                    <li><a href="service-details.html">Services Details</a></li>
-                                    <li><a href="book-taxi.html">Book a Ride</a></li>
-                                </ul> -->
-                            </li>
-                            <li class="dropdown_menu">
-                                <a href="/#advantages">Преимущества</a>
-                                <!-- <ul>
-                                    <li><a href="our-taxi.html">Taxi Lists</a></li>
-                                    <li><a href="taxi-details.html">Taxi Details</a></li>
-                                </ul> -->
-                            </li>
-                            <li class="dropdown_menu">
-                                <a href="/#app">О Приложении</a>
-                                <!-- <ul>
-                                    <li><a href="/manual-action">Удаление аккаунта</a></li>
-                                </ul> -->
-                            </li>
-                            <li class="dropdown_menu">
-                                <a href="#">Информация</a>
-                                <ul>
-                                    <li><a href="/user-agreement">Пользовательское соглашение</a></li>
-                                    <li><a href="/politika-konfidencialinosti">Политика конфиденциальности</a></li>
-                                    <li><a href="/manual-action">Удаление аккаунта</a></li>
-                                </ul>
-                            </li>
-                            <!-- <li><a href="contact.html">Contact</a></li> -->
-                        </ul>
-                    </div>
-                    <!-- <div class="menu-right-item">
-                        <div class="search-icon dl-search-icon">
-                            <i class="las la-search"></i>
-                        </div>
-                        <div class="sidebox-icon dl-sidebox-icon">
-                            <i class="las la-bars"></i>
-                        </div>
-                        <a href="book-taxi.html" class="menu-btn">Скачать приложение</a>
-                    </div>
-                    <div class="mobile-menu-icon">
-                        <div class="burger-menu">
-                            <div class="line-menu line-half first-line"></div>
-                            <div class="line-menu"></div>
-                            <div class="line-menu line-half last-line"></div>
-                        </div>
-                    </div> -->
-                </div>
-            </div>
-        </div>
-        <!--/.nav-menu-->
-    </header>
-    <!--/.main-header-->
+            <nav class="main-nav" id="main-nav" aria-label="Основная навигация">
+                <a class="nav-link" href="/">Главная</a>
+                <a class="nav-link" href="#about-link">О нас</a>
+                <a class="nav-link" href="#services">Услуги</a>
+                <a class="nav-link" href="#fleet">Автопарк</a>
+                <a class="nav-link" href="#tariffs">Тарифы</a>
+                <a class="nav-link" href="#app">Приложение</a>
+            </nav>
 
-    <div id="popup-search-box">
-        <div class="box-inner-wrap d-flex align-items-center">
-            <form id="form" action="#" method="get" role="search">
-                <input id="popup-search" type="text" name="s" placeholder="Type keywords here...">
-                <button id="popup-search-button" type="submit" name="submit">
-                    <i class="las la-search"></i>
+            <div class="header-actions">
+                <a class="btn btn-brand btn-call" href="tel:7777">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    7777
+                </a>
+                <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="main-nav">
+                    <span></span><span></span><span></span>
                 </button>
-            </form>
-            <div class="search-close"><i class="las la-times"></i></div>
-        </div>
-    </div>
-    <!--/.popupsearch-box-->
-    <div id="searchbox-overlay"></div>
-
-    <!-- <div id="popup-sidebox" class="popup-sidebox">
-        <div class="sidebox-content">
-            <div class="site-logo">
-                <a href="index.html"><img src="{{asset('assetsSite2/img/logo-light.png')}}" width="75" alt="logo"></a>
-            </div>
-            <p>Everything your taxi business needs is already here! Ridek, a theme
-                made for taxi service companies.</p>
-            <ul class="sidebox-list">
-                <li class="call"><span>Call for ride:</span>7668</li>
-                <li>
-                    <span>You can find us at:</span>Halk Street New York, USA - 2386
-                </li>
-            </ul>
-        </div>
-    </div> -->
-    <!--/.popup-sidebox-->
-    <div id="sidebox-overlay"></div>
-
-    <div class="slider-section">
-        <div class="main-slider">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="slider-img"><img src="{{asset('assetsSite2/img/slider-bg.webp')}}" alt="img" class="kenburns"
-                            style="animation-duration: 12000ms; "></div>
-                    <div class="car-holder">
-                        <img src="{{asset('assetsSite2/img/car-1.webp')}}" alt="car" data-animation="car-animation" data-duration="1.5s">
-                        <div class="shape">
-                            <div data-animation="slide-in-bottom" data-duration="1.5s" data-delay="0.3s"></div>
-                            <div data-animation="fade-in" data-duration="1.5s" data-delay="0.2s"></div>
-                            <div data-animation="slide-in-top" data-duration="1.5s" data-delay="0.5s"></div>
-                        </div>
-                    </div>
-                    <div class="slider-content-wrap d-flex align-items-center text-left">
-                        <div class="container">
-                            <div class="slider-content">
-                                <div class="slider-caption medium">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.3s">Комфортные поездки с ОК Такси
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="slider-caption big">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.5s">Закажите такси в Быхове
-                                            <br>прямо сейчас
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="slider-caption small">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.7s" data-duration="1s">
-                                            Скачайте наше приложение</div>
-                                    </div>
-                                </div>
-                                <div class="download-btn">
-                                    <a href="{{ asset('uploads/okTaksi.apk') }}" download><img src="{{asset('assetsSite2/img/google-play.webp')}}" height="50" alt="PlayStore"></a>
-                                    <a href="https://apps.apple.com/by/app/%D0%BE%D0%BA-%D1%82%D0%B0%D0%BA%D1%81%D0%B8/id6748324111"><img src="{{asset('assetsSite2/img/app-store.webp')}}" height="50" alt="AppStore"></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="slider-img"><img src="{{asset('assetsSite2/img/slider-bg.webp')}}" alt="img" class="kenburns"
-                            style="animation-duration: 12000ms; "></div>
-                    <div class="car-holder">
-                        <img src="{{asset('assetsSite2/img/car-1.webp')}}" alt="car" data-animation="car-animation" data-duration="1.5s">
-                        <div class="shape">
-                            <div data-animation="slide-in-bottom" data-duration="1.5s" data-delay="0.3s"></div>
-                            <div data-animation="fade-in" data-duration="1.5s" data-delay="0.2s"></div>
-                            <div data-animation="slide-in-top" data-duration="1.5s" data-delay="0.5s"></div>
-                        </div>
-                    </div>
-                    <div class="slider-content-wrap d-flex align-items-center text-left">
-                        <div class="container">
-                            <div class="slider-content">
-                                <div class="slider-caption medium">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.3s">Выгодные поездки с ОК Такси
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="slider-caption big">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.5s">Стоимость поездки
-                                            <br>от 5 рублей
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="slider-caption small">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.7s" data-duration="1s">
-                                            Скачайте наше приложение</div>
-                                    </div>
-                                </div>
-                                <div class="download-btn slider-btn">
-                                    <a href="{{ asset('uploads/okTaksi.apk') }}" download><img src="{{asset('assetsSite2/img/google-play.webp')}}" height="50" alt="PlayStore"></a>
-                                    <a href="https://apps.apple.com/by/app/%D0%BE%D0%BA-%D1%82%D0%B0%D0%BA%D1%81%D0%B8/id6748324111"><img src="{{asset('assetsSite2/img/app-store.webp')}}" height="50" alt="AppStore"></a>
-                                </div>
-                                <!-- <div class="slider-caption small">
-                                    <div class="inner-layer">
-                                        <div data-animation="fade-in-bottom" data-delay="0.7s" data-duration="1s">
-                                            Everything your taxi business needs is already here! <br>Ridek made for taxi
-                                            service companies!</div>
-                                    </div>
-                                </div> -->
-                                <!-- <div class="slider-btn">
-                                    <a href="book-taxi.html" class="default-btn" data-animation="fade-in-bottom"
-                                        data-delay="0.9s">Book Now</a>
-                                </div> -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Slider navigation buttons -->
-            <div class="slider-controls">
-                <div class="slider-control slider-button-prev"><span><i
-                            class="las la-long-arrow-alt-left"></i></span>Назад</div>
-                <div class="slider-pagination"></div>
-                <div class="slider-control slider-button-next">Вперед<span><i
-                            class="las la-long-arrow-alt-right"></i></span>
-                </div>
             </div>
         </div>
-    </div>
-    <!--/.slider-section-->
+    </header>
 
-    <section class="about-section padding" id="about-link">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="about-img">
-                        <img class="about-img1 wow fade-in-left" data-wow-delay="200ms" src="{{asset('assetsSite2/img/about-1.webp')}}" alt="img">
-                        <img class="about-img2 wow fade-in-bottom" data-wow-delay="400ms" src="{{asset('assetsSite2/img/about-2.webp')}}" alt="img">
-                        <figure class="round-text"><img src="{{asset('assetsSite2/img/experience-text-round.webp')}}" alt="img"></figure>
+    <main>
+        {{-- Герой --}}
+        <section class="hero" style="background-image: url('{{ asset('assetsSite2/img/bg-1.webp') }}')">
+            <div class="container hero-inner">
+                <div class="hero-content">
+                    <p class="eyebrow eyebrow-light">Безопасные поездки - лучшие маршруты</p>
+                    <h1 class="hero-title">Ваше надёжное <span class="text-accent">такси</span></h1>
+                    <p class="hero-lead">Поездки по городу и за его пределами - быстро, комфортно и по честной цене. Закажите по короткому номеру 7777 или в приложении: машина подаётся за 3-5 минут.</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-brand btn-lg" href="tel:7777">Заказать такси</a>
+                        <a class="btn btn-ghost btn-lg" href="#app">Скачать приложение</a>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="section-heading mb-40 wow fade-in-right" data-wow-delay="200ms">
-                        <h4><span></span>О нашем такси</h4>
-                        <h2>ОК Такси — ваш надежный партнёр на дорогах Быхова</h2>
-                        <p>ОК Такси — это удобный, быстрый и безопасный способ передвижения по Быхову и окрестностям. Мы работаем круглосуточно, чтобы вы могли добраться туда, куда нужно — в любое время дня и ночи.
-Быстро. Безопасно. ОК!</p>
-                    </div>
-                    <!--/.section-heading-->
-                    <ul class="about-info wow fade-in-right" data-wow-delay="400ms">
-                        <!-- <li>
-                            <img class="owner-thumb" src="{{asset('assetsSite2/img/comment-1.png')}}" alt="thumb">
-                            <div class="owner">
-                                <h4>Founder - CEO</h4>
-                                <img class="signature" src="{{asset('assetsSite2/img/signature.png')}}" alt="signature">
-                            </div>
-                        </li> -->
-                        <li>
-                            <h2><span>Закажите такси</span><a href="tel:7668">7668</a></h2>
+                    <ul class="trust-chips">
+                        <li class="trust-chip">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            Работаем 24/7
+                        </li>
+                        <li class="trust-chip">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            Опытные водители
+                        </li>
+                        <li class="trust-chip">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            Фиксированная цена
                         </li>
                     </ul>
                 </div>
+                <img class="hero-car" src="{{ asset('assetsSite2/img/taxi.png') }}" alt="Жёлтый автомобиль такси">
             </div>
-        </div>
-    </section>
-    <!--/.about-section-->
+        </section>
 
-    <section class="service-section bg-grey padding" id="advantages">
-        <div class="bg-half"></div>
-        <div class="container">
-            <div class="section-heading text-center mb-40 wow fade-in-bottom" data-wow-delay="200ms">
-                <!-- <h4><span></span>Что мы предлагаем</h4> -->
-                <h2 class="white">Преимущества поездок с нами</h2>
-                <p>ОК Такси — это ваш надёжный способ передвижения по Быхову и району. Мы делаем ставку на комфорт, безопасность и заботу об экологии.</p>
-            </div>
-            <div class="swiper-outside">
-                <div class="service-carousel">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="service-item wow fade-in-bottom" data-wow-delay="200ms">
-                                <div class="service-thumb">
-                                    <img src="{{asset('assetsSite2/img/service-1.webp')}}" alt="img">
-                                    <div class="service-shape-wrap">
-                                        <div class="service-shape"></div>
-                                    </div>
-                                    <div class="service-car"><img src="{{asset('assetsSite2/img/car-1.webp')}}" alt="car"></div>
-                                </div>
-                                <div class="service-content">
-                                    <h3><a href="service-details.html">Современный автопарк</a></h3>
-                                    <p>Только новые электромобили для вашего комфорта</p>
-                                    <!-- <a class="read-more" href="service-details.html">Read More</a> -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="service-item wow fade-in-bottom" data-wow-delay="400ms">
-                                <div class="service-thumb">
-                                    <img src="{{asset('assetsSite2/img/service-2.webp')}}" alt="img">
-                                    <div class="service-shape-wrap">
-                                        <div class="service-shape"></div>
-                                    </div>
-                                    <div class="service-car"><img src="{{asset('assetsSite2/img/car-1.webp')}}" alt="car"></div>
-                                </div>
-                                <div class="service-content">
-                                    <h3><a href="service-details.html">Опытные водители</a></h3>
-                                    <p>Наши водители всегда хорошо знают город</p>
-                                    <!-- <a class="read-more" href="service-details.html">Read More</a> -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="service-item wow fade-in-bottom" data-wow-delay="600ms">
-                                <div class="service-thumb">
-                                    <img src="{{asset('assetsSite2/img/service-3.webp')}}" alt="img">
-                                    <div class="service-shape-wrap">
-                                        <div class="service-shape"></div>
-                                    </div>
-                                    <div class="service-car"><img src="{{asset('assetsSite2/img/car-1.webp')}}" alt="car"></div>
-                                </div>
-                                <div class="service-content">
-                                    <h3><a href="service-details.html">Быстрая подача машины</a></h3>
-                                    <p>Среднее время ожидания от 3 до 5 минут</p>
-                                    <!-- <a class="read-more" href="service-details.html">Read More</a> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                <div class="swiper-nav swiper-next"><i class="las la-long-arrow-alt-right"></i></div>
-                <div class="swiper-nav swiper-prev"><i class="las la-long-arrow-alt-left"></i></div>
-            </div>
+        {{-- Панель быстрого заказа --}}
+        <div class="container booking-wrap">
+            <form class="booking-bar" action="#" method="get">
+                <label class="booking-field">
+                    <span class="booking-label">Откуда</span>
+                    <input type="text" name="from" placeholder="Введите адрес подачи">
+                </label>
+                <label class="booking-field">
+                    <span class="booking-label">Куда</span>
+                    <input type="text" name="to" placeholder="Введите адрес назначения">
+                </label>
+                <label class="booking-field">
+                    <span class="booking-label">Дата и время</span>
+                    <input type="text" name="when" placeholder="Сегодня, сейчас">
+                </label>
+                <a class="btn btn-brand booking-btn" href="tel:7777">Заказать</a>
+            </form>
+            <p class="booking-caption">Или просто позвоните: <a href="tel:7777">7777</a> - диспетчер на связи круглосуточно</p>
         </div>
-    </section>
-    <!--/.service-section-->
 
-    <section class="booking-section">
-        <div class="container">
-            <div class="row pos-relative padding">
-                <div class="col-lg-4">
-                    <div class="booking-car wow fade-in-left" data-wow-delay="200ms"></div>
+        {{-- Услуги --}}
+        <section class="section" id="services">
+            <div class="container">
+                <div class="section-head">
+                    <p class="eyebrow">Наши услуги</p>
+                    <h2 class="section-title">Поездка под любую задачу</h2>
+                    <p class="section-lead">От короткой поездки по городу до трансфера в аэропорт - выберите формат, а мы позаботимся об остальном.</p>
                 </div>
-                <div class="col-lg-8">
-                    <div class="booking-wrap">
-                        <div class="section-heading mb-30">
-                            <h4><span></span>Electric car</h4>
-                            <h2 class="white">Наш таксопарк – современные электромобили</h2>
+
+                <div class="services-grid">
+                    <article class="service-card">
+                        <div class="service-media">
+                            <img src="{{ asset('assetsSite2/img/service-1.webp') }}" alt="Такси едет по городской улице" loading="lazy">
                         </div>
-                        <ul style="display: flex; flex-wrap: wrap; gap: 20px; max-width: 566px">
-                            <p style="color: white; width: 273px; height: 50px; background-color: #333; display: flex; align-items: center; justify-content: center; margin: 0">
-                                Экологичность
-                            </p>
-                            <p style="color: white; width: 273px; height: 50px; background-color: #333; display: flex; align-items: center; justify-content: center; margin: 0">
-                                Тишина и комфорт
-                            </p>
-                            <p style="color: white; width: 273px; height: 50px; background-color: #333; display: flex; align-items: center; justify-content: center; margin: 0">
-                                Бесшумная поездка
-                            </p>
-                            <p style="color: white; width: 273px; height: 50px; background-color: #333; display: flex; align-items: center; justify-content: center; margin: 0">
-                                Меньше затрат
-                            </p>
-                        </ul>
-                        <!-- <form action="book-ride.php" id="book-taxi-ride">
-                            <div class="booking-form">
-                                <div class="form-field">
-                                    <i class="las la-user-tie"></i>
-                                    <input type="text" id="full-name" name="full-name" class="form-control"
-                                        placeholder="Your Name" required>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-envelope-open"></i>
-                                    <input type="email" id="email" name="email" class="form-control" placeholder="Email"
-                                        required>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-tags"></i>
-                                    <select name="package-type" id="type" class="niceSelect">
-                                        <option value="standard">Standard</option>
-                                        <option value="business">Business</option>
-                                        <option value="economy">Economy</option>
-                                        <option value="vip-spacial">VIP Spacial</option>
-                                        <option value="comfort">Comfort</option>
-                                    </select>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-user-friends"></i>
-                                    <select name="passengers" id="passengers" class="niceSelect">
-                                        <option value="1">1 Person</option>
-                                        <option value="2">2 Person</option>
-                                        <option value="3">3 Person</option>
-                                        <option value="4">4 Person</option>
-                                        <option value="5">5 Person</option>
-                                    </select>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-map-marker"></i>
-                                    <input type="text" id="start-dest" name="start-dest" class="form-control"
-                                        placeholder="Start Destination" required>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-map-marker"></i>
-                                    <input type="text" id="end-dest" name="end-dest" class="form-control"
-                                        placeholder="End Destination" required>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-calendar"></i>
-                                    <input type="text" id="ride-date" name="ride-date" class="form-control date-picker"
-                                        placeholder="Select Date" required>
-                                </div>
-                                <div class="form-field">
-                                    <i class="las la-clock"></i>
-                                    <input type="text" id="ride-time" name="ride-time" class="form-control time-picker"
-                                        placeholder="Select Time" required>
-                                </div>
-                                <div class="form-field">
-                                    <button id="submit" class="default-btn" type="submit">Book Your Taxi</button>
-                                </div>
+                        <div class="service-body">
+                            <h3 class="service-title">Поездки по городу</h3>
+                            <p class="service-text">Быстрые поездки по городу в любое время дня и ночи - подача машины за 3-5 минут.</p>
+                            <a class="card-link" href="#">Подробнее
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-media">
+                            <img src="{{ asset('assetsSite2/img/service-2.webp') }}" alt="Автомобиль такси на загородной трассе" loading="lazy">
+                        </div>
+                        <div class="service-body">
+                            <h3 class="service-title">За город</h3>
+                            <p class="service-text">Поездки в соседние города и деревни по прозрачному тарифу за километр - без сюрпризов в пути.</p>
+                            <a class="card-link" href="#">Подробнее
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-media">
+                            <img src="{{ asset('assetsSite2/img/service-3.webp') }}" alt="Встреча пассажира в аэропорту" loading="lazy">
+                        </div>
+                        <div class="service-body">
+                            <h3 class="service-title">Трансфер в аэропорт</h3>
+                            <p class="service-text">Встретим с табличкой, отследим рейс и поможем с багажом. Цена фиксируется при заказе.</p>
+                            <a class="card-link" href="#">Подробнее
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-media">
+                            <img src="{{ asset('assetsSite2/img/service-4.jpg') }}" alt="Деловая поездка на автомобиле комфорт-класса" loading="lazy">
+                        </div>
+                        <div class="service-body">
+                            <h3 class="service-title">Корпоративные поездки</h3>
+                            <p class="service-text">Поездки для сотрудников и гостей компании, отчётные документы и оплата по безналичному расчёту.</p>
+                            <a class="card-link" href="#">Подробнее
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        {{-- О нас / почему мы --}}
+        <section class="section section-alt" id="about-link">
+            <div class="container about-grid">
+                <div class="about-media">
+                    <img class="about-photo-main" src="{{ asset('assetsSite2/img/cta-men.webp') }}" alt="Водитель такси за рулём автомобиля" loading="lazy">
+                    <img class="about-photo-small" src="{{ asset('assetsSite2/img/about-2.webp') }}" alt="Салон автомобиля такси" loading="lazy">
+                    <div class="about-badge">
+                        <span class="about-badge-num">5+</span>
+                        <span class="about-badge-text">лет опыта работы</span>
+                    </div>
+                </div>
+
+                <div class="about-content">
+                    <p class="eyebrow">Почему мы</p>
+                    <h2 class="section-title">Больше, чем просто такси</h2>
+                    <p class="about-text">Мы - локальная служба такси, которая знает город и ценит ваше время. Собственное приложение, круглосуточная диспетчерская и водители, для которых безопасность и вежливость - не пустые слова. Быстро. Безопасно. По честной цене.</p>
+
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <span class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                            </span>
+                            <div>
+                                <h3 class="feature-title">Онлайн-отслеживание</h3>
+                                <p class="feature-text">Видите движение машины на карте в реальном времени.</p>
                             </div>
-                            <div id="form-messages" class="alert" role="alert"></div>
-                        </form> -->
-                        <!-- Booking Form -->
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.7 8.95a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.72a1.17 1.17 0 0 1 1.6 0C14.5 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                            </span>
+                            <div>
+                                <h3 class="feature-title">Проверенные водители</h3>
+                                <p class="feature-text">Опыт от 5 лет, проверка документов и состояния автомобиля.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"/></svg>
+                            </span>
+                            <div>
+                                <h3 class="feature-title">Чистые и ухоженные машины</h3>
+                                <p class="feature-text">Регулярная мойка и технический осмотр каждого автомобиля.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                            </span>
+                            <div>
+                                <h3 class="feature-title">Поддержка 24/7</h3>
+                                <p class="feature-text">Диспетчер на связи круглосуточно - по телефону и в приложении.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a class="btn btn-dark btn-lg" href="tel:7777">Позвонить: 7777</a>
+                </div>
+            </div>
+        </section>
+
+        {{-- Автопарк --}}
+        <section class="section" id="fleet">
+            <div class="container">
+                <div class="section-head">
+                    <p class="eyebrow">Автопарк</p>
+                    <h2 class="section-title">Современные и ухоженные автомобили</h2>
+                    <p class="section-lead">Наш таксопарк - современные автомобили, которые проходят осмотр перед каждой сменой. Выберите класс под свою поездку.</p>
+                </div>
+
+                <div class="fleet-grid">
+                    <article class="car-card">
+                        <div class="car-media">
+                            <img src="{{ asset('assetsSite2/img/car-1.webp') }}" alt="Автомобиль такси эконом-класса" loading="lazy">
+                            <span class="car-class">Эконом</span>
+                        </div>
+                        <div class="car-body">
+                            <h3 class="car-title">Для ежедневных поездок</h3>
+                            <ul class="spec-chips">
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    4 пассажира
+                                </li>
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"/><path d="m4.9 4.9 14.2 14.2"/><path d="M19.1 4.9 4.9 19.1"/></svg>
+                                    Кондиционер
+                                </li>
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                                    Места для багажа
+                                </li>
+                            </ul>
+                            <div class="car-foot">
+                                <span class="car-price">от 7 руб.</span>
+                                <a class="card-link" href="tel:7777">Заказать
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="car-card">
+                        <div class="car-media">
+                            <img src="{{ asset('assetsSite2/img/car-2.webp') }}" alt="Автомобиль такси комфорт-класса" loading="lazy">
+                            <span class="car-class">Комфорт</span>
+                        </div>
+                        <div class="car-body">
+                            <h3 class="car-title">Простор и тишина в салоне</h3>
+                            <ul class="spec-chips">
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    4 пассажира
+                                </li>
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"/><path d="m4.9 4.9 14.2 14.2"/><path d="M19.1 4.9 4.9 19.1"/></svg>
+                                    Кондиционер
+                                </li>
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                                    Места для багажа
+                                </li>
+                            </ul>
+                            <div class="car-foot">
+                                <span class="car-price">от 10 руб.</span>
+                                <a class="card-link" href="tel:7777">Заказать
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="car-card">
+                        <div class="car-media">
+                            <img src="{{ asset('assetsSite2/img/car-3.png') }}" alt="Автомобиль такси бизнес-класса" loading="lazy">
+                            <span class="car-class">Бизнес</span>
+                        </div>
+                        <div class="car-body">
+                            <h3 class="car-title">Для деловых поездок и встреч</h3>
+                            <ul class="spec-chips">
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    4 пассажира
+                                </li>
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20"/><path d="m4.9 4.9 14.2 14.2"/><path d="M19.1 4.9 4.9 19.1"/></svg>
+                                    Кондиционер
+                                </li>
+                                <li class="spec-chip">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                                    Места для багажа
+                                </li>
+                            </ul>
+                            <div class="car-foot">
+                                <span class="car-price">от 15 руб.</span>
+                                <a class="card-link" href="tel:7777">Заказать
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        {{-- Цифры --}}
+        <section class="stats-band">
+            <div class="container stats-grid">
+                <div class="stat">
+                    <span class="stat-num">10K+</span>
+                    <span class="stat-label">довольных клиентов</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">5K+</span>
+                    <span class="stat-label">выполненных поездок</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">4.9</span>
+                    <span class="stat-label">средняя оценка сервиса</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">24/7</span>
+                    <span class="stat-label">всегда на связи</span>
+                </div>
+            </div>
+        </section>
+
+        {{-- Как заказать --}}
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <p class="eyebrow">Как заказать</p>
+                    <h2 class="section-title">Четыре простых шага</h2>
+                    <p class="section-lead">От адреса до поездки - меньше минуты. Никаких очередей и ожидания на линии.</p>
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step">
+                        <span class="step-num">1</span>
+                        <h3 class="step-title">Укажите адрес</h3>
+                        <p class="step-text">Откуда и куда - в приложении или по телефону 7777.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">2</span>
+                        <h3 class="step-title">Выберите поездку</h3>
+                        <p class="step-text">Класс автомобиля и пожелания: детское кресло, багаж, встреча с табличкой.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">3</span>
+                        <h3 class="step-title">Подтвердите заказ</h3>
+                        <p class="step-text">Цена известна заранее и не меняется в пути.</p>
+                    </div>
+                    <div class="step">
+                        <span class="step-num">4</span>
+                        <h3 class="step-title">В путь</h3>
+                        <p class="step-text">Водитель уже едет - отслеживайте машину на карте.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section><!--/.booking-section-->
+        </section>
 
-    <!-- <section class="pricing-section bg-grey bd-bottom padding">
-        <div class="container">
-            <div class="section-heading text-center mb-40 wow fade-in-bottom" data-wow-delay="200ms">
-                <h4><span></span>Lets Go With Us!</h4>
-                <h2>Choose Your Taxi to Ride!</h2>
-                <p>We successfully cope with tasks of varying complexity, provide long-term <br>guarantees and regularly
-                    master new technologies.</p>
-            </div>
-            <ul class="nav pricing-tab-menu" id="pricing-tab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="hybrid-taxi" data-bs-toggle="tab"
-                        data-bs-target="#hybrid-taxi-content" type="button" role="tab"
-                        aria-controls="hybrid-taxi-content" aria-selected="true">Hybrid Taxi</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="town-taxt" data-bs-toggle="tab" data-bs-target="#town-taxi-content"
-                        type="button" role="tab" aria-controls="town-taxi-content" aria-selected="false">Town
-                        Taxi</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="limousine-taxi" data-bs-toggle="tab"
-                        data-bs-target="#limousine-taxi-content" type="button" role="tab"
-                        aria-controls="limousine-taxi-content" aria-selected="false">Limousine Taxi</button>
-                </li>
-            </ul>
-            <div class="tab-content" id="pricing-tab-content">
-                <div class="tab-pane fade show active" id="hybrid-taxi-content" role="tabpanel"
-                    aria-labelledby="hybrid-taxi-content">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$2.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">BMW X5 2008</a></h3>
-                                    <span class="location">Chicago</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$3.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">Mercedes‑Benz</a></h3>
-                                    <span class="location">Florida</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$4.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">Hyundai 2022</a></h3>
-                                    <span class="location">New York</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
+        {{-- Приложение --}}
+        <section class="section section-alt" id="app">
+            <div class="container app-grid">
+                <div class="app-content">
+                    <p class="eyebrow">Мобильное приложение</p>
+                    <h2 class="section-title">Заказ, отслеживание и поездка - всё в одном приложении</h2>
+                    <p class="about-text">СитиТакси теперь в вашем смартфоне. Заказывайте поездку в пару касаний и следите за машиной на карте - без звонков диспетчеру.</p>
+
+                    <ul class="app-features">
+                        <li class="app-feature">
+                            <span class="check-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            </span>
+                            Онлайн-отслеживание машины на карте
+                        </li>
+                        <li class="app-feature">
+                            <span class="check-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            </span>
+                            Заказ без звонков - в пару касаний
+                        </li>
+                        <li class="app-feature">
+                            <span class="check-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            </span>
+                            Пожелания к поездке: детское кресло, багаж, встреча с табличкой
+                        </li>
+                        <li class="app-feature">
+                            <span class="check-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                            </span>
+                            История поездок и чеки в одном месте
+                        </li>
+                    </ul>
+
+                    <div class="store-badges">
+                        <a class="store-badge" href="#" aria-label="Скачать в Google Play">
+                            <img src="{{ asset('assetsSite2/img/google-play.webp') }}" alt="Доступно в Google Play" loading="lazy">
+                        </a>
+                        <a class="store-badge" href="#" aria-label="Скачать в App Store">
+                            <img src="{{ asset('assetsSite2/img/app-store.webp') }}" alt="Доступно в App Store" loading="lazy">
+                        </a>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="town-taxi-content" role="tabpanel" aria-labelledby="town-taxi-content">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$2.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">BMW X5 2008</a></h3>
-                                    <span class="location">Chicago</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$3.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">Mercedes‑Benz</a></h3>
-                                    <span class="location">Florida</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$4.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">Hyundai 2022</a></h3>
-                                    <span class="location">New York</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="limousine-taxi-content" role="tabpanel" aria-labelledby="limousine-taxi">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$2.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">BMW X5 2008</a></h3>
-                                    <span class="location">Chicago</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$3.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">Mercedes‑Benz</a></h3>
-                                    <span class="location">Florida</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 sm-padding">
-                            <div class="pricing-item">
-                                <div class="pricing-head-wrap">
-                                    <div class="pricing-car">
-                                        <img src="{{asset('assetsSite2/img/pricing-car.png')}}" alt="car">
-                                        <div class="price">$4.50/km</div>
-                                    </div>
-                                </div>
-                                <div class="pricing-head">
-                                    <h3><a href="taxi-details.html">Hyundai 2022</a></h3>
-                                    <span class="location">New York</span>
-                                </div>
-                                <ul class="pricing-list">
-                                    <li>Initial Charge: <span>$2.50</span></li>
-                                    <li>Per Mile/KM: <span>$4.20</span></li>
-                                    <li>Per Stopped Trafic: <span>$1.50</span></li>
-                                    <li>Passengers: <span>4 Person</span></li>
-                                    <li><a href="book-taxi.html" class="default-btn">Book Taxi Now</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+
+                <div class="app-media">
+                    <div class="app-blob"></div>
+                    <img class="app-phone" src="{{ asset('assetsSite2/img/mockup.png') }}" alt="Приложение СитиТакси на экране смартфона" loading="lazy">
                 </div>
             </div>
-        </div>
-    </section> -->
-    <!--/.pricing-section-->
+        </section>
 
-    <section class="download-section bd-bottom padding" id="app">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="section-heading wow fade-in-left" data-wow-delay="200ms">
-                        <h4><span></span>Скачайте приложение</h4>
-                        <h2>Ок Такси — теперь в вашем смартфоне</h2>
-                        <p>Скачайте наше мобильное приложение и заказывайте такси в пару касаний. Удобный интерфейс, быстрая подача, история поездок и возможность выбрать электромобиль — всё для вашего комфорта.</p>
-                        <ul class="app-feature">
+        {{-- Тарифы --}}
+        <section class="section" id="tariffs">
+            <div class="container">
+                <div class="section-head">
+                    <p class="eyebrow">Тарифы</p>
+                    <h2 class="section-title">Прозрачные цены без сюрпризов</h2>
+                    <img class="tariffs-car" src="{{ asset('assetsSite2/img/pricing-car.png') }}" alt="Жёлтый автомобиль такси" loading="lazy">
+                    <p class="section-lead">Стоимость известна при заказе и не меняется в пути - ни из-за пробок, ни из-за погоды.</p>
+                </div>
+
+                <div class="pricing-grid">
+                    <article class="pricing-card">
+                        <h3 class="pricing-name">По городу</h3>
+                        <p class="pricing-price">7 <span class="pricing-unit">руб.</span></p>
+                        <p class="pricing-note">поездка по городу</p>
+                        <ul class="pricing-list">
                             <li>
-                                <i><img class="feature-icon" src="{{asset('assetsSite2/img/icon-navigator.svg')}}" alt="icon"></i>
-                                <h3>Онлайн-отслеживание<br/>машины</h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Подача за 3-5 минут
                             </li>
                             <li>
-                                <i><img class="feature-icon" src="{{asset('assetsSite2/img/icon-clock.png')}}" alt="icon"></i>
-                                <h3>Заказ<br/>без звонков</h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Цена фиксируется при заказе
                             </li>
                             <li>
-                                <i><img class="feature-icon" src="{{asset('assetsSite2/img/icon-docs.svg')}}" alt="icon"></i>
-                                <h3>Указание пожеланий<br/>к поездке</h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Оплата картой или наличными
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Работаем круглосуточно
                             </li>
                         </ul>
-                        <div class="download-btn">
-                            <a href="{{ asset('uploads/okTaksi.apk') }}" download><img src="{{asset('assetsSite2/img/google-play.webp')}}" height="50" alt="PlayStore"></a>
-                            <a href="https://apps.apple.com/by/app/%D0%BE%D0%BA-%D1%82%D0%B0%D0%BA%D1%81%D0%B8/id6748324111"><img src="{{asset('assetsSite2/img/app-store.webp')}}" height="50" alt="AppStore"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="taxi-holder">
-                        <!-- <div class="taxi wow fade-in-left" data-wow-delay="300ms"></div>
-                        <div class="mockup wow fade-in-bottom" data-wow-delay="400ms"></div>
-                        <div class="charecter wow fade-in-right" data-wow-delay="500ms"></div>
-                        <img class="location-marker" src="{{asset('assetsSite2/img/location-marker.png')}}" alt="location"> -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!--/.download-section-->
+                        <a class="btn btn-outline pricing-btn" href="tel:7777">Заказать</a>
+                    </article>
 
-    <!-- <section class="testimonial-section bg-grey">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="section-heading mb-10">
-                        <h4><span></span>Clients Testimonial</h4>
-                        <h2>Ridek Passenger Reviews...</h2>
-                        <p>We successfully cope with tasks of varying complexity, provide long-term guarantees and
-                            regularly master technologies.</p>
-                    </div>
-                    <div class="swiper-outside testi-pagination">
-                        <div class="testimonial-carousel">
-                            <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <div class="testi-item">
-                                        <div class="quote-icon"><i class="las la-quote-right"></i></div>
-                                        <p>Good to have transportation available in places and times it is otherwise
-                                            hard to find, but the app has always been a bit difficult to use especially
-                                            how it works or doesnt with large font phone settings.</p>
-                                        <div class="testi-author">
-                                            <div class="author-thumb"><img src="{{asset('assetsSite2/img/comment-1.png')}}" alt="author">
-                                            </div>
-                                            <div class="author-info">
-                                                <h3>Eredrik Johanson <span>Financial .INC</span></h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="testi-item">
-                                        <div class="quote-icon"><i class="las la-quote-right"></i></div>
-                                        <p>Good to have transportation available in places and times it is otherwise
-                                            hard to find, but the app has always been a bit difficult to use especially
-                                            how it works or doesnt with large font phone settings.</p>
-                                        <div class="testi-author">
-                                            <div class="author-thumb"><img src="{{asset('assetsSite2/img/comment-1.png')}}" alt="author">
-                                            </div>
-                                            <div class="author-info">
-                                                <h3>Eredrik Johanson <span>Financial .INC</span></h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="testi-item">
-                                        <div class="quote-icon"><i class="las la-quote-right"></i></div>
-                                        <p>Good to have transportation available in places and times it is otherwise
-                                            hard to find, but the app has always been a bit difficult to use especially
-                                            how it works or doesnt with large font phone settings.</p>
-                                        <div class="testi-author">
-                                            <div class="author-thumb"><img src="{{asset('assetsSite2/img/comment-1.png')}}" alt="author">
-                                            </div>
-                                            <div class="author-info">
-                                                <h3>Eredrik Johanson <span>Financial .INC</span></h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-pagination"></div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="feature-wrap">
-                        <div class="section-heading mb-30 wow fade-in-right" data-wow-delay="200ms">
-                            <h4 class="white"><span></span>Why Choose Us!</h4>
-                            <h2 class="white">Why Ride with Ridek?</h2>
-                            <p class="white">We successfully cope with tasks of varying complexity, provide long-term
-                                guarantees and regularly master technologies.</p>
-                        </div>
-                        <ul class="ridek-features">
-                            <li class="wow fade-in-right" data-wow-delay="300ms">
-                                <div class="feature-icon">
-                                    <i class="las la-gem"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h3>Safe Guarantee</h3>
-                                    <p>We successfully cope with tasks of <br> varying complexity!</p>
-                                </div>
+                    <article class="pricing-card pricing-card-featured">
+                        <span class="pricing-badge">Популярный</span>
+                        <h3 class="pricing-name">За городом</h3>
+                        <p class="pricing-price">1,50 <span class="pricing-unit">руб/км</span></p>
+                        <p class="pricing-note">междугородние поездки</p>
+                        <ul class="pricing-list">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Тариф за километр - без скрытых доплат
                             </li>
-                            <li class="wow fade-in-right" data-wow-delay="400ms">
-                                <div class="feature-icon">
-                                    <i class="las la-taxi"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h3>Fast Pickups</h3>
-                                    <p>We successfully cope with tasks of <br> varying complexity!</p>
-                                </div>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Поездки в соседние города и деревни
                             </li>
-                            <li class="wow fade-in-right" data-wow-delay="500ms">
-                                <div class="feature-icon">
-                                    <i class="las la-tachometer-alt"></i>
-                                </div>
-                                <div class="feature-content">
-                                    <h3>Quick Ride</h3>
-                                    <p>We successfully cope with tasks of <br> varying complexity!</p>
-                                </div>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Опытные водители на трассе
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Детское кресло по запросу
                             </li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> -->
-    <!--/.testimonial-section-->
+                        <a class="btn btn-brand pricing-btn" href="tel:7777">Заказать</a>
+                    </article>
 
-    <section class="cta-section padding">
-        <div class="cta-men wow fade-in-bottom" data-wow-delay="200ms"></div>
-        <div class="container">
-            <div class="cta-content">
-                <h2>КАРАОКЕ ПРЯМО В ТАКСИ!</h2>
-                <p>У нас можно даже петь!<br/>Заказываетенаше специальное такси с караоке-микрофономи пойте во время поездки.</p>
-                <div class="cta-call">
-                    <i class="las la-phone-volume"></i>
-                    <p><span>Закажите такси</span><a href="tel:7668">7668</a></p>
+                    <article class="pricing-card">
+                        <h3 class="pricing-name">Трансфер</h3>
+                        <p class="pricing-price">25 <span class="pricing-unit">руб.</span></p>
+                        <p class="pricing-note">фиксированная цена</p>
+                        <ul class="pricing-list">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Встреча с табличкой
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Отслеживание рейса
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Помощь с багажом
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                Цена не зависит от пробок
+                            </li>
+                        </ul>
+                        <a class="btn btn-outline pricing-btn" href="tel:7777">Заказать</a>
+                    </article>
                 </div>
             </div>
-        </div>
-    </section>
-    <!--/.cta-section-->
-<!-- 
-    <section class="blog-section bg-grey padding">
-        <div class="container">
-            <div class="section-heading text-center mb-40 wow fade-in-bottom" data-wow-delay="200ms">
-                <h4><span></span>Recent Posts!</h4>
-                <h2>News And Insights!</h2>
-                <p>We successfully cope with tasks of varying complexity, provide long-term <br>guarantees and regularly
-                    master new technologies.</p>
-            </div>
-            <div class="row grid-post">
-                <div class="col-lg-4 col-md-6 padding-15">
-                    <div class="post-card">
-                        <div class="post-thumb">
-                            <img src="{{asset('assetsSite2/img/post-1.jpg')}}" alt="post">
-                            <a href="blog-details.html" class="post-category">Business</a>
-                        </div>
-                        <div class="post-content-wrap">
-                            <ul class="post-meta">
-                                <li><i class="las la-calendar"></i>Jan 01 2022</li>
-                                <li><i class="las la-user"></i>Elliot Alderson</li>
-                            </ul>
-                            <div class="post-content">
-                                <h3>
-                                    <a href="blog-details.html" class="hover">How to start initiating an startup in few
-                                        days.</a>
-                                </h3>
-                                <p>Financial experts support or help you to to find out which way you can raise your
-                                    funds more...</p>
-                                <a href="blog-details.html" class="read-more">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 padding-15">
-                    <div class="post-card">
-                        <div class="post-thumb">
-                            <img src="{{asset('assetsSite2/img/post-2.jpg')}}" alt="post">
-                            <a href="blog-details.html" class="post-category">Startup</a>
-                        </div>
-                        <div class="post-content-wrap">
-                            <ul class="post-meta">
-                                <li><i class="las la-calendar"></i>Jan 01 2022</li>
-                                <li><i class="las la-user"></i>Elliot Alderson</li>
-                            </ul>
-                            <div class="post-content">
-                                <h3>
-                                    <a href="blog-details.html">Financial experts support help you to find out.</a>
-                                </h3>
-                                <p>Financial experts support or help you to to find out which way you can raise your
-                                    funds more...</p>
-                                <a href="blog-details.html" class="read-more">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 padding-15">
-                    <div class="post-card">
-                        <div class="post-thumb">
-                            <img src="{{asset('assetsSite2/img/post-3.jpg')}}" alt="post">
-                            <a href="blog-details.html" class="post-category">Finance</a>
-                        </div>
-                        <div class="post-content-wrap">
-                            <ul class="post-meta">
-                                <li><i class="las la-calendar"></i>Jan 01 2022</li>
-                                <li><i class="las la-user"></i>Elliot Alderson</li>
-                            </ul>
-                            <div class="post-content">
-                                <h3>
-                                    <a href="blog-details.html">Innovative business all over the world.</a>
-                                </h3>
-                                <p>Financial experts support or help you to to find out which way you can raise your
-                                    funds more...</p>
-                                <a href="blog-details.html" class="read-more">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> -->
-    <!--/.blog-section-->
+        </section>
 
-    <footer class="footer-section">
-        <div class="footer-top-wrap bg-grey">
+        {{-- Отзывы --}}
+        <section class="section section-alt">
             <div class="container">
-                <div class="footer-top">
-                    <div class="row align-items-end">
-                        <div class="col-lg-8">
-                            <div class="brand">
-                                <a class="footer-logo" href="index.html"><img src="{{asset('assetsSite2/img/logo_light.webp')}}" width="75" alt="logo"></a>
-                                <p>Ок Такси — это всегда удобно и по делу.<br/>Быстро. Безопасно. Ок!</p>
-                            </div>
+                <div class="section-head">
+                    <p class="eyebrow">Отзывы</p>
+                    <h2 class="section-title">Что говорят пассажиры</h2>
+                </div>
+
+                <div class="reviews-grid">
+                    <article class="review-card">
+                        <div class="review-stars" aria-label="Оценка 5 из 5">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="footer-call">
-                                <i class="las la-phone-volume"></i>
-                                <p><span>Закажите такси</span><a href="tel:7668">7668</a></p>
-                            </div>
+                        <p class="review-text">Заказываю почти каждый день на работу. Машина приезжает за пять минут, водители вежливые, в салоне чисто. Лучшее такси в городе.</p>
+                        <div class="review-author">
+                            <span class="review-avatar">АК</span>
+                            <span>
+                                <span class="review-name">Анна К.</span>
+                                <span class="review-role">постоянный клиент</span>
+                            </span>
                         </div>
-                    </div>
+                    </article>
+
+                    <article class="review-card">
+                        <div class="review-stars" aria-label="Оценка 5 из 5">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <p class="review-text">Заказывал трансфер в аэропорт ночью. Водитель приехал заранее, помог с чемоданами, а цена не изменилась ни на копейку.</p>
+                        <div class="review-author">
+                            <span class="review-avatar">ДВ</span>
+                            <span>
+                                <span class="review-name">Дмитрий В.</span>
+                                <span class="review-role">трансфер в аэропорт</span>
+                            </span>
+                        </div>
+                    </article>
+
+                    <article class="review-card">
+                        <div class="review-stars" aria-label="Оценка 5 из 5">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <p class="review-text">Удобное приложение: видно, где едет машина, и не нужно никуда звонить. Детское кресло поставили без лишних вопросов.</p>
+                        <div class="review-author">
+                            <span class="review-avatar">ОС</span>
+                            <span>
+                                <span class="review-name">Ольга С.</span>
+                                <span class="review-role">поездки с ребёнком</span>
+                            </span>
+                        </div>
+                    </article>
                 </div>
             </div>
+        </section>
+
+        {{-- Призыв к действию --}}
+        <section class="cta-band" style="background-image: url('{{ asset('assetsSite2/img/map.png') }}')">
+            <div class="container cta-inner">
+                <div class="cta-content">
+                    <h2 class="cta-title">Готовы к следующей поездке?</h2>
+                    <p class="cta-text">Позвоните по короткому номеру 7777 - или скачайте приложение и закажите поездку в пару касаний. Машина уже ждёт.</p>
+                    <a class="btn btn-brand btn-lg" href="tel:7777">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Позвонить: 7777
+                    </a>
+                </div>
+                <img class="cta-car" src="{{ asset('assetsSite2/img/taxi.png') }}" alt="Жёлтый автомобиль такси" loading="lazy">
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a class="logo" href="/" aria-label="СитиТакси - на главную">
+                    <span class="logo-pin">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </span>
+                    <span class="logo-text">Сити<span class="logo-accent">Такси</span></span>
+                </a>
+                <p class="footer-about">Надёжное такси в вашем городе: быстрая подача, честные тарифы и заказ в пару касаний - по телефону или в приложении.</p>
+                <div class="socials">
+                    <a class="social-link" href="#" aria-label="Telegram">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
+                    </a>
+                    <a class="social-link" href="#" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                    </a>
+                    <a class="social-link" href="#" aria-label="WhatsApp">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <nav class="footer-col" aria-label="Навигация в подвале">
+                <h3 class="footer-title">Навигация</h3>
+                <a class="footer-link" href="/">Главная</a>
+                <a class="footer-link" href="#about-link">О нас</a>
+                <a class="footer-link" href="#services">Услуги</a>
+                <a class="footer-link" href="#fleet">Автопарк</a>
+                <a class="footer-link" href="#tariffs">Тарифы</a>
+                <a class="footer-link" href="#app">Приложение</a>
+            </nav>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Услуги</h3>
+                <a class="footer-link" href="#services">Поездки по городу</a>
+                <a class="footer-link" href="#services">За город</a>
+                <a class="footer-link" href="#services">Трансфер в аэропорт</a>
+                <a class="footer-link" href="#services">Корпоративные поездки</a>
+            </div>
+
+            <div class="footer-col">
+                <h3 class="footer-title">Контакты</h3>
+                <a class="footer-contact" href="tel:7777">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    Короткий номер: 7777
+                </a>
+                <a class="footer-contact" href="mailto:zakaz@example.com">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                    zakaz@example.com
+                </a>
+                <p class="footer-contact">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Ваш город
+                </p>
+                <p class="footer-contact">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    Работаем круглосуточно
+                </p>
+            </div>
         </div>
-        <!--/.footer-top-wrap-->
-        <!-- <div class="footer-mid-wrap">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 sm-padding">
-                        <div class="footer-item">
-                            <div class="widget-title">
-                                <h3>ИНФО</h3>
-                            </div>
-                            <ul class="footer-contact">
-                                <li><span>Вторник - Friday:</span>9.00am To 8.00pm</li>
-                                <li><span>Saturday:</span>10.00am To 7.30pm</li>
-                                <li><span>Sunday:</span>Close Day!</li>
-                            </ul>
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-lg-3 col-md-6 sm-padding">
-                        <div class="footer-item footer-list">
-                            <div class="widget-title">
-                                <h3>Usefull Links</h3>
-                            </div>
-                            <ul class="footer-links">
-                                <li><a href="book-taxi.html">Taxi Booking</a></li>
-                                <li><a href="faqs.html">Help Center</a></li>
-                                <li><a href="about-us.html">Privacy and Policy</a></li>
-                                <li><a href="about-company.html">Terms of Use</a></li>
-                                <li><a href="contact.html">Contact Us</a></li>
-                            </ul>
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-lg-3 col-md-6 sm-padding">
-                        <div class="footer-item">
-                            <div class="widget-title">
-                                <h3>Контакты</h3>
-                            </div>
-                            <ul class="footer-contact">
-                                <li>Беларусь, Быхов</li>
-                                <li>ПН-ВС: круглосуточно</li>
-                            </ul>
-                        </div>
-                    </div> -->
-                    <!-- <div class="col-lg-3 col-md-6 sm-padding">
-                        <div class="footer-item subscribe-wrap">
-                            <div class="widget-title">
-                                <h3>Newsletter Signup</h3>
-                            </div>
-                            <form action="#" class="subscribe-form">
-                                <input class="form-control" type="email" name="email" placeholder="Your Email"
-                                    required="">
-                                <input type="hidden" name="action" value="mailchimpsubscribe">
-                                <button class="submit">Subscribe Now</button>
-                                <div class="clearfix"></div>
-                                <div id="subscribe-result">
-                                    <div class="subscription-success"></div>
-                                    <div class="subscription-error"></div>
-                                </div>
-                            </form>
-                        </div>
-                    </div> -->
-                <!-- </div>
-            </div>
-            <div class="running-taxi">
-                <div class="taxi"></div>
-                <div class="taxi-2"></div>
-                <div class="taxi-3"></div>
-            </div>
-        </div> -->
-        <!--/.footer-mid-wrap-->
-        <div class="copyright-wrap">
-            <div class="container">
-                <p>© <span id="currentYear"></span> ОК Такси. Все права защищены. Разработано в <a style="color: #ccc" href="https://mediakit.by/">Mediakit</a></p>
+
+        <div class="container footer-bottom">
+            <p class="footer-copy">© <span id="current-year">2026</span> СитиТакси. Все права защищены.</p>
+            <div class="footer-legal">
+                <a class="footer-link" href="/user-agreement">Пользовательское соглашение</a>
+                <a class="footer-link" href="/politika-konfidencialinosti">Политика конфиденциальности</a>
+                <a class="footer-link" href="/manual-action">Инструкция</a>
             </div>
         </div>
-        <!--/.copyright-wrap-->
     </footer>
-    <!--/.footer-section-->
 
-    <div id="scrollup">
-        <button id="scroll-top" class="scroll-to-top">
-            <i class="las la-arrow-up"></i>
-        </button>
-    </div>
-    <!--scrollup-->
+    <script>
+        // Мобильное меню и текущий год в подвале.
+        (function () {
+            var toggle = document.querySelector('.nav-toggle');
+            var header = document.querySelector('.site-header');
 
-    <div class="dl-cursor">
-        <div class="cursor-icon-holder"><i class="las la-times"></i></div>
-    </div>
-    <!--/.dl-cursor-->
+            if (toggle && header) {
+                toggle.addEventListener('click', function () {
+                    var isOpen = header.classList.toggle('nav-open');
+                    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
 
-    <!--jQuery Lib-->
-    <script src="{{asset('assetsSite2/js/vendor/jquary-3.6.0.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/jquery.ajaxchimp.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/bootstrap.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/popper.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/swiper.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/jquery.datetimepicker.full.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/jquery.nice-select.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/venobox.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/smooth-scroll.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/vendor/wow.min.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/book-ride.js')}}"></script>
-    <script src="{{asset('assetsSite2/js/main.js')}}"></script>
+                header.querySelectorAll('.nav-link').forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        header.classList.remove('nav-open');
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                });
+            }
+
+            var year = document.getElementById('current-year');
+            if (year) {
+                year.textContent = new Date().getFullYear();
+            }
+        })();
+    </script>
 </body>
 
 </html>
