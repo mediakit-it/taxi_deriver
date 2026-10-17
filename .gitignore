@@ -1,0 +1,44 @@
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Database dumps - never commit
+*.sql
+*.sql.gz
+*.sql.zip
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+
+# Dependencies - installed by command
+/vendor/
+/node_modules/
+
+# Laravel cache, logs, sessions
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*
+*.log
+
+# Archives and backups
+*.zip
+*.rar
+*.tar
+*.tar.gz
+*.bak
+*~
+
+# Editor and OS
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+
+# Test / build cache
+/.phpunit.cache/
