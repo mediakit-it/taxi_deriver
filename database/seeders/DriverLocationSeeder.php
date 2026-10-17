@@ -12,25 +12,20 @@ class DriverLocationSeeder extends Seeder
     /**
      * Геопозиции шести водителей: четверо свободных и двое занятых.
      *
-     * Занятые берутся из заказов в работе (in_progress, при отсутствии -
-     * назначенных): владелец позиции - именно водитель этого заказа.
-     * Позиция у водителя одна (user_id уникален).
+     * Занятые берутся из заказов в работе (сначала in_progress, потом
+     * назначенные): владелец позиции - именно водитель этого заказа.
+     * Позиция у водителя одна (user_id уникален), поэтому заказы для
+     * занятых позиций отбираются по одному на водителя.
      */
     public function run(): void
     {
-        $busyOrders = Order::where('status', Order::STATUS_IN_PROGRESS)
+        $busyOrders = Order::whereIn('status', [Order::STATUS_IN_PROGRESS, Order::STATUS_ASSIGNED])
             ->whereNotNull('driver_id')
+            ->orderByRaw("CASE WHEN status = 'in_progress' THEN 0 ELSE 1 END")
             ->orderBy('id')
-            ->take(2)
-            ->get();
-
-        if ($busyOrders->count() < 2) {
-            $busyOrders = Order::whereIn('status', [Order::STATUS_IN_PROGRESS, Order::STATUS_ASSIGNED])
-                ->whereNotNull('driver_id')
-                ->orderBy('id')
-                ->take(2)
-                ->get();
-        }
+            ->get()
+            ->unique('driver_id')
+            ->take(2);
 
         $busyDriverIds = [];
 
