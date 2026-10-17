@@ -1,0 +1,29 @@
+@media (min-width: 701px) {
+	.messendger-p-p {
+		display: none;
+	}
+	.mobile-meny {
+		display: none;
+	}
+	.btn-viber {
+		display: none;
+	}
+}
+
+
+
+@media (max-width: 700px) {
+	.messendger-a {
+		flex-direction: column;
+    	padding: 5px;
+	}
+	.messendger-p {
+		display: none;
+	}
+	.messendger-p-p {
+		font-size: 12px;
+		padding: 0;
+		margin: 0;
+	}
+	
+}
