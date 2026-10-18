@@ -1,1 +1,81 @@
-PD9waHAKCm5hbWVzcGFjZSBBcHBcTW9kZWxzOwoKLy8gdXNlIElsbHVtaW5hdGVcQ29udHJhY3RzXEF1dGhcTXVzdFZlcmlmeUVtYWlsOwp1c2UgSWxsdW1pbmF0ZVxEYXRhYmFzZVxFbG9xdWVudFxGYWN0b3JpZXNcSGFzRmFjdG9yeTsKdXNlIElsbHVtaW5hdGVcRm91bmRhdGlvblxBdXRoXFVzZXIgYXMgQXV0aGVudGljYXRhYmxlOwp1c2UgSWxsdW1pbmF0ZVxOb3RpZmljYXRpb25zXE5vdGlmaWFibGU7CnVzZSBUeW1vblxKV1RBdXRoXENvbnRyYWN0c1xKV1RTdWJqZWN0OwoKY2xhc3MgVXNlciBleHRlbmRzIEF1dGhlbnRpY2F0YWJsZSBpbXBsZW1lbnRzIEpXVFN1YmplY3QKewogICAgdXNlIEhhc0ZhY3RvcnksIE5vdGlmaWFibGU7CgogICAKICAgIC8vINCg0LXQsNC70LjQt9Cw0YbQuNGPINC80LXRgtC+0LTQvtCyINC40L3RgtC10YDRhNC10LnRgdCwIEpXVFN1YmplY3QKICAgIHB1YmxpYyBmdW5jdGlvbiBnZXRKV1RJZGVudGlmaWVyKCkKICAgIHsKICAgICAgICByZXR1cm4gJHRoaXMtPmdldEtleSgpOwogICAgfQoKICAgIHB1YmxpYyBmdW5jdGlvbiBnZXRKV1RDdXN0b21DbGFpbXMoKQogICAgewogICAgICAgIHJldHVybiBbXTsKICAgIH0KCiAgICBwdWJsaWMgZnVuY3Rpb24gbWVzc2FnZXMoKQogICAgewogICAgICAgIHJldHVybiAkdGhpcy0+aGFzTWFueShNZXNzYWdlOjpjbGFzcyk7CiAgICB9CgogICAgcHVibGljIGZ1bmN0aW9uIHVucmVhZE1lc3NhZ2VzQ291bnQoKQogICAgewogICAgICAgIHJldHVybiAkdGhpcy0+bWVzc2FnZXMoKQogICAgICAgICAgICAtPndoZXJlKCd0eXBlJywgJ3VzZXInKQogICAgICAgICAgICAtPndoZXJlKCdpc19hY3RpdmUnLCAwKQogICAgICAgICAgICAtPmNvdW50KCk7CiAgICB9CgogICAgLyoqCiAgICAgKiBUaGUgYXR0cmlidXRlcyB0aGF0IGFyZSBtYXNzIGFzc2lnbmFibGUuCiAgICAgKgogICAgICogQHZhciBhcnJheTxpbnQsIHN0cmluZz4KICAgICAqLwogICAgcHJvdGVjdGVkICRmaWxsYWJsZSA9IFsKICAgICAgICAnbGFzdF9uYW1lJywKICAgICAgICAnZmlyc3RfbmFtZScsCiAgICAgICAgJ2VtYWlsJywKICAgICAgICAncGhvbmUnLAogICAgICAgICdwYXNzd29yZCcsCiAgICAgICAgJ3JvbGUnLAogICAgXTsKCiAgICAvKioKICAgICAqIFRoZSBhdHRyaWJ1dGVzIHRoYXQgc2hvdWxkIGJlIGhpZGRlbiBmb3Igc2VyaWFsaXphdGlvbi4KICAgICAqCiAgICAgKiBAdmFyIGFycmF5PGludCwgc3RyaW5nPgogICAgICovCiAgICBwcm90ZWN0ZWQgJGhpZGRlbiA9IFsKICAgICAgICAncGFzc3dvcmQnLAogICAgICAgICdyZW1lbWJlcl90b2tlbicsCiAgICBdOwoKICAgIC8qKgogICAgICogVGhlIGF0dHJpYnV0ZXMgdGhhdCBzaG91bGQgYmUgY2FzdC4KICAgICAqCiAgICAgKiBAdmFyIGFycmF5PHN0cmluZywgc3RyaW5nPgogICAgICovCiAgICBwcm90ZWN0ZWQgJGNhc3RzID0gWwogICAgICAgICdwYXNzd29yZCcgPT4gJ2hhc2hlZCcsCiAgICBdOwoKICAgIHByb3RlY3RlZCAkd2l0aCA9IFsnY2FyJ107CgogICAgcHVibGljIGZ1bmN0aW9uIGNhcigpCiAgICB7CiAgICAgICAgcmV0dXJuICR0aGlzLT5oYXNPbmUoQ2FyOjpjbGFzcyk7CiAgICB9CgoKfQo=
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+class User extends Authenticatable implements JWTSubject
+{
+    use HasFactory, Notifiable;
+
+   
+    // Реализация методов интерфейса JWTSubject
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function unreadMessagesCount()
+    {
+        return $this->messages()
+            ->where('type', 'user')
+            ->where('is_active', 0)
+            ->count();
+    }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'last_name',
+        'first_name',
+        'email',
+        'phone',
+        'password',
+        'role',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
+    protected $with = ['car'];
+
+    public function car()
+    {
+        return $this->hasOne(Car::class);
+    }
+
+
+}
