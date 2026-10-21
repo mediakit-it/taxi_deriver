@@ -22,8 +22,8 @@ use App\Http\Controllers\api\AppSettingsController;
 Route::prefix('v1')->group(function () {
     Route::get('/app-settings', [AppSettingsController::class, 'index']);
     Route::get('/cost-of-trip', [CostOfTripController::class, 'index']);
-    Route::get('/cost-of-trip/{name}', [CostOfTripController::class, 'getByName']);
     Route::get('/cost-of-trip/simple', [CostOfTripController::class, 'getSimple']);
+    Route::get('/cost-of-trip/{name}', [CostOfTripController::class, 'getByName']);
 });
 
 
