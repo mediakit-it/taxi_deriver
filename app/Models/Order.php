@@ -47,6 +47,34 @@ class Order extends Model
         'status' => self::STATUS_PENDING,
     ];
 
+    // Подписи статусов для админки (те же, что в списках заказов)
+    const STATUS_LABELS = [
+        self::STATUS_PENDING => 'Ожидание',
+        self::STATUS_SEARCHING => 'Ищем водителя',
+        self::STATUS_SEARCHING_OTHER => 'Ищем другого водителя',
+        self::STATUS_ASSIGNED => 'Водитель в пути',
+        self::STATUS_ON_PLACE => 'Водитель на месте',
+        self::STATUS_IN_PROGRESS => 'В дороге',
+        self::STATUS_COMPLETED => 'Завершено',
+        self::STATUS_CANCELED => 'Отменено',
+    ];
+
+    /**
+     * Карта статус => подпись для всех статусов.
+     *
+     * @return array<string, string>
+     */
+    public static function statusLabels(): array
+    {
+        return self::STATUS_LABELS;
+    }
+
+    // Человекочитаемая подпись текущего статуса
+    public function getStatusLabelAttribute(): ?string
+    {
+        return self::STATUS_LABELS[$this->status] ?? $this->status;
+    }
+
     // Связи с другими моделями (предположим, что модель пользователя для водителей и клиентов)
     
     // Связь с клиентом (пользователь)
