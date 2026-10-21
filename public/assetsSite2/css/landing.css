@@ -210,6 +210,11 @@ p {
     color: var(--brand-color);
 }
 
+.logo-img {
+    height: 40px;
+    width: auto;
+}
+
 .main-nav {
     display: flex;
     align-items: center;
@@ -1011,6 +1016,16 @@ p {
     grid-template-columns: repeat(3, 1fr);
     gap: 26px;
     align-items: stretch;
+}
+
+/* Количество карточек из базы тарифов может отличаться от демо-трёх */
+.pricing-grid-count-1 {
+    grid-template-columns: minmax(0, 420px);
+    justify-content: center;
+}
+
+.pricing-grid-count-2 {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .pricing-card {

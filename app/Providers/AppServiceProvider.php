@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\View\Composers\LandingComposer;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
@@ -23,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
         Paginator::useBootstrapFour();
 
+        View::composer('site.html.index', LandingComposer::class);
     }
 }
