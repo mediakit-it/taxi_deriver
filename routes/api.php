@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\LogisticController;
 use App\Http\Controllers\api\CostOfTripController;
+use App\Http\Controllers\api\AppSettingsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,6 +20,7 @@ use App\Http\Controllers\api\CostOfTripController;
 
 
 Route::prefix('v1')->group(function () {
+    Route::get('/app-settings', [AppSettingsController::class, 'index']);
     Route::get('/cost-of-trip', [CostOfTripController::class, 'index']);
     Route::get('/cost-of-trip/{name}', [CostOfTripController::class, 'getByName']);
     Route::get('/cost-of-trip/simple', [CostOfTripController::class, 'getSimple']);
