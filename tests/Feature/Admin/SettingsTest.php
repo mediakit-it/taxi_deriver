@@ -29,14 +29,14 @@ class SettingsTest extends TestCase
 
     public function test_admin_can_open_settings_page(): void
     {
-        $response = $this->actingAs($this->admin())->get('/admin/settings');
+        $response = $this->actingAs($this->admin(), 'web')->get('/admin/settings');
 
         $response->assertOk();
     }
 
     public function test_admin_can_update_company_name(): void
     {
-        $response = $this->actingAs($this->admin())->put('/admin/settings', [
+        $response = $this->actingAs($this->admin(), 'web')->put('/admin/settings', [
             'company_name' => 'Такси Тест',
         ]);
 
@@ -54,7 +54,7 @@ class SettingsTest extends TestCase
 
         $file = UploadedFile::fake()->create('policy.pdf', 100, 'application/pdf');
 
-        $response = $this->actingAs($this->admin())->post('/admin/settings/documents', [
+        $response = $this->actingAs($this->admin(), 'web')->post('/admin/settings/documents', [
             'title' => 'Политика конфиденциальности',
             'file' => $file,
         ]);
@@ -73,7 +73,7 @@ class SettingsTest extends TestCase
     {
         Storage::fake('public');
 
-        $response = $this->actingAs($this->admin())->post('/admin/settings/steps', [
+        $response = $this->actingAs($this->admin(), 'web')->post('/admin/settings/steps', [
             'text' => 'Откройте настройки приложения',
             'sort_order' => 1,
         ]);
@@ -86,7 +86,7 @@ class SettingsTest extends TestCase
         $step = AppDeletionStep::first();
         $this->assertNotNull($step);
 
-        $response = $this->actingAs($this->admin())->delete('/admin/settings/steps/' . $step->id);
+        $response = $this->actingAs($this->admin(), 'web')->delete('/admin/settings/steps/' . $step->id);
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('app_deletion_steps', ['id' => $step->id]);
