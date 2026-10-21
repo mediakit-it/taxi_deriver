@@ -46,6 +46,7 @@
 										<th class="wd-20p border-bottom-0">Дистанция</th>
 										<th class="wd-20p border-bottom-0">Время</th>
 										<th class="wd-20p border-bottom-0">Цена</th>
+										<th class="wd-15p border-bottom-0">Класс</th>
 										<th class="wd-15p border-bottom-0">Действие</th>
 									</tr>
 								</thead>
@@ -97,6 +98,7 @@
 											<td>{{ $order->distance }}</td>
 											<td>{{ $order->duration }}</td>
 											<td>{{ $order->price }}</td>
+											<td>{{ $order->tariff ? ($order->tariffClass?->label ?? $order->tariff) : '' }}</td>
 											<td>
 												 <!-- раскоментить -->
 												@if(in_array($order->status, ['pending', 'searching', 'searching_other']))<a href="{{route('order.edit',['order'=>$order->id])}}" class="btn btn-warning"><i class="fa fa-pencil"></i></a>@endif

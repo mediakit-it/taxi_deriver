@@ -55,6 +55,7 @@
 										@endif
 										<p><strong>Адрес клиента:</strong> <span id="summary-from-address">{{$order->from_address}}</span></p>
 										<p><strong>Конечный адрес:</strong> <span id="summary-to-address">{{$order->to_address}}</span></p>
+										<p><strong>Класс обслуживания:</strong> <span id="summary-tariff">{{$order->tariffClass?->label ?? '—'}}</span></p>
 									</div>
 									<div class="col-sm-12 col-md-12 col-xl-6">
 										<div class="form-group">
@@ -68,6 +69,17 @@
 										</div>
 									</div>
 								</div>
+									<div class="col-sm-12 col-md-12 col-xl-6">
+										<div class="form-group">
+											<label class="form-label text-muted">Класс обслуживания:</label>
+											<select class="form-control form-select text-dark" name="tariff">
+												<option value="">-</option>
+												@foreach ($tariffs as $tariff)
+													<option value="{{ $tariff->name }}" @selected(old('tariff', $order->tariff) == $tariff->name)>{{ $tariff->label }}</option>
+												@endforeach
+											</select>
+										</div>
+									</div>
 								<div class="row p-5">
 									<div class="btn-list text-end">
 										<a class="btn btn-outline-danger" href="{{route('order.index')}}"> <i class="fe fe-x-circle"></i> Отмена</a>
