@@ -40,7 +40,8 @@ class CostOfTripController extends Controller
     // Получить цены в простом формате (key => value)
     public function getSimple()
     {
-        $prices = CostOfTrip::all()->pluck('price', 'name');
+        $prices = CostOfTrip::all()->pluck('price', 'name')
+            ->map(fn ($price) => $price === null ? null : CostOfTrip::formatPrice($price));
         
         return response()->json([
             'success' => true,
