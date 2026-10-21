@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Broadcast;
 
 use App\Http\Controllers\admin\DriverLocationController;
 use App\Http\Controllers\admin\CostOfTripController;
+use App\Http\Controllers\admin\SettingController;
+use App\Http\Controllers\admin\PolicyDocumentController;
+use App\Http\Controllers\admin\AppDeletionStepController;
 
 
 
@@ -80,6 +83,14 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/cost-of-trip', [CostOfTripController::class, 'edit'])->name('cost-of-trip.edit');
     Route::put('/cost-of-trip', [CostOfTripController::class, 'update'])->name('cost-of-trip.update');
+
+    Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::post('/settings/documents', [PolicyDocumentController::class, 'store'])->name('settings.documents.store');
+    Route::delete('/settings/documents/{document}', [PolicyDocumentController::class, 'destroy'])->name('settings.documents.destroy');
+    Route::post('/settings/steps', [AppDeletionStepController::class, 'store'])->name('settings.steps.store');
+    Route::put('/settings/steps/{step}', [AppDeletionStepController::class, 'update'])->name('settings.steps.update');
+    Route::delete('/settings/steps/{step}', [AppDeletionStepController::class, 'destroy'])->name('settings.steps.destroy');
 
     Route::resource('user', 'App\Http\Controllers\admin\UserController');
     Route::resource('car', 'App\Http\Controllers\admin\CarController');

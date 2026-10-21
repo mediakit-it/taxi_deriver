@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             OrderSeeder::class,
             MessageSeeder::class,
             DriverLocationSeeder::class,
+            SettingSeeder::class,
         ]);
     }
 }
