@@ -44,7 +44,7 @@
 										<th class="wd-20p border-bottom-0">Адрес нахождения клиента</th>
 										<th class="wd-20p border-bottom-0">Адрес куда клиента</th>
 										<th class="wd-20p border-bottom-0">Дистанция</th>
-										<th class="wd-20p border-bottom-0">Время</th>
+										<th class="wd-20p border-bottom-0">Время в пути</th>
 										<th class="wd-20p border-bottom-0">Цена</th>
 										<th class="wd-15p border-bottom-0">Действие</th>
 									</tr>
@@ -94,8 +94,8 @@
 											<td>{{ $order->driver ? $order->driver->first_name.' '.$order->driver->last_name : "Не назначен" }}</td>
 											<td>{{ $order->from_address }}</td>
 											<td>{{ $order->to_address }}</td>
-											<td>{{ $order->distance }}</td>
-											<td>{{ $order->duration }}</td>
+											<td>{{ $order->distance_km !== null ? number_format($order->distance_km, 2, ',', ' ') . ' км' : '—' }}</td>
+											<td>{{ $order->duration_min !== null ? $order->duration_min . ' мин' : '—' }}</td>
 											<td>{{ $order->price }}</td>
 											<td>
 												 <!-- раскоментить -->

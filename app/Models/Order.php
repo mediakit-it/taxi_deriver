@@ -88,4 +88,28 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'driver_id');
     }
+
+    // Дистанция поездки в километрах (в базе хранится в метрах)
+    public function getDistanceKmAttribute(): ?float
+    {
+        return $this->distance === null ? null : round($this->distance / 1000, 2);
+    }
+
+    // Длительность поездки в целых минутах (в базе хранится в секундах)
+    public function getDurationMinAttribute(): ?int
+    {
+        return $this->duration === null ? null : (int) round($this->duration / 60);
+    }
+
+    // Дистанция до клиента в километрах (в базе хранится в метрах)
+    public function getDistanceToClientKmAttribute(): ?float
+    {
+        return $this->distance_to_client === null ? null : round($this->distance_to_client / 1000, 2);
+    }
+
+    // Время до клиента в целых минутах (в базе хранится в секундах)
+    public function getTimeToClientMinAttribute(): ?int
+    {
+        return $this->time_to_client === null ? null : (int) round($this->time_to_client / 60);
+    }
 }
