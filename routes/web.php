@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\DriverLocationController;
 use App\Http\Controllers\admin\CostOfTripController;
 use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\DashboardController;
+use App\Http\Controllers\admin\DriverController;
 use App\Http\Controllers\admin\PolicyDocumentController;
 use App\Http\Controllers\admin\AppDeletionStepController;
 
@@ -78,6 +79,8 @@ Route::middleware(['auth:web'])->group(function () {
 
 Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.index');
 
     Route::get('/cost-of-trip', [CostOfTripController::class, 'edit'])->name('cost-of-trip.edit');
     Route::put('/cost-of-trip', [CostOfTripController::class, 'update'])->name('cost-of-trip.update');

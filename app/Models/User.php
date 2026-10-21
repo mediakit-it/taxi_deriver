@@ -77,5 +77,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Car::class);
     }
 
+    public function location()
+    {
+        return $this->hasOne(DriverLocation::class);
+    }
+
 
 }
