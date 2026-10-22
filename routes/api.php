@@ -8,6 +8,7 @@ use App\Http\Controllers\api\LogisticController;
 use App\Http\Controllers\api\CostOfTripController;
 use App\Http\Controllers\api\AppSettingsController;
 use App\Http\Controllers\api\ClientNotificationController;
+use App\Http\Controllers\api\GeocodeController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,6 +27,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/notifications', [ClientNotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [ClientNotificationController::class, 'unreadCount']);
         Route::post('/notifications/read', [ClientNotificationController::class, 'markRead']);
+        Route::get('/geocode', [GeocodeController::class, 'geocode']);
+        Route::get('/reverse-geocode', [GeocodeController::class, 'reverse']);
     });
     Route::get('/cost-of-trip', [CostOfTripController::class, 'index']);
     Route::get('/cost-of-trip/simple', [CostOfTripController::class, 'getSimple']);
