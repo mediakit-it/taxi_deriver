@@ -73,6 +73,17 @@
 											</select>
 										</div>
 									</div>
+									<div class="col-sm-12 col-md-12 col-xl-5">
+										<div class="form-group">
+											<label class="form-label text-muted">Класс обслуживания:</label>
+											<select class="form-control form-select text-dark" name="tariff">
+												<option value="" selected>-</option>
+												@foreach ($tariffs as $tariff)
+													<option value="{{ $tariff->name }}" @selected(old('tariff') == $tariff->name)>{{ $tariff->label }}</option>
+												@endforeach
+											</select>
+										</div>
+									</div>
 									<!-- Адрес клиента -->
 									<div class="col-sm-12 col-md-12 col-xl-6">
 										<div class="form-group">
