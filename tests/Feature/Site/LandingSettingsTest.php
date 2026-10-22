@@ -63,14 +63,14 @@ class LandingSettingsTest extends TestCase
     public function test_landing_renders_tariffs_from_database(): void
     {
         CostOfTrip::create(['name' => 'City', 'price' => '9']);
-        CostOfTrip::create(['name' => 'Outside_the_City', 'price' => '2,00']);
+        CostOfTrip::create(['name' => 'Outside_the_City', 'price' => '2.50']);
 
         $response = $this->get('/');
 
         $response->assertOk();
         $response->assertSee('По городу');
         $response->assertSee('За городом');
-        $response->assertSee('2,00');
+        $response->assertSee('2,50');
         // Демо-карточка «Трансфер» из запасного блока не показывается
         $response->assertDontSee('25 <span class="pricing-unit">руб.</span>', false);
     }

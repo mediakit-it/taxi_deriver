@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class Setting extends Model
 {
@@ -26,6 +27,10 @@ class Setting extends Model
     public static function allCached(): array
     {
         return Cache::rememberForever('settings.all', function () {
+            if (!Schema::hasTable('settings')) {
+                return [];
+            }
+
             return static::query()->pluck('value', 'key')->toArray();
         });
     }
