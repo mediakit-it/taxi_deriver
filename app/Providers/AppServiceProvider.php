@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Message;
+use App\Models\Order;
+use App\Observers\MessageObserver;
+use App\Observers\OrderObserver;
 use App\View\Composers\LandingComposer;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -26,5 +30,8 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFour();
 
         View::composer('site.html.index', LandingComposer::class);
+
+        Order::observe(OrderObserver::class);
+        Message::observe(MessageObserver::class);
     }
 }

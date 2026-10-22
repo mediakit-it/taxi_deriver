@@ -7,6 +7,7 @@ use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\LogisticController;
 use App\Http\Controllers\api\CostOfTripController;
 use App\Http\Controllers\api\AppSettingsController;
+use App\Http\Controllers\api\ClientNotificationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +22,11 @@ use App\Http\Controllers\api\AppSettingsController;
 
 Route::prefix('v1')->group(function () {
     Route::get('/app-settings', [AppSettingsController::class, 'index']);
+    Route::middleware('auth:api')->group(function () {
+        Route::get('/notifications', [ClientNotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [ClientNotificationController::class, 'unreadCount']);
+        Route::post('/notifications/read', [ClientNotificationController::class, 'markRead']);
+    });
     Route::get('/cost-of-trip', [CostOfTripController::class, 'index']);
     Route::get('/cost-of-trip/simple', [CostOfTripController::class, 'getSimple']);
     Route::get('/cost-of-trip/{name}', [CostOfTripController::class, 'getByName']);
