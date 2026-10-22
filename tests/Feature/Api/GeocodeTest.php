@@ -11,7 +11,7 @@ class GeocodeTest extends TestCase
 {
     use RefreshDatabase;
 
-    private array $headers;
+    private User $client;
 
     protected function setUp(): void
     {
@@ -19,8 +19,17 @@ class GeocodeTest extends TestCase
 
         config(['services.yandex.geocoder_key' => 'test-geocoder-key']);
 
-        $client = User::factory()->create(['role' => 'client']);
-        $this->headers = ['Authorization' => 'Bearer '.auth('api')->login($client)];
+        $this->client = User::factory()->create(['role' => 'client']);
+    }
+
+    /**
+     * Login is deliberately per test: logging in inside setUp leaves
+     * the api guard authenticated for the whole test, which would
+     * silently break the requires-auth test.
+     */
+    private function authHeaders(): array
+    {
+        return ['Authorization' => 'Bearer '.auth('api')->login($this->client)];
     }
 
     private function fakeYandex(): void
@@ -52,7 +61,7 @@ class GeocodeTest extends TestCase
     {
         $this->fakeYandex();
 
-        $this->getJson('/api/v1/geocode?address='.urlencode('Быхов, улица Ленина, 10'), $this->headers)
+        $this->getJson('/api/v1/geocode?address='.urlencode('Быхов, улица Ленина, 10'), $this->authHeaders())
             ->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.lat', 53.5203)
@@ -63,7 +72,7 @@ class GeocodeTest extends TestCase
     {
         $this->fakeYandex();
 
-        $this->getJson('/api/v1/reverse-geocode?lat=53.5203&lng=30.2371', $this->headers)
+        $this->getJson('/api/v1/reverse-geocode?lat=53.5203&lng=30.2371', $this->authHeaders())
             ->assertOk()
             ->assertJsonPath('data.address', 'Беларусь, Могилёвская область, Быхов, улица Ленина, 10');
     }
@@ -79,13 +88,13 @@ class GeocodeTest extends TestCase
         config(['services.yandex.geocoder_key' => null]);
         Http::fake();
 
-        $this->getJson('/api/v1/geocode?address=Быхов', $this->headers)
+        $this->getJson('/api/v1/geocode?address=Быхов', $this->authHeaders())
             ->assertStatus(503);
     }
 
     public function test_geocode_validates_input(): void
     {
-        $this->getJson('/api/v1/geocode', $this->headers)
+        $this->getJson('/api/v1/geocode', $this->authHeaders())
             ->assertUnprocessable()
             ->assertJsonValidationErrors('address');
     }
