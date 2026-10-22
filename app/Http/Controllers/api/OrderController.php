@@ -272,7 +272,7 @@ class OrderController extends Controller
 
         $this->logOrderActivity('NEW_ORDER_USER_START', [
             'toAddress' => $request->input('toAddress'),
-            'fromAddress' => $request->input('fromAddress')
+            'fromAddress' => $request->input('fromAddress'),
         ], $user);
 
         if (!$user) {
@@ -283,106 +283,42 @@ class OrderController extends Controller
         $toAddress = $request->input('toAddress');
 
         if (!$toAddress) {
-            $this->logOrderActivity('NEW_ORDER_USER_ADDRESS_MISSING', [
-                'reason' => 'toAddress not provided'
-            ], $user);
             return response()->json(['status' => false, 'message' => 'Поле toAddress не заполнено'], 400);
         }
 
-        // Запрос к Яндекс Геокодеру для получения координат
-        $this->logOrderActivity('NEW_ORDER_USER_YANDEX_REQUEST', [
-            'address' => $toAddress,
-            'action' => 'geocoding_to_address'
-        ], $user);
+        // The app sends real coordinates for both points; the server-side
+        // geocoder is only a fallback for older app versions.
+        $toLat = $request->input('toLat');
+        $toLng = $request->input('toLon');
 
-        $response = Http::get('https://geocode-maps.yandex.ru/1.x/', [
-            'apikey' => 'ad38720a-e8c9-443c-b454-1f4d2499ad78',
-            'format' => 'json',
-            'geocode' => $toAddress,
-            'lang' => 'ru_RU',
-            'results' => 1,
-        ]);
+        if (!is_numeric($toLat) || !is_numeric($toLng)) {
+            $point = $this->geocodePoint($toAddress);
 
-        if ($response->failed()) {
-            $this->logOrderActivity('NEW_ORDER_USER_YANDEX_ERROR', [
-                'address' => $toAddress,
-                'error' => 'Yandex API request failed'
-            ], $user);
-            return response()->json(['status' => false, 'message' => 'Ошибка при получении координат'], 500);
+            if ($point === null) {
+                return response()->json(['status' => false, 'message' => 'Координаты не найдены по адресу'], 404);
+            }
+
+            $toLat = $point['lat'];
+            $toLng = $point['lng'];
         }
-
-        $json = $response->json();
-        $featureMember = $json['response']['GeoObjectCollection']['featureMember'] ?? [];
-
-        if (count($featureMember) === 0) {
-            $this->logOrderActivity('NEW_ORDER_USER_COORDINATES_NOT_FOUND', [
-                'address' => $toAddress
-            ], $user);
-            return response()->json(['status' => false, 'message' => 'Координаты не найдены по адресу'], 404);
-        }
-
-        $pos = $featureMember[0]['GeoObject']['Point']['pos'] ?? null;
-
-        if (!$pos) {
-            $this->logOrderActivity('NEW_ORDER_USER_POSITION_MISSING', [
-                'address' => $toAddress
-            ], $user);
-            return response()->json(['status' => false, 'message' => 'Координаты отсутствуют в ответе'], 404);
-        }
-
-        [$longitude, $latitude] = explode(' ', $pos);
 
         $fromAddress = $request->input('fromAddress');
         $fromLat = $request->input('fromLat');
-        $fromLon = $request->input('fromLon');
-        
-        if($fromAddress=="Моё местоположение"){
-            $fromAddress = "От клиента";
-            $this->logOrderActivity('NEW_ORDER_USER_FROM_LOCATION', [
-                'user_location' => 'Клиентское местоположение'
-            ], $user);
-        } else {
-            $this->logOrderActivity('NEW_ORDER_USER_YANDEX_REQUEST', [
-                'address' => $fromAddress,
-                'action' => 'geocoding_from_address'
-            ], $user);
+        $fromLng = $request->input('fromLon');
 
-            $fromResponse = Http::get('https://geocode-maps.yandex.ru/1.x/', [
-                'apikey' => 'ad38720a-e8c9-443c-b454-1f4d2499ad78',
-                'format' => 'json',
-                'geocode' => $fromAddress,
-                'lang' => 'ru_RU',
-                'results' => 1,
-            ]);
-        
-            if ($fromResponse->failed()) {
-                $this->logOrderActivity('NEW_ORDER_USER_YANDEX_ERROR', [
-                    'address' => $fromAddress,
-                    'error' => 'Yandex API request failed for fromAddress'
-                ], $user);
-                return response()->json(['status' => false, 'message' => 'Ошибка при получении координат (fromAddress)'], 500);
-            }
-        
-            $fromJson = $fromResponse->json();
-            $fromFeatureMember = $fromJson['response']['GeoObjectCollection']['featureMember'] ?? [];
-        
-            if (count($fromFeatureMember) === 0) {
-                $this->logOrderActivity('NEW_ORDER_USER_COORDINATES_NOT_FOUND', [
-                    'address' => $fromAddress
-                ], $user);
+        if ($fromAddress === "Моё местоположение") {
+            $fromAddress = "От клиента";
+        }
+
+        if (!is_numeric($fromLat) || !is_numeric($fromLng)) {
+            $point = $this->geocodePoint((string) $fromAddress);
+
+            if ($point === null) {
                 return response()->json(['status' => false, 'message' => 'Координаты не найдены по адресу отправления'], 404);
             }
-        
-            $fromPos = $fromFeatureMember[0]['GeoObject']['Point']['pos'] ?? null;
-        
-            if (!$fromPos) {
-                $this->logOrderActivity('NEW_ORDER_USER_POSITION_MISSING', [
-                    'address' => $fromAddress
-                ], $user);
-                return response()->json(['status' => false, 'message' => 'Координаты отсутствуют в ответе (откуда)'], 404);
-            }
-        
-            [$fromLon, $fromLat] = explode(' ', $fromPos);
+
+            $fromLat = $point['lat'];
+            $fromLng = $point['lng'];
         }
 
         $order = Order::create([
@@ -391,15 +327,15 @@ class OrderController extends Controller
             'client_last_name' => $user->last_name,
             'client_phone' => $user->phone,
             'from_address' => $fromAddress,
-            'from_lat' => $fromLon,
-            'from_lng' => $fromLat,
+            'from_lat' => (float) $fromLat,
+            'from_lng' => (float) $fromLng,
             'to_address' => $toAddress,
-            'to_lat' => $longitude,
-            'to_lng' => $latitude,
+            'to_lat' => (float) $toLat,
+            'to_lng' => (float) $toLng,
             'distance_to_client' => 0,
             'time_to_client' => 0,
-            'distance' => 0,
-            'duration' => 0,
+            'distance' => max(0, (int) $request->input('distance', 0)),
+            'duration' => max(0, (int) $request->input('duration', 0)),
             'price' => null,
             'tariff' => $request->input('tariff'),
         ]);
@@ -407,28 +343,49 @@ class OrderController extends Controller
         $this->logOrderActivity('NEW_ORDER_USER_CREATED', [
             'order_id' => $order->id,
             'client_id' => $user->id,
-            'from_address' => $fromAddress,
-            'to_address' => $toAddress,
-            'from_coordinates' => "$fromLat, $fromLon",
-            'to_coordinates' => "$latitude, $longitude"
+            'from_coordinates' => "$fromLat, $fromLng",
+            'to_coordinates' => "$toLat, $toLng",
         ], $user);
 
-        \Log::info('Координаты по адресу: ' . $toAddress . ' — широта: ' . $latitude . ', долгота: ' . $longitude);
-
         event(new OrderCreated());
+        event(new OrderSentNewDriving('Поступил новый заказ'));
 
-        if($order){
-            event(new OrderSentNewDriving('Поступил новый заказ'));
-            $this->logOrderActivity('NEW_ORDER_USER_SUCCESS', [
-                'order_id' => $order->id
-            ], $user);
-            return response()->json(['status' => true]);
-        } else {
-            $this->logOrderActivity('NEW_ORDER_USER_CREATION_FAILED', [
-                'user_id' => $user->id
-            ], $user);
-            return response()->json(['status' => false]);
+        return response()->json(['status' => true]);
+    }
+
+    /**
+     * Geocode an address via Yandex; returns ['lat' => ..., 'lng' => ...]
+     * or null when the key is missing or nothing was found.
+     */
+    private function geocodePoint(string $address): ?array
+    {
+        $key = config('services.yandex.geocoder_key');
+
+        if (!$key || $address === '') {
+            return null;
         }
+
+        $response = Http::get('https://geocode-maps.yandex.ru/1.x/', [
+            'apikey' => $key,
+            'format' => 'json',
+            'geocode' => $address,
+            'lang' => 'ru_RU',
+            'results' => 1,
+        ]);
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        $pos = $response->json('response.GeoObjectCollection.featureMember.0.GeoObject.Point.pos');
+
+        if (!$pos) {
+            return null;
+        }
+
+        [$lng, $lat] = explode(' ', $pos);
+
+        return ['lat' => (float) $lat, 'lng' => (float) $lng];
     }
 
     public function closeOrderUser(Request $request)
