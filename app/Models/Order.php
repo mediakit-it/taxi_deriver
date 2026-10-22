@@ -47,6 +47,34 @@ class Order extends Model
         'status' => self::STATUS_PENDING,
     ];
 
+    // Подписи статусов для админки (те же, что в списках заказов)
+    const STATUS_LABELS = [
+        self::STATUS_PENDING => 'Ожидание',
+        self::STATUS_SEARCHING => 'Ищем водителя',
+        self::STATUS_SEARCHING_OTHER => 'Ищем другого водителя',
+        self::STATUS_ASSIGNED => 'Водитель в пути',
+        self::STATUS_ON_PLACE => 'Водитель на месте',
+        self::STATUS_IN_PROGRESS => 'В дороге',
+        self::STATUS_COMPLETED => 'Завершено',
+        self::STATUS_CANCELED => 'Отменено',
+    ];
+
+    /**
+     * Карта статус => подпись для всех статусов.
+     *
+     * @return array<string, string>
+     */
+    public static function statusLabels(): array
+    {
+        return self::STATUS_LABELS;
+    }
+
+    // Человекочитаемая подпись текущего статуса
+    public function getStatusLabelAttribute(): ?string
+    {
+        return self::STATUS_LABELS[$this->status] ?? $this->status;
+    }
+
     // Связи с другими моделями (предположим, что модель пользователя для водителей и клиентов)
     
     // Связь с клиентом (пользователь)
@@ -59,5 +87,29 @@ class Order extends Model
     public function driver()
     {
         return $this->belongsTo(User::class, 'driver_id');
+    }
+
+    // Дистанция поездки в километрах (в базе хранится в метрах)
+    public function getDistanceKmAttribute(): ?float
+    {
+        return $this->distance === null ? null : round($this->distance / 1000, 2);
+    }
+
+    // Длительность поездки в целых минутах (в базе хранится в секундах)
+    public function getDurationMinAttribute(): ?int
+    {
+        return $this->duration === null ? null : (int) round($this->duration / 60);
+    }
+
+    // Дистанция до клиента в километрах (в базе хранится в метрах)
+    public function getDistanceToClientKmAttribute(): ?float
+    {
+        return $this->distance_to_client === null ? null : round($this->distance_to_client / 1000, 2);
+    }
+
+    // Время до клиента в целых минутах (в базе хранится в секундах)
+    public function getTimeToClientMinAttribute(): ?int
+    {
+        return $this->time_to_client === null ? null : (int) round($this->time_to_client / 60);
     }
 }
