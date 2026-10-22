@@ -21,18 +21,22 @@ class CostOfTripController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'price_city' => 'required|string|max:255',
-            'price_outside' => 'required|string|max:255',
+            'price_city' => 'required|numeric|min:0',
+            'price_outside' => 'required|numeric|min:0',
+            'display_name_city' => 'nullable|string|max:255',
+            'display_name_outside' => 'nullable|string|max:255',
         ]);
 
         // Обновляем City
         CostOfTrip::where('name', 'City')->update([
-            'price' => $request->price_city
+            'price' => $request->price_city,
+            'display_name' => $request->display_name_city,
         ]);
 
         // Обновляем Outside_the_City
         CostOfTrip::where('name', 'Outside_the_City')->update([
-            'price' => $request->price_outside
+            'price' => $request->price_outside,
+            'display_name' => $request->display_name_outside,
         ]);
 
         return redirect()->route('cost-of-trip.edit')

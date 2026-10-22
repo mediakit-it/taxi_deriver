@@ -18,8 +18,9 @@ class CostOfTripFactory extends Factory
     {
         return [
             'name' => fake()->randomElement(['City', 'Outside_the_City']),
-            // Цена в таблице хранится строкой - как на проде.
-            'price' => (string) fake()->numberBetween(2, 15),
+            'display_name' => null,
+            // Цена - decimal, как на проде после конвертации.
+            'price' => fake()->randomFloat(2, 2, 15),
         ];
     }
 }
