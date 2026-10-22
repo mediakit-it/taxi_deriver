@@ -29,6 +29,7 @@ class Order extends Model
         'price',
         'comment',
         'status',
+        'tariff',
     ];
 
     // Статусы
@@ -111,5 +112,12 @@ class Order extends Model
     public function getTimeToClientMinAttribute(): ?int
     {
         return $this->time_to_client === null ? null : (int) round($this->time_to_client / 60);
+    }
+
+    // Класс обслуживания заказа (тариф): orders.tariff хранит машинное
+    // имя класса из cost_of_trip.name
+    public function tariffClass()
+    {
+        return $this->belongsTo(CostOfTrip::class, 'tariff', 'name');
     }
 }

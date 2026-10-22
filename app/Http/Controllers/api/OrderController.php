@@ -401,6 +401,7 @@ class OrderController extends Controller
             'distance' => 0,
             'duration' => 0,
             'price' => null,
+            'tariff' => $request->input('tariff'),
         ]);
 
         $this->logOrderActivity('NEW_ORDER_USER_CREATED', [

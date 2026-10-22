@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Car;
+use App\Models\CostOfTrip;
 use App\Models\User;
 use App\Models\Order;
 use App\Events\OrderSent;
@@ -17,15 +18,15 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::orderBy('id','desc')->paginate(30);
+        $orders = Order::with('tariffClass')->orderBy('id','desc')->paginate(30);
 
         return view('admin.order.index',compact('orders'));
     }
 
     public function indexAjax()
     {
-        $orders = Order::orderBy('id','desc')->paginate(30);
-    
+        $orders = Order::with('tariffClass')->orderBy('id','desc')->paginate(30);
+
         return view('admin.order.table', compact('orders'));
     }
     
@@ -36,7 +37,8 @@ class OrderController extends Controller
     public function create()
     {
         $users = User::where('role','driving')->get();
-        return view('admin.order.add',compact('users'));
+        $tariffs = CostOfTrip::all();
+        return view('admin.order.add',compact('users','tariffs'));
         // return view('admin.order.add');
     }
 
@@ -101,9 +103,10 @@ class OrderController extends Controller
     public function edit(string $id)
     {
         $users = User::where('role','driving')->get();
+        $tariffs = CostOfTrip::all();
         $order = Order::find($id);
 
-        return view('admin.order.edit',compact('users','order'));
+        return view('admin.order.edit',compact('users','order','tariffs'));
     }
 
     /**
