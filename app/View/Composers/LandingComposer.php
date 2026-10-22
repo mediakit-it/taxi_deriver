@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use App\Models\CostOfTrip;
+use Illuminate\Support\Facades\Schema;
 use App\Models\PolicyDocument;
 use App\Models\Setting;
 use Illuminate\View\View;
@@ -106,7 +107,7 @@ class LandingComposer
         ]);
 
         $view->with('tariffCards', $this->tariffCards($currency));
-        $view->with('policyDocuments', PolicyDocument::ordered()->get());
+        $view->with('policyDocuments', Schema::hasTable('policy_documents') ? PolicyDocument::ordered()->get() : collect());
     }
 
     /**
@@ -117,6 +118,10 @@ class LandingComposer
      */
     private function tariffCards(string $currency): array
     {
+        if (!Schema::hasTable('cost_of_trip')) {
+            return [];
+        }
+
         $cards = [];
 
         foreach (CostOfTrip::query()->orderBy('id')->get() as $tariff) {
@@ -130,7 +135,7 @@ class LandingComposer
 
             $cards[] = [
                 'title' => $presentation['title'],
-                'price' => $tariff->price,
+                'price' => $tariff->price === null ? '' : CostOfTrip::formatPrice($tariff->price),
                 'unit' => $presentation['per_km'] ? $currency . '/км' : $currency,
                 'note' => $presentation['note'],
                 'featured' => $presentation['featured'],
