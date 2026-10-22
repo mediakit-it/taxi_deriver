@@ -145,7 +145,7 @@
 						<p><strong>Конечный адрес:</strong> <span id="summary-to-address">---</span></p>
 						<p><strong>Водитель:</strong> <span id="summary-driver-name">---</span></p>
 						<p><strong>Цена:</strong> <span id="summary-price">---</span></p>
-						<p><strong>Дистанция:</strong> <span id="summary-distance">---</span> метров</p>
+						<p><strong>Дистанция:</strong> <span id="summary-distance">---</span> км</p>
 						<p><strong>Время в пути:</strong> <span id="summary-duration">---</span></p>
 					</div>
 					<div class="col-md-6">
@@ -253,7 +253,7 @@ $(document).ready(function () {
                     $('#duration').val(hours * 60 + minutes); // Время в пути в минутах
 
                     // Обновляем информацию о заказе
-                    $('#summary-distance').text(km); // Расстояние
+                    $('#summary-distance').text((distance / 1000).toFixed(2).replace('.', ',')); // Расстояние в километрах
                     $('#summary-duration').text(`${hours} ч ${minutes} мин`); // Время в пути
 
 					drawRouteOnMap(coordsFrom, coordsTo);
