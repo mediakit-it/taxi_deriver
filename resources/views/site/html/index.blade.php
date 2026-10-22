@@ -4,24 +4,48 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="СитиТакси - заказ такси в вашем городе по короткому номеру 7777. Поездки по городу и за город, трансферы, корпоративные поездки. Заказ по телефону и в приложении.">
-    <title>СитиТакси - заказ такси в вашем городе</title>
+    <meta name="description" content="{{ $landing['seo_description'] }}">
+    <title>{{ $landing['seo_title'] }}</title>
+    <meta property="og:title" content="{{ $landing['seo_title'] }}">
+    <meta property="og:description" content="{{ $landing['seo_description'] }}">
+    @if($landing['seo_og_url'])
+    <meta property="og:image" content="{{ $landing['seo_og_url'] }}">
+    @endif
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assetsSite2/img/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $landing['favicon_url'] }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assetsSite2/css/landing.css') }}">
+    @if($landing['color_primary'] || $landing['color_accent'])
+    <style>
+        /* Фирменные цвета из настроек коробки */
+        :root {
+            @if($landing['color_primary'])
+            --brand-color: {{ $landing['color_primary'] }};
+            --brand-color-dark: color-mix(in srgb, {{ $landing['color_primary'] }} 78%, #000000);
+            --brand-soft: color-mix(in srgb, {{ $landing['color_primary'] }} 15%, #ffffff);
+            @endif
+            @if($landing['color_accent'])
+            --brand-color-dark: {{ $landing['color_accent'] }};
+            @endif
+        }
+    </style>
+    @endif
 </head>
 
 <body>
     <header class="site-header" id="top">
         <div class="container header-inner">
-            <a class="logo" href="/" aria-label="СитиТакси - на главную">
-                <span class="logo-pin">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                </span>
-                <span class="logo-text">Сити<span class="logo-accent">Такси</span></span>
+            <a class="logo" href="/" aria-label="{{ $landing['company_name'] }} - на главную">
+                @if($landing['logo_url'])
+                    <img class="logo-img" src="{{ $landing['logo_url'] }}" alt="{{ $landing['company_name'] }}">
+                @else
+                    <span class="logo-pin">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </span>
+                    <span class="logo-text">{{ $landing['company_name'] }}</span>
+                @endif
             </a>
 
             <nav class="main-nav" id="main-nav" aria-label="Основная навигация">
@@ -34,9 +58,9 @@
             </nav>
 
             <div class="header-actions">
-                <a class="btn btn-brand btn-call" href="tel:7777">
+                <a class="btn btn-brand btn-call" href="tel:{{ $landing['call_phone_href'] }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    7777
+                    {{ $landing['call_phone'] }}
                 </a>
                 <button class="nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="main-nav">
                     <span></span><span></span><span></span>
@@ -52,9 +76,9 @@
                 <div class="hero-content">
                     <p class="eyebrow eyebrow-light">Безопасные поездки - лучшие маршруты</p>
                     <h1 class="hero-title">Ваше надёжное <span class="text-accent">такси</span></h1>
-                    <p class="hero-lead">Поездки по городу и за его пределами - быстро, комфортно и по честной цене. Закажите по короткому номеру 7777 или в приложении: машина подаётся за 3-5 минут.</p>
+                    <p class="hero-lead">Поездки по городу и за его пределами - быстро, комфортно и по честной цене. Закажите по номеру {{ $landing['call_phone'] }} или в приложении: машина подаётся за 3-5 минут.</p>
                     <div class="hero-actions">
-                        <a class="btn btn-brand btn-lg" href="tel:7777">Заказать такси</a>
+                        <a class="btn btn-brand btn-lg" href="tel:{{ $landing['call_phone_href'] }}">Заказать такси</a>
                         <a class="btn btn-ghost btn-lg" href="#app">Скачать приложение</a>
                     </div>
                     <ul class="trust-chips">
@@ -91,9 +115,9 @@
                     <span class="booking-label">Дата и время</span>
                     <input type="text" name="when" placeholder="Сегодня, сейчас">
                 </label>
-                <a class="btn btn-brand booking-btn" href="tel:7777">Заказать</a>
+                <a class="btn btn-brand booking-btn" href="tel:{{ $landing['call_phone_href'] }}">Заказать</a>
             </form>
-            <p class="booking-caption">Или просто позвоните: <a href="tel:7777">7777</a> - диспетчер на связи круглосуточно</p>
+            <p class="booking-caption">Или просто позвоните: <a href="tel:{{ $landing['call_phone_href'] }}">{{ $landing['call_phone'] }}</a> - диспетчер на связи круглосуточно</p>
         </div>
 
         {{-- Услуги --}}
@@ -217,7 +241,7 @@
                         </div>
                     </div>
 
-                    <a class="btn btn-dark btn-lg" href="tel:7777">Позвонить: 7777</a>
+                    <a class="btn btn-dark btn-lg" href="tel:{{ $landing['call_phone_href'] }}">Позвонить: {{ $landing['call_phone'] }}</a>
                 </div>
             </div>
         </section>
@@ -255,7 +279,7 @@
                             </ul>
                             <div class="car-foot">
                                 <span class="car-price">от 7 руб.</span>
-                                <a class="card-link" href="tel:7777">Заказать
+                                <a class="card-link" href="tel:{{ $landing['call_phone_href'] }}">Заказать
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
                                 </a>
                             </div>
@@ -285,7 +309,7 @@
                             </ul>
                             <div class="car-foot">
                                 <span class="car-price">от 10 руб.</span>
-                                <a class="card-link" href="tel:7777">Заказать
+                                <a class="card-link" href="tel:{{ $landing['call_phone_href'] }}">Заказать
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
                                 </a>
                             </div>
@@ -315,7 +339,7 @@
                             </ul>
                             <div class="car-foot">
                                 <span class="car-price">от 15 руб.</span>
-                                <a class="card-link" href="tel:7777">Заказать
+                                <a class="card-link" href="tel:{{ $landing['call_phone_href'] }}">Заказать
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
                                 </a>
                             </div>
@@ -360,7 +384,7 @@
                     <div class="step">
                         <span class="step-num">1</span>
                         <h3 class="step-title">Укажите адрес</h3>
-                        <p class="step-text">Откуда и куда - в приложении или по телефону 7777.</p>
+                        <p class="step-text">Откуда и куда - в приложении или по телефону {{ $landing['call_phone'] }}.</p>
                     </div>
                     <div class="step">
                         <span class="step-num">2</span>
@@ -387,7 +411,7 @@
                 <div class="app-content">
                     <p class="eyebrow">Мобильное приложение</p>
                     <h2 class="section-title">Заказ, отслеживание и поездка - всё в одном приложении</h2>
-                    <p class="about-text">СитиТакси теперь в вашем смартфоне. Заказывайте поездку в пару касаний и следите за машиной на карте - без звонков диспетчеру.</p>
+                    <p class="about-text">{{ $landing['company_name'] }} теперь в вашем смартфоне. Заказывайте поездку в пару касаний и следите за машиной на карте - без звонков диспетчеру.</p>
 
                     <ul class="app-features">
                         <li class="app-feature">
@@ -428,7 +452,7 @@
 
                 <div class="app-media">
                     <div class="app-blob"></div>
-                    <img class="app-phone" src="{{ asset('assetsSite2/img/mockup.png') }}" alt="Приложение СитиТакси на экране смартфона" loading="lazy">
+                    <img class="app-phone" src="{{ asset('assetsSite2/img/mockup.png') }}" alt="Приложение {{ $landing['company_name'] }} на экране смартфона" loading="lazy">
                 </div>
             </div>
         </section>
@@ -443,7 +467,30 @@
                     <p class="section-lead">Стоимость известна при заказе и не меняется в пути - ни из-за пробок, ни из-за погоды.</p>
                 </div>
 
-                <div class="pricing-grid">
+                <div class="pricing-grid{{ count($tariffCards) === 1 ? ' pricing-grid-count-1' : (count($tariffCards) === 2 ? ' pricing-grid-count-2' : '') }}">
+                    @forelse($tariffCards as $card)
+                        <article class="pricing-card{{ $card['featured'] ? ' pricing-card-featured' : '' }}">
+                            @if($card['featured'])
+                                <span class="pricing-badge">Популярный</span>
+                            @endif
+                            <h3 class="pricing-name">{{ $card['title'] }}</h3>
+                            <p class="pricing-price">{{ $card['price'] }} <span class="pricing-unit">{{ $card['unit'] }}</span></p>
+                            @if($card['note'])
+                                <p class="pricing-note">{{ $card['note'] }}</p>
+                            @endif
+                            @if($card['features'])
+                                <ul class="pricing-list">
+                                    @foreach($card['features'] as $feature)
+                                        <li>
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                            {{ $feature }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                            <a class="btn {{ $card['featured'] ? 'btn-brand' : 'btn-outline' }} pricing-btn" href="tel:{{ $landing['call_phone_href'] }}">Заказать</a>
+                        </article>
+                    @empty
                     <article class="pricing-card">
                         <h3 class="pricing-name">По городу</h3>
                         <p class="pricing-price">7 <span class="pricing-unit">руб.</span></p>
@@ -466,7 +513,7 @@
                                 Работаем круглосуточно
                             </li>
                         </ul>
-                        <a class="btn btn-outline pricing-btn" href="tel:7777">Заказать</a>
+                        <a class="btn btn-outline pricing-btn" href="tel:{{ $landing['call_phone_href'] }}">Заказать</a>
                     </article>
 
                     <article class="pricing-card pricing-card-featured">
@@ -492,7 +539,7 @@
                                 Детское кресло по запросу
                             </li>
                         </ul>
-                        <a class="btn btn-brand pricing-btn" href="tel:7777">Заказать</a>
+                        <a class="btn btn-brand pricing-btn" href="tel:{{ $landing['call_phone_href'] }}">Заказать</a>
                     </article>
 
                     <article class="pricing-card">
@@ -517,8 +564,9 @@
                                 Цена не зависит от пробок
                             </li>
                         </ul>
-                        <a class="btn btn-outline pricing-btn" href="tel:7777">Заказать</a>
+                        <a class="btn btn-outline pricing-btn" href="tel:{{ $landing['call_phone_href'] }}">Заказать</a>
                     </article>
+                    @endforelse
                 </div>
             </div>
         </section>
@@ -594,10 +642,10 @@
             <div class="container cta-inner">
                 <div class="cta-content">
                     <h2 class="cta-title">Готовы к следующей поездке?</h2>
-                    <p class="cta-text">Позвоните по короткому номеру 7777 - или скачайте приложение и закажите поездку в пару касаний. Машина уже ждёт.</p>
-                    <a class="btn btn-brand btn-lg" href="tel:7777">
+                    <p class="cta-text">Позвоните по номеру {{ $landing['call_phone'] }} - или скачайте приложение и закажите поездку в пару касаний. Машина уже ждёт.</p>
+                    <a class="btn btn-brand btn-lg" href="tel:{{ $landing['call_phone_href'] }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        Позвонить: 7777
+                        Позвонить: {{ $landing['call_phone'] }}
                     </a>
                 </div>
                 <img class="cta-car" src="{{ asset('assetsSite2/img/taxi.png') }}" alt="Жёлтый автомобиль такси" loading="lazy">
@@ -608,21 +656,25 @@
     <footer class="site-footer">
         <div class="container footer-grid">
             <div class="footer-brand">
-                <a class="logo" href="/" aria-label="СитиТакси - на главную">
-                    <span class="logo-pin">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                    </span>
-                    <span class="logo-text">Сити<span class="logo-accent">Такси</span></span>
+                <a class="logo" href="/" aria-label="{{ $landing['company_name'] }} - на главную">
+                    @if($landing['logo_url'])
+                        <img class="logo-img" src="{{ $landing['logo_url'] }}" alt="{{ $landing['company_name'] }}">
+                    @else
+                        <span class="logo-pin">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        </span>
+                        <span class="logo-text">{{ $landing['company_name'] }}</span>
+                    @endif
                 </a>
                 <p class="footer-about">Надёжное такси в вашем городе: быстрая подача, честные тарифы и заказ в пару касаний - по телефону или в приложении.</p>
                 <div class="socials">
-                    <a class="social-link" href="#" aria-label="Telegram">
+                    <a class="social-link" href="{{ $landing['socials']['telegram'] ?? '#' }}" aria-label="Telegram">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
                     </a>
-                    <a class="social-link" href="#" aria-label="Instagram">
+                    <a class="social-link" href="{{ $landing['socials']['instagram'] ?? '#' }}" aria-label="Instagram">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                     </a>
-                    <a class="social-link" href="#" aria-label="WhatsApp">
+                    <a class="social-link" href="{{ $landing['socials']['whatsapp'] ?? '#' }}" aria-label="WhatsApp">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                     </a>
                 </div>
@@ -648,18 +700,27 @@
 
             <div class="footer-col">
                 <h3 class="footer-title">Контакты</h3>
-                <a class="footer-contact" href="tel:7777">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    Короткий номер: 7777
-                </a>
-                <a class="footer-contact" href="mailto:zakaz@example.com">
+                @foreach($landing['phones'] as $phone)
+                    <a class="footer-contact" href="tel:{{ $phone['href'] }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        @if($phone['label']){{ $phone['label'] }}: @endif{{ $phone['number'] }}
+                    </a>
+                @endforeach
+                <a class="footer-contact" href="mailto:{{ $landing['email'] }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
-                    zakaz@example.com
+                    {{ $landing['email'] }}
                 </a>
-                <p class="footer-contact">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                    Ваш город
-                </p>
+                @forelse($landing['addresses'] as $address)
+                    <p class="footer-contact">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {{ $address['address'] }}@if($address['label']) ({{ $address['label'] }})@endif
+                    </p>
+                @empty
+                    <p class="footer-contact">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {{ $landing['city'] }}
+                    </p>
+                @endforelse
                 <p class="footer-contact">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                     Работаем круглосуточно
@@ -668,11 +729,14 @@
         </div>
 
         <div class="container footer-bottom">
-            <p class="footer-copy">© <span id="current-year">2026</span> СитиТакси. Все права защищены.</p>
+            <p class="footer-copy">© <span id="current-year">2026</span> {{ $landing['company_name'] }}. Все права защищены.</p>
             <div class="footer-legal">
                 <a class="footer-link" href="/user-agreement">Пользовательское соглашение</a>
                 <a class="footer-link" href="/politika-konfidencialinosti">Политика конфиденциальности</a>
                 <a class="footer-link" href="/manual-action">Инструкция</a>
+                @foreach($policyDocuments as $document)
+                    <a class="footer-link" href="{{ asset('storage/' . $document->file_path) }}" target="_blank" rel="noopener">{{ $document->title }}</a>
+                @endforeach
             </div>
         </div>
     </footer>
