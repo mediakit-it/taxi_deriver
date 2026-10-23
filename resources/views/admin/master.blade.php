@@ -27,6 +27,9 @@
 	<link href="{{asset('assets/css/style.css')}}" rel="stylesheet" />
 	<link href="{{asset('assets/css/skin-modes.css')}}" rel="stylesheet" />
 
+	<!-- ADMIN LYFT RESTYLE -->
+	<link href="{{asset('assets/css/admin-lyft.css')}}" rel="stylesheet" />
+
 
 
 	<!--- FONT-ICONS CSS -->
@@ -36,7 +39,7 @@
 
 </head>
 
-<body class="ltr app sidebar-mini light-mode">
+<body class="ltr app sidebar-mini light-mode admin-lyft">
 
 	<!-- GLOBAL-LOADER -->
 	<div id="global-loader">

@@ -10,6 +10,13 @@
                 <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img light-logo1" alt="logo">
             </a><!-- LOGO -->
         </div>
+        <div class="admin-user-card">
+            <img src="{{asset('assets/images/faces/6.jpg')}}" alt="profile-user" class="admin-user-card__avatar">
+            <div class="admin-user-card__meta">
+                <span class="admin-user-card__name">{{auth()->user()->name}}</span>
+                <span class="admin-user-card__email">{{auth()->user()->email}}</span>
+            </div>
+        </div>
         <div class="main-sidemenu">
             <div class="slide-left disabled" id="slide-left"><svg xmlns="http://www.w3.org/2000/svg"
                     fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">

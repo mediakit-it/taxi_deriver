@@ -21,7 +21,7 @@
         <!-- СЧЁТЧИКИ -->
         <div class="row">
             <div class="col-12 col-md-6 col-xl">
-                <div class="card overflow-hidden">
+                <div class="card overflow-hidden admin-stat admin-stat--blue">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl">
-                <div class="card overflow-hidden">
+                <div class="card overflow-hidden admin-stat admin-stat--green">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl">
-                <div class="card overflow-hidden">
+                <div class="card overflow-hidden admin-stat admin-stat--peach">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -72,7 +72,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl">
-                <div class="card overflow-hidden">
+                <div class="card overflow-hidden admin-stat admin-stat--pink">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -89,7 +89,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-xl">
-                <div class="card overflow-hidden">
+                <div class="card overflow-hidden admin-stat admin-stat--violet">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
