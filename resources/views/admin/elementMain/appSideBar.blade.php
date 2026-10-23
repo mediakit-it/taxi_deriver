@@ -11,7 +11,10 @@
             </a><!-- LOGO -->
         </div>
         <div class="admin-user-card">
-            <img src="{{asset('assets/images/faces/6.jpg')}}" alt="profile-user" class="admin-user-card__avatar">
+            <span class="admin-user-card__avatar-wrap">
+                <span class="admin-user-card__avatar-fallback">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                <img src="{{asset('assets/images/faces/6.jpg')}}" alt="profile-user" class="admin-user-card__avatar">
+            </span>
             <div class="admin-user-card__meta">
                 <span class="admin-user-card__name">{{auth()->user()->name}}</span>
                 <span class="admin-user-card__email">{{auth()->user()->email}}</span>
