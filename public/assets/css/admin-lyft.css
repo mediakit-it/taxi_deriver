@@ -1,0 +1,330 @@
+/*
+ * Admin Lyft restyle.
+ * Loaded only by the admin layout (admin.master) after the theme CSS.
+ * Every rule is scoped to body.admin-lyft, so site pages never see it.
+ * Repeated elements live here as named component classes:
+ * .admin-card, .admin-btn, .admin-pill, .admin-stat, .admin-user-card.
+ */
+
+body.admin-lyft {
+    --admin-accent: #4B5CFF;
+    --admin-accent-dark: #3A4BDB;
+    --admin-bg: #EDF0F7;
+    --admin-sidebar-bg: #0C0C14;
+    --admin-panel-radius: 24px;
+    --admin-card-radius: 20px;
+    --admin-border: #EDF0F7;
+    --admin-money-bg: #DDF3E4;
+    --admin-money-text: #177245;
+    background: var(--admin-bg);
+}
+
+/* ---------- Shell: light background + one big white panel ---------- */
+
+.admin-lyft .page {
+    background: transparent;
+}
+
+.admin-lyft .app-content {
+    padding: 20px 24px 10px;
+}
+
+.admin-lyft .side-app {
+    background: #FFFFFF;
+    border-radius: var(--admin-panel-radius);
+    box-shadow: 0 12px 40px rgba(16, 24, 40, 0.07);
+    padding: 6px 24px 28px;
+}
+
+.admin-lyft .app-header {
+    background: transparent;
+    border-bottom: none;
+    box-shadow: none;
+}
+
+.admin-lyft .footer {
+    background: transparent;
+    border-top: none;
+}
+
+/* ---------- Sidebar: near-black, user card, menu pills ---------- */
+
+.admin-lyft .app-sidebar {
+    background: var(--admin-sidebar-bg);
+    border-right: none;
+    box-shadow: none;
+}
+
+.admin-lyft .side-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Keep the brand logo readable on the dark sidebar. */
+.admin-lyft .side-header .header-brand-img {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 4px 8px;
+}
+
+.admin-lyft .side-menu > li > h3 {
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.admin-lyft .side-menu__item {
+    color: #C6CADB;
+    border-radius: 999px;
+    margin: 3px 14px;
+}
+
+.admin-lyft .side-menu__item .side-menu__icon {
+    color: #C6CADB;
+    fill: #C6CADB;
+}
+
+.admin-lyft .side-menu__item:hover,
+.admin-lyft .side-menu__item:focus {
+    background: rgba(255, 255, 255, 0.08);
+    color: #FFFFFF;
+}
+
+.admin-lyft .side-menu__item:hover .side-menu__icon {
+    color: #FFFFFF;
+    fill: #FFFFFF;
+}
+
+/* Active item: white pill, blue text (sidemenu.js sets .active). */
+.admin-lyft .side-menu__item.active,
+.admin-lyft .slide.active > .side-menu__item {
+    background: #FFFFFF;
+    color: var(--admin-accent);
+}
+
+.admin-lyft .side-menu__item.active .side-menu__icon,
+.admin-lyft .slide.active > .side-menu__item .side-menu__icon {
+    color: var(--admin-accent);
+    fill: var(--admin-accent);
+}
+
+/* User card on top of the sidebar (admin.elementMain.appSideBar). */
+.admin-user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 14px 4px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.admin-user-card__avatar {
+    width: 42px;
+    height: 42px;
+    flex: none;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.admin-user-card__meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-user-card__name {
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-user-card__email {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Component: card ---------- */
+
+.admin-card {
+    background: #FFFFFF;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-card-radius);
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+.admin-lyft .app-content .card {
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-card-radius);
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+.admin-lyft .app-content .card-header {
+    background: transparent;
+}
+
+/* ---------- Component: dashboard stat cards (pastel) ---------- */
+
+.admin-stat {
+    border: none;
+}
+
+.admin-stat--blue {
+    background: #E1E9FF;
+}
+
+.admin-stat--green {
+    background: #DDF3E4;
+}
+
+.admin-stat--peach {
+    background: #FFE8D6;
+}
+
+.admin-stat--pink {
+    background: #FFE1EC;
+}
+
+.admin-stat--violet {
+    background: #EAE4FF;
+}
+
+/* ---------- Component: buttons ---------- */
+
+.admin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 22px;
+    background: var(--admin-accent);
+    color: #FFFFFF;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-btn:hover {
+    background: var(--admin-accent-dark);
+    color: #FFFFFF;
+}
+
+.admin-btn--dark {
+    background: #0B0B10;
+}
+
+.admin-btn--dark:hover {
+    background: #23232E;
+}
+
+.admin-lyft .app-content .btn {
+    border-radius: 999px;
+}
+
+.admin-lyft .app-content .btn-primary {
+    background: var(--admin-accent);
+    border-color: var(--admin-accent);
+}
+
+.admin-lyft .app-content .btn-primary:hover,
+.admin-lyft .app-content .btn-primary:focus {
+    background: var(--admin-accent-dark);
+    border-color: var(--admin-accent-dark);
+}
+
+/* ---------- Component: pills (status / money) ---------- */
+
+.admin-pill {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.admin-pill--money {
+    background: var(--admin-money-bg);
+    color: var(--admin-money-text);
+}
+
+.admin-pill--accent {
+    background: #E1E9FF;
+    color: var(--admin-accent);
+}
+
+/* Existing badges across admin lists become pills. */
+.admin-lyft .app-content .badge {
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 600;
+}
+
+/* ---------- Tables: light header, generous rows ---------- */
+
+.admin-lyft .app-content .table {
+    border-color: var(--admin-border);
+}
+
+.admin-lyft .app-content .table thead th {
+    background: #F5F6FA;
+    color: #5B6478;
+    font-weight: 600;
+    border-color: var(--admin-border);
+    padding: 14px 16px;
+}
+
+.admin-lyft .app-content .table tbody td {
+    border-color: var(--admin-border);
+    padding: 14px 16px;
+    vertical-align: middle;
+}
+
+/* Opt-in alias for future markup: same look without Bootstrap classes. */
+.admin-table {
+    width: 100%;
+    border-color: var(--admin-border);
+}
+
+/* ---------- Pagination as pills ---------- */
+
+.admin-lyft .app-content .pagination {
+    gap: 6px;
+}
+
+.admin-lyft .app-content .pagination .page-link {
+    border: none;
+    border-radius: 999px;
+    color: #3D4459;
+    padding: 8px 15px;
+    box-shadow: none;
+}
+
+.admin-lyft .app-content .pagination .page-item.active .page-link {
+    background: var(--admin-accent);
+    color: #FFFFFF;
+}
+
+.admin-lyft .app-content .pagination .page-item.disabled .page-link {
+    background: transparent;
+    color: #9AA1B5;
+}
+
+/* ---------- Forms ---------- */
+
+.admin-lyft .app-content .form-control,
+.admin-lyft .app-content .form-select {
+    border-color: #E3E7F2;
+    border-radius: 12px;
+}
+
+.admin-lyft .app-content .form-control:focus,
+.admin-lyft .app-content .form-select:focus {
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px rgba(75, 92, 255, 0.15);
+}
