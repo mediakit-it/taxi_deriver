@@ -49,13 +49,20 @@ body.admin-lyft {
 
 /* ---------- Sidebar: near-black, user card, menu pills ---------- */
 
-.admin-lyft .app-sidebar {
-    background: var(--admin-sidebar-bg);
+/* The theme's sidemenu block in style.css paints the sidebar with
+   `.app-sidebar { background: #fff !important; }`, so a normal declaration
+   loses no matter the specificity. Ours is !important too, and
+   body.admin-lyft .app-sidebar (0,2,1) outranks .app-sidebar (0,1,0). */
+body.admin-lyft .app-sidebar {
+    background: var(--admin-sidebar-bg) !important;
     border-right: none;
     box-shadow: none;
 }
 
-.admin-lyft .side-header {
+/* The header/logo strip is a separate fixed element inside the sidebar;
+   the theme paints it `.side-header { background: #fff; }`. */
+.admin-lyft .app-sidebar .side-header {
+    background: var(--admin-sidebar-bg);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -81,21 +88,26 @@ body.admin-lyft {
     fill: #C6CADB;
 }
 
+/* The theme forces hover with
+   `.side-menu__item:hover { color: var(--primary-bg-color) !important;
+   background: transparent !important; }` (and the same for the icon),
+   so the dark-sidebar hover uses !important too and wins on specificity. */
 .admin-lyft .side-menu__item:hover,
 .admin-lyft .side-menu__item:focus {
-    background: rgba(255, 255, 255, 0.08);
-    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
 }
 
-.admin-lyft .side-menu__item:hover .side-menu__icon {
-    color: #FFFFFF;
-    fill: #FFFFFF;
+.admin-lyft .side-menu__item:hover .side-menu__icon,
+.admin-lyft .side-menu__item:focus .side-menu__icon {
+    color: #FFFFFF !important;
+    fill: #FFFFFF !important;
 }
 
 /* Active item: white pill, blue text (sidemenu.js sets .active). */
 .admin-lyft .side-menu__item.active,
 .admin-lyft .slide.active > .side-menu__item {
-    background: #FFFFFF;
+    background: #FFFFFF !important;
     color: var(--admin-accent);
 }
 
@@ -103,6 +115,20 @@ body.admin-lyft {
 .admin-lyft .slide.active > .side-menu__item .side-menu__icon {
     color: var(--admin-accent);
     fill: var(--admin-accent);
+}
+
+/* Hovering the active item must not punch the theme's transparent
+   !important background through the white pill. */
+.admin-lyft .side-menu__item.active:hover,
+.admin-lyft .slide.active > .side-menu__item:hover {
+    background: #FFFFFF !important;
+    color: var(--admin-accent) !important;
+}
+
+.admin-lyft .side-menu__item.active:hover .side-menu__icon,
+.admin-lyft .slide.active > .side-menu__item:hover .side-menu__icon {
+    color: var(--admin-accent) !important;
+    fill: var(--admin-accent) !important;
 }
 
 /* User card on top of the sidebar (admin.elementMain.appSideBar). */
@@ -118,10 +144,33 @@ body.admin-lyft {
     overflow: hidden;
 }
 
-.admin-user-card__avatar {
+.admin-user-card__avatar-wrap {
+    position: relative;
     width: 42px;
     height: 42px;
     flex: none;
+    border-radius: 50%;
+    background: var(--admin-accent);
+    overflow: hidden;
+}
+
+/* Initial letter sits behind the photo; visible only if the image fails. */
+.admin-user-card__avatar-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.admin-user-card__avatar {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -172,6 +221,14 @@ body.admin-lyft {
 
 .admin-stat {
     border: none;
+    height: 100%;
+}
+
+/* Keep "value + currency" on one line: a wrapped value (0,00 / руб.)
+   was making the revenue card taller than the rest of the row. */
+.admin-lyft .admin-stat h3 {
+    white-space: nowrap;
+    font-size: clamp(1.05rem, 0.85rem + 0.7vw, 1.5rem);
 }
 
 .admin-stat--blue {
@@ -313,6 +370,38 @@ body.admin-lyft {
 .admin-lyft .app-content .pagination .page-item.disabled .page-link {
     background: transparent;
     color: #9AA1B5;
+}
+
+/* ---------- Tables never widen the content panel ---------- */
+
+/* Grid/flex children must be allowed to shrink below their content's
+   min-content width, otherwise a wide table stretches .side-app past
+   the viewport (the theme hides body overflow-x, so it just clipped). */
+.admin-lyft .app-content .row > * {
+    min-width: 0;
+}
+
+.admin-lyft .app-content .card,
+.admin-lyft .app-content .card-body {
+    min-width: 0;
+}
+
+/* Backstop: a table that is still too wide scrolls inside its wrapper. */
+.admin-lyft .app-content .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Long text (route addresses) wraps instead of forcing the table wide.
+   The donor markup puts Bootstrap's .text-nowrap on the tables
+   (`.text-nowrap { white-space: nowrap !important; }`), so this override
+   needs !important as well; scoped to admin tables only. */
+.admin-lyft .app-content table.table {
+    white-space: normal !important;
+}
+
+.admin-lyft .app-content .table td {
+    overflow-wrap: break-word;
 }
 
 /* ---------- Forms ---------- */
