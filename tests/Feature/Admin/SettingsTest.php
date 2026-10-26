@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -46,6 +47,35 @@ class SettingsTest extends TestCase
             'value' => 'Такси Тест',
         ]);
         $this->assertSame('Такси Тест', Setting::get('company_name'));
+    }
+
+    public function test_car_bind_password_is_stored_hashed(): void
+    {
+        $response = $this->actingAs($this->admin(), 'web')->put('/admin/settings', [
+            'company_name' => 'Такси Тест',
+            'car_bind_password' => 'installer-secret',
+        ]);
+
+        $response->assertRedirect(route('settings.edit'));
+
+        $stored = Setting::get('car_bind_password');
+        $this->assertNotNull($stored);
+        $this->assertNotSame('installer-secret', $stored);
+        $this->assertTrue(Hash::check('installer-secret', $stored));
+    }
+
+    public function test_empty_car_bind_password_keeps_existing_hash(): void
+    {
+        $hash = Hash::make('installer-secret');
+        Setting::set('car_bind_password', $hash);
+
+        $response = $this->actingAs($this->admin(), 'web')->put('/admin/settings', [
+            'company_name' => 'Такси Тест',
+            'car_bind_password' => '',
+        ]);
+
+        $response->assertRedirect(route('settings.edit'));
+        $this->assertSame($hash, Setting::get('car_bind_password'));
     }
 
     public function test_policy_document_can_be_uploaded(): void

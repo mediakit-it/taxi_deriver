@@ -33,7 +33,13 @@ class SettingController extends Controller
         $data = $request->validated();
         unset($data['logo'], $data['favicon'], $data['seo_og_image']);
 
+        // Пароль привязки авто не едет в общие настройки открытым
+        // текстом: сервис хранит только хеш, пустое поле = без изменений.
+        $carBindPassword = $data['car_bind_password'] ?? null;
+        unset($data['car_bind_password']);
+
         $this->settingsService->updateScalars($data);
+        $this->settingsService->updateCarBindPassword($carBindPassword);
 
         if ($request->hasFile('logo')) {
             Setting::set('logo_path', $this->settingsService->storeUploadedFile($request->file('logo'), 'branding'));

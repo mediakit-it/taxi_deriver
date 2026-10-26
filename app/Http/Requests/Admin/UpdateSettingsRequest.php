@@ -28,6 +28,7 @@ class UpdateSettingsRequest extends FormRequest
             'currency_label' => 'nullable|string|max:32',
             'notification_email' => 'nullable|email|max:255',
             'driver_accept_seconds' => 'nullable|integer|min:10|max:600',
+            'car_bind_password' => 'nullable|string|max:255',
 
             'color_primary' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'color_accent' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],

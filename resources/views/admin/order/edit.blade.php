@@ -56,6 +56,7 @@
 										<p><strong>Адрес клиента:</strong> <span id="summary-from-address">{{$order->from_address}}</span></p>
 										<p><strong>Конечный адрес:</strong> <span id="summary-to-address">{{$order->to_address}}</span></p>
 										<p><strong>Класс обслуживания:</strong> <span id="summary-tariff">{{$order->tariffClass?->label ?? '—'}}</span></p>
+										<p><strong>Автомобиль:</strong> <span id="summary-car">{{$order->car ? $order->car->label . ' (' . $order->car->number_plate . ')' : '—'}}</span></p>
 									</div>
 									<div class="col-sm-12 col-md-12 col-xl-6">
 										<div class="form-group">

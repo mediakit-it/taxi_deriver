@@ -71,6 +71,13 @@
                                min="10" max="600">
                         <small class="text-muted">От 10 до 600 секунд. По истечении времени заказ считается непринятым.</small>
                     </div>
+                    <div class="mb-3">
+                        <label for="car_bind_password" class="form-label fw-bold">Пароль привязки авто</label>
+                        <input type="password" class="form-control" id="car_bind_password" name="car_bind_password"
+                               value="" autocomplete="new-password"
+                               placeholder="{{ !empty($settings['car_bind_password']) ? 'Пароль задан' : 'Пароль не задан' }}">
+                        <small class="text-muted">По этому паролю установщик водительского приложения при установке на устройство в автомобиле выбирает, к какому авто привязано устройство. Оставьте поле пустым, чтобы не менять пароль. @if(!empty($settings['car_bind_password']))Сейчас пароль задан.@elseСейчас пароль не задан - привязка недоступна.@endif</small>
+                    </div>
                 </div>
             </div>
 

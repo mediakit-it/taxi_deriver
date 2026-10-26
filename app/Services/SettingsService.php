@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Setting;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 
 class SettingsService
 {
@@ -27,6 +28,19 @@ class SettingsService
 
             Setting::set($key, $value);
         }
+    }
+
+    /**
+     * Пароль привязки авто к устройству водителя: в настройках хранится
+     * только хеш. Пустое значение - пароль не меняется.
+     */
+    public function updateCarBindPassword(?string $plainPassword): void
+    {
+        if ($plainPassword === null || $plainPassword === '') {
+            return;
+        }
+
+        Setting::set('car_bind_password', Hash::make($plainPassword));
     }
 
     /**

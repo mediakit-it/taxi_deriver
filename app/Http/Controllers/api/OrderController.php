@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Car;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -124,7 +125,11 @@ class OrderController extends Controller
             ], $user);
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
         }
-        
+
+        if (!$this->applyBoundCar($order, $request)) {
+            return response()->json(['status' => false, 'message' => 'Car not found'], 422);
+        }
+
         // Водитель принимает заказ, который диспетчер назначил лично ему:
         // это ответ на персональное предложение. Водитель остаётся тот же,
         // меняется только статус; OrderSentClose не нужен - предложение
@@ -528,7 +533,11 @@ class OrderController extends Controller
             ], $user);
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
         }
-        
+
+        if (!$this->applyBoundCar($order, $request)) {
+            return response()->json(['status' => false, 'message' => 'Car not found'], 422);
+        }
+
         // Водитель принимает заказ, который диспетчер назначил лично ему:
         // это ответ на персональное предложение. Водитель остаётся тот же,
         // меняется только статус; OrderSentClose не нужен - предложение
@@ -697,11 +706,38 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Forbidden'], 403);
         }
 
+        if (!$this->applyBoundCar($order, $request)) {
+            return response()->json(['status' => false, 'message' => 'Car not found'], 422);
+        }
+
         $order->status = 'in_progress';
         $order->save();
 
         event(new OrderStatusChanged($order, 'ride_started'));
 
         return response()->json(['status' => true]);
+    }
+
+    // Привязка авто при установке: водительское приложение шлёт car_id
+    // привязанного устройства. Пишем в заказ, только если авто ещё не
+    // задано: привязка жёсткая, первое авто заказа не перезаписывается.
+    // false - передан несуществующий car_id, запрос надо отклонить.
+    private function applyBoundCar(Order $order, Request $request): bool
+    {
+        $carId = $request->input('car_id');
+
+        if ($carId === null || $carId === '') {
+            return true;
+        }
+
+        if (!Car::whereKey($carId)->exists()) {
+            return false;
+        }
+
+        if (!$order->car_id) {
+            $order->car_id = (int) $carId;
+        }
+
+        return true;
     }
 }

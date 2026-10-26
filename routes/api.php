@@ -7,6 +7,7 @@ use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\LogisticController;
 use App\Http\Controllers\api\CostOfTripController;
 use App\Http\Controllers\api\AppSettingsController;
+use App\Http\Controllers\api\CarBindingController;
 use App\Http\Controllers\api\ClientNotificationController;
 use App\Http\Controllers\api\GeocodeController;
 /*
@@ -30,6 +31,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/geocode', [GeocodeController::class, 'geocode']);
         Route::get('/reverse-geocode', [GeocodeController::class, 'reverse']);
     });
+    // Привязка устройства водителя к авто при установке приложения:
+    // без авторизации (экран входа), доступ по паролю привязки из
+    // настроек, троттлинг от перебора пароля.
+    Route::post('/car-binding/cars', [CarBindingController::class, 'cars'])->middleware('throttle:5,1');
     Route::get('/cost-of-trip', [CostOfTripController::class, 'index']);
     Route::get('/cost-of-trip/simple', [CostOfTripController::class, 'getSimple']);
     Route::get('/cost-of-trip/{name}', [CostOfTripController::class, 'getByName']);

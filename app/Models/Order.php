@@ -17,6 +17,7 @@ class Order extends Model
         'client_phone',
         'driver_id',
         'driver_offered_at',
+        'car_id',
         'from_address',
         'from_lat',
         'from_lng',
@@ -93,6 +94,13 @@ class Order extends Model
     public function driver()
     {
         return $this->belongsTo(User::class, 'driver_id');
+    }
+
+    // Автомобиль, с чьего устройства выполняется заказ (привязка
+    // устройства к авто при установке водительского приложения)
+    public function car()
+    {
+        return $this->belongsTo(Car::class);
     }
 
     // Дистанция поездки в километрах (в базе хранится в метрах)
