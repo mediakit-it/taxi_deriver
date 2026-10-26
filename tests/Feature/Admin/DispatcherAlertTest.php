@@ -88,10 +88,94 @@ class DispatcherAlertTest extends TestCase
         $response->assertOk();
         $response->assertJsonCount(1);
         $response->assertJsonPath('0.order_id', $overdue->id);
+        $response->assertJsonPath('0.reason', 'no_response');
         $response->assertJsonStructure([
-            ['order_id', 'driver_name', 'from_address', 'to_address', 'waiting_seconds', 'url'],
+            ['order_id', 'reason', 'driver_name', 'from_address', 'to_address', 'waiting_seconds', 'url'],
         ]);
         $this->assertGreaterThanOrEqual(300, $response->json('0.waiting_seconds'));
+    }
+
+    public function test_overdue_endpoint_includes_declined_order(): void
+    {
+        Setting::set('driver_accept_seconds', '60');
+        // Отказ: назначение снято, метка предложения сохранена.
+        $declined = Order::factory()->searching()->create([
+            'driver_id' => null,
+            'driver_offered_at' => now()->subSeconds(120),
+        ]);
+
+        $response = $this->actingAs($this->admin(), 'web')->get('/admin/data/overdue-orders');
+
+        $response->assertOk();
+        $response->assertJsonCount(1);
+        $response->assertJsonPath('0.order_id', $declined->id);
+        $response->assertJsonPath('0.reason', 'declined');
+        $this->assertNull($response->json('0.driver_name'));
+        $this->assertGreaterThanOrEqual(120, $response->json('0.waiting_seconds'));
+    }
+
+    public function test_overdue_endpoint_excludes_fresh_broadcast_order(): void
+    {
+        Setting::set('driver_accept_seconds', '60');
+        // Свежий broadcast-заказ: водителя нет и предложения не было.
+        Order::factory()->searching()->create([
+            'driver_id' => null,
+            'driver_offered_at' => null,
+        ]);
+
+        $response = $this->actingAs($this->admin(), 'web')->get('/admin/data/overdue-orders');
+
+        $response->assertOk();
+        $response->assertJsonCount(0);
+    }
+
+    public function test_overdue_endpoint_excludes_manually_unassigned_order(): void
+    {
+        Event::fake();
+        Setting::set('driver_accept_seconds', '60');
+        $driver = User::factory()->driver()->create();
+        $order = Order::factory()->searching()->create([
+            'driver_id' => $driver->id,
+            'driver_offered_at' => now()->subSeconds(300),
+        ]);
+
+        // Диспетчер сам снял водителя: админка сбрасывает и метку
+        // предложения - заказ перестаёт быть проблемным для панели.
+        $response = $this->actingAs($this->admin(), 'web')->put(route('order.update', $order), [
+            'driver_id' => null,
+        ]);
+        $response->assertRedirect(route('order.index'));
+        $this->assertNull($order->fresh()->driver_offered_at);
+
+        $response = $this->actingAs($this->admin(), 'web')->get('/admin/data/overdue-orders');
+
+        $response->assertOk();
+        $response->assertJsonCount(0);
+    }
+
+    public function test_declined_order_leaves_overdue_endpoint_after_reassignment(): void
+    {
+        Event::fake();
+        Setting::set('driver_accept_seconds', '60');
+        $order = Order::factory()->searching()->create([
+            'driver_id' => null,
+            'driver_offered_at' => now()->subSeconds(120),
+        ]);
+        $newDriver = User::factory()->driver()->create();
+
+        $response = $this->actingAs($this->admin(), 'web')->get('/admin/data/overdue-orders');
+        $response->assertJsonCount(1);
+
+        // Переназначение: водитель назначен, отсчёт предложения свежий -
+        // заказ уходит из панели до следующего таймаута.
+        $response = $this->actingAs($this->admin(), 'web')->put(route('order.update', $order), [
+            'driver_id' => $newDriver->id,
+        ]);
+        $response->assertRedirect(route('order.index'));
+
+        $response = $this->actingAs($this->admin(), 'web')->get('/admin/data/overdue-orders');
+        $response->assertOk();
+        $response->assertJsonCount(0);
     }
 
     public function test_store_with_driver_sets_offered_at(): void

@@ -148,6 +148,22 @@ class Order extends Model
     }
 
     /**
+     * Заказы, от которых назначенный водитель отказался: назначение снято
+     * (driver_id пуст), но метка предложения driver_offered_at сохранена -
+     * это и есть признак «заказ предлагался конкретному водителю».
+     * Свежие broadcast-заказы сюда не попадают (метки у них нет), как и
+     * заказы, где водителя снял сам диспетчер: админка при снятии метку
+     * сбрасывает. Такие заказы висят в панели «Требуют внимания», пока
+     * диспетчер не назначит нового водителя.
+     */
+    public function scopeDeclinedByDriver($query)
+    {
+        return $query->where('status', self::STATUS_SEARCHING)
+            ->whereNull('driver_id')
+            ->whereNotNull('driver_offered_at');
+    }
+
+    /**
      * Таймаут ответа водителя из настроек (driver_accept_seconds).
      */
     public static function driverAcceptTimeout(): int
