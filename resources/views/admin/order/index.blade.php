@@ -47,6 +47,7 @@
 										<th class="wd-20p border-bottom-0">Время в пути</th>
 										<th class="wd-20p border-bottom-0">Цена</th>
 										<th class="wd-15p border-bottom-0">Класс</th>
+										<th class="wd-15p border-bottom-0">Источник</th>
 										<th class="wd-15p border-bottom-0">Действие</th>
 									</tr>
 								</thead>
@@ -99,6 +100,7 @@
 											<td>{{ $order->duration_min !== null ? $order->duration_min . ' мин' : '—' }}</td>
 											<td>{{ $order->price }}</td>
 											<td>{{ $order->tariff ? ($order->tariffClass?->label ?? $order->tariff) : '' }}</td>
+											<td>{{ $order->source_label }}</td>
 											<td>
 												 <!-- раскоментить -->
 												@if(in_array($order->status, ['pending', 'searching', 'searching_other']))<a href="{{route('order.edit',['order'=>$order->id])}}" class="btn btn-warning"><i class="fa fa-pencil"></i></a>@endif
