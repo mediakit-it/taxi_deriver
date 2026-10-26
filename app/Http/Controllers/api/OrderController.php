@@ -79,17 +79,16 @@ class OrderController extends Controller
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
     
-        // Добавлено RAY - расширенная выборка: pending + свои активные заказы водителя
+        // Выборка для «Новых заказов» водителя: свободные pending для всех
+        // + только свои searching - персональные предложения диспетчера,
+        // ожидающие ответа этого водителя. Принятые и активные заказы сюда
+        // не входят: их отдаёт index() (GET /api/orders), иначе принятый
+        // заказ после перезагрузки списка снова падал в «Новые заказы».
         $orders = Order::where(function ($q) use ($user) {
                 $q->where('status', 'pending')
                   ->orWhere(function ($q2) use ($user) {
                       $q2->where('driver_id', $user->id)
-                         ->whereIn('status', [
-                             'searching',
-                             'assigned',
-                             'on_place',
-                             'in_progress',
-                         ]);
+                         ->where('status', 'searching');
                   });
             })
             ->orderBy('id', 'desc')
