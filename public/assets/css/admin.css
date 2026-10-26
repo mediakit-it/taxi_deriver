@@ -239,12 +239,12 @@ button, input, select, textarea {
 
 .side-app,
 .app-content > .container {
-    background: var(--admin-panel);
+    /* background: var(--admin-panel);
     border-radius: var(--admin-panel-radius);
-    box-shadow: var(--admin-shadow);
+    box-shadow: var(--admin-shadow); */
     /* отступ сверху переехал сюда из .app-content: шапка фиксированная,
        без него панель уезжает под неё (высота шапки + прежние 20px) */
-    margin-top: calc(var(--admin-header-h) + 20px);
+    /* margin-top: calc(var(--admin-header-h) + 20px); */
     padding: 20px;
     min-height: calc(100vh - var(--admin-header-h) - 20px);
     min-width: 0;
@@ -657,7 +657,7 @@ button, input, select, textarea {
 .card-body { padding: 20px; flex: 1 1 auto; }
 
 /* Метрики дашборда: пастельная подложка + круглая иконка справа */
-.admin-stat { border: none; height: 100%; }
+.admin-stat { border: 1px solid white; height: 100%; }
 .admin-stat--blue { background: #E3E9FF; }
 .admin-stat--green { background: #DDF5E3; }
 .admin-stat--peach { background: #FFE8D6; }

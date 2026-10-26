@@ -19,7 +19,7 @@
         <!-- PAGE-HEADER END -->
 
         <!-- СЧЁТЧИКИ -->
-        <div class="row">
+        <div class="row" style="margin-bottom: 22px;">
             <div class="col-12 col-md-6 col-xl">
                 <div class="card overflow-hidden admin-stat admin-stat--blue">
                     <div class="card-body">
