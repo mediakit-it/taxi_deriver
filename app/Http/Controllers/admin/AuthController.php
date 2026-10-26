@@ -25,19 +25,19 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
-        // Проверяем роль пользователя
+        // Вход в веб-панель - только для ролей панели (админка,
+        // диспетчерская). Клиенты и водители входят через приложение:
+        // для них веб-вход закрыт, даже если пароль верный.
         $user = User::where('email', $request->email)->first();
 
-        if ($user) {
-            if (in_array($user->role, ["admin", "superadmin"])) {
-                if (Auth::guard('web')->attempt($credentials, $remember)) {
-                    return redirect()->intended('/admin/dashboard');
-                }
-            } else {
-                if (Auth::guard('web')->attempt($credentials, $remember)) {
-                    return redirect()->intended('/');
-                }
-            }
+        if ($user && !$user->hasPanelAccess()) {
+            return redirect()->back()->withInput($request->only('email'))->withErrors([
+                'email' => 'Учётная запись не имеет доступа в панель управления',
+            ]);
+        }
+
+        if (Auth::guard('web')->attempt($credentials, $remember)) {
+            return redirect()->intended('/admin/dashboard');
         }
 
         return redirect()->back()->withInput($request->only('email'))->withErrors([

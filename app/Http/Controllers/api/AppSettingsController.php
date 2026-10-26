@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\FunctionalSettingsService;
 use Illuminate\Http\JsonResponse;
 
 class AppSettingsController extends Controller
@@ -13,6 +14,7 @@ class AppSettingsController extends Controller
     public function index(): JsonResponse
     {
         $settings = Setting::allCached();
+        $functional = app(FunctionalSettingsService::class)->all();
 
         return response()->json([
             'success' => true,
@@ -31,6 +33,15 @@ class AppSettingsController extends Controller
                 'driver_accept_seconds' => isset($settings['driver_accept_seconds']) && $settings['driver_accept_seconds'] !== ''
                     ? (int) $settings['driver_accept_seconds']
                     : null,
+                // Переключатели раздела «Функционал» (только чтение):
+                // режимы цены/назначения, предзаказы, источники, оценки
+                'functional' => [
+                    'price_mode' => $functional['price_mode'],
+                    'assignment_mode' => $functional['assignment_mode'],
+                    'preorders_enabled' => $functional['preorders_enabled'],
+                    'order_sources' => $functional['order_sources'],
+                    'ratings_enabled' => $functional['ratings_enabled'],
+                ],
                 'socials' => [
                     'telegram' => $settings['social_telegram'] ?? null,
                     'viber' => $settings['social_viber'] ?? null,

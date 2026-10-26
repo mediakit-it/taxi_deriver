@@ -70,9 +70,9 @@
 										<div class="form-group">
 											<label class="form-label text-muted">Роль:</label>
 											<select class="form-control select2 form-select select2-hidden-accessible text-dark" value="{{old('role')}}" name="role" id="client-salution1" data-placeholder="Choose Category..." tabindex="-1" aria-hidden="true">
-												<option value="user" {{ $user->role =="user" ? 'selected' : '' }}>Пользователь</option>
-												<option value="driving" {{ $user->role =="driving" ? 'selected' : '' }}>Водитель</option>
-												<option value="admin" {{ $user->role =="admin" ? 'selected' : '' }}>Администратор</option>
+												@foreach (\App\Models\User::assignableRoles() as $roleValue => $roleLabel)
+													<option value="{{ $roleValue }}" @selected(old('role', $user->role) == $roleValue)>{{ $roleLabel }}</option>
+												@endforeach
 											</select>
 										</div>
 									</div>
