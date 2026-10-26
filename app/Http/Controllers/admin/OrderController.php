@@ -10,6 +10,7 @@ use App\Models\CostOfTrip;
 use App\Models\User;
 use App\Models\Order;
 use App\Events\OrderSent;
+use App\Services\FunctionalSettingsService;
 use App\Events\OrderStatusChanged; // добавлены события статусов RAY
 class OrderController extends Controller
 {
@@ -38,8 +39,43 @@ class OrderController extends Controller
     {
         $users = User::where('role','driving')->get();
         $tariffs = CostOfTrip::all();
-        return view('admin.order.add',compact('users','tariffs'));
+        $sources = $this->orderSources();
+        return view('admin.order.add',compact('users','tariffs','sources'));
         // return view('admin.order.add');
+    }
+
+    /**
+     * Источники, доступные в форме заказа: подписи, ограниченные
+     * разрешением из раздела «Функционал».
+     *
+     * @return array<string, string>
+     */
+    private function orderSources(): array
+    {
+        $allowed = app(FunctionalSettingsService::class)->allowedOrderSources();
+
+        return array_intersect_key(Order::sourceLabels(), array_flip($allowed));
+    }
+
+    /**
+     * Источник для сохранения: выбор из формы принимается только
+     * если он разрешён настройками, иначе - телефон (или первый
+     * разрешённый). У заказов из приложения источник не меняется.
+     */
+    private function resolveSource(Request $request, ?Order $order = null): string
+    {
+        if ($order && $order->source === Order::SOURCE_APP) {
+            return Order::SOURCE_APP;
+        }
+
+        $allowed = array_keys($this->orderSources());
+        $source = (string) $request->input('source', '');
+
+        if (in_array($source, $allowed, true)) {
+            return $source;
+        }
+
+        return in_array(Order::SOURCE_PHONE, $allowed, true) ? Order::SOURCE_PHONE : $allowed[0];
     }
 
     /**
@@ -70,6 +106,7 @@ class OrderController extends Controller
 
         // Новый медот RAY
             $data = $request->all();
+            $data['source'] = $this->resolveSource($request);
             if (!empty($data['driver_id'])) {
                 $data['status'] = Order::STATUS_SEARCHING;
                 $data['driver_offered_at'] = now();
@@ -105,9 +142,10 @@ class OrderController extends Controller
     {
         $users = User::where('role','driving')->get();
         $tariffs = CostOfTrip::all();
+        $sources = $this->orderSources();
         $order = Order::find($id);
 
-        return view('admin.order.edit',compact('users','order','tariffs'));
+        return view('admin.order.edit',compact('users','order','tariffs','sources'));
     }
 
     /**
@@ -140,7 +178,9 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
     $oldDriver = $order->driver_id;
 
-    $order->update($request->all());
+    $data = $request->all();
+    $data['source'] = $this->resolveSource($request, $order);
+    $order->update($data);
 
     // Момент предложения заказа водителю (для сторожа ответов водителей):
     // при смене водителя отсчёт начинается заново, при снятии - сбрасывается,

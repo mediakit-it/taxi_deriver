@@ -31,6 +31,7 @@ class Order extends Model
         'comment',
         'status',
         'tariff',
+        'source',
     ];
 
     // Статусы
@@ -44,9 +45,36 @@ class Order extends Model
     const STATUS_ON_PLACE         = 'on_place';
     const STATUS_IN_PROGRESS      = 'in_progress';
 
-    // Статус по умолчанию
+    // Источники заказа: телефон (диспетчер) / приложение (клиент)
+    const SOURCE_PHONE = 'phone';
+    const SOURCE_APP = 'app';
+
+    // Подписи источников для админки
+    const SOURCE_LABELS = [
+        self::SOURCE_PHONE => 'Телефон',
+        self::SOURCE_APP => 'Приложение',
+    ];
+
+    /**
+     * Карта источник => подпись для всех источников.
+     *
+     * @return array<string, string>
+     */
+    public static function sourceLabels(): array
+    {
+        return self::SOURCE_LABELS;
+    }
+
+    // Человекочитаемая подпись источника текущего заказа
+    public function getSourceLabelAttribute(): ?string
+    {
+        return self::SOURCE_LABELS[$this->source] ?? $this->source;
+    }
+
+    // Значения по умолчанию
     protected $attributes = [
         'status' => self::STATUS_PENDING,
+        'source' => self::SOURCE_PHONE,
     ];
 
     protected $casts = [
