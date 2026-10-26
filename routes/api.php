@@ -9,6 +9,7 @@ use App\Http\Controllers\api\CostOfTripController;
 use App\Http\Controllers\api\AppSettingsController;
 use App\Http\Controllers\api\ClientNotificationController;
 use App\Http\Controllers\api\GeocodeController;
+use App\Http\Controllers\api\EmailVerificationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -23,6 +24,7 @@ use App\Http\Controllers\api\GeocodeController;
 
 Route::prefix('v1')->group(function () {
     Route::get('/app-settings', [AppSettingsController::class, 'index']);
+    Route::post('/auth/verify-email', [EmailVerificationController::class, 'verify']);
     Route::middleware('auth:api')->group(function () {
         Route::get('/notifications', [ClientNotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [ClientNotificationController::class, 'unreadCount']);
@@ -161,6 +163,7 @@ Route::get('/suggest', function (Request $request) {
 
     return $response->json();
 });
+
 
 
 

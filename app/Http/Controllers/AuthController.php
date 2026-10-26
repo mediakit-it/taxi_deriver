@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificationCodeMail;
+use App\Http\Requests\Api\SendVerificationCodeRequest;
+use App\Services\EmailDomainValidator;
+use App\Services\EmailVerificationService;
 
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
@@ -110,10 +113,23 @@ class AuthController extends Controller
     }
 
     // Регистрация
-    public function register(Request $request)
+    public function register(Request $request, EmailVerificationService $verification)
     {
 
         \Log::info($request->all());
+
+        // Если по этому адресу запрашивали код подтверждения (поток клиентского
+        // приложения: verify2 -> v1/auth/verify-email -> userSignUp), регистрация
+        // обязана дождаться подтверждения адреса. Потоки, где код не запрашивали,
+        // идут как раньше: гейт касается только начатой проверки.
+        $email = (string) $request->input('email');
+        if ($email !== '' && $verification->flowInitiated($email) && ! $verification->isVerified($email)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Сначала подтвердите адрес электронной почты кодом из письма.',
+            ], 422);
+        }
+
         $user = User::create([
             'last_name'=>$request->input('last_name'),
             'first_name'=>$request->input('first_name'),
@@ -124,6 +140,7 @@ class AuthController extends Controller
         ]);
 
         if($user){
+            $verification->consumeVerification($email);
             return response()->json([
                 'status' => true
                 ], 200);
@@ -300,10 +317,10 @@ class AuthController extends Controller
         ]);
     }
 
-    public function verify2(Request $request){
-        $newVerificationCode = Str::random(6);
+    public function verify2(SendVerificationCodeRequest $request, EmailDomainValidator $validator, EmailVerificationService $verification){
+        $email = $request->validated('email');
 
-        $existingUser = User::where('email', $request->input('email'))->first();
+        $existingUser = User::where('email', $email)->first();
 
         if ($existingUser) {
             return response()->json([
@@ -312,14 +329,23 @@ class AuthController extends Controller
             ]);
         }
 
+        // До отправки письма убеждаемся, что домен вообще принимает почту:
+        // письмо на несуществующий адрес - это bounce и потерянный клиент.
+        if (! $validator->isDeliverable($email)) {
+            return response()->json([
+                'message' => 'Похоже, такой почты не существует. Проверьте адрес.',
+                'suggestion' => $validator->suggestDomain($email),
+            ], 422);
+        }
 
-        Mail::to($request->input('email'))->send(new VerificationCodeMail($newVerificationCode));
-
+        // Код хранится только на сервере (хеш в кэше) и наружу не отдаётся:
+        // проверка - отдельным запросом POST /api/v1/auth/verify-email.
+        $verification->sendCode($email);
 
         return response()->json([
             'status' => true,
             'status_code' =>'verified',
-            'code' => $newVerificationCode,
         ]);
     }
 }
+
