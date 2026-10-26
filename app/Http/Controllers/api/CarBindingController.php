@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CarBindingCarsRequest;
+use App\Http\Requests\Api\CarBindingReportRequest;
 use App\Services\CarBindingService;
 use Illuminate\Http\JsonResponse;
 
@@ -33,6 +34,28 @@ class CarBindingController extends Controller
             default => response()->json([
                 'success' => true,
                 'data' => $result['cars'],
+            ]),
+        };
+    }
+
+    // Доклад водительского приложения после авторизации водителя:
+    // устройство при установке привязано к авто по паролю, водитель
+    // вошёл - сервер запоминает текущее авто водителя
+    // (users.current_car_id), и диспетчер видит его в админке.
+    // Докладывать может только водитель - роль проверяет
+    // CarBindingReportRequest::authorize() (остальным 403).
+    public function report(CarBindingReportRequest $request): JsonResponse
+    {
+        $result = $this->carBinding->reportCurrentCar($request->user(), (int) $request->validated('car_id'));
+
+        return match ($result['status']) {
+            CarBindingService::STATUS_CAR_NOT_FOUND => response()->json([
+                'success' => false,
+                'message' => 'Автомобиль не найден',
+            ], 422),
+            default => response()->json([
+                'success' => true,
+                'data' => $result['car'],
             ]),
         };
     }

@@ -32,6 +32,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/notifications/read', [ClientNotificationController::class, 'markRead']);
         Route::get('/geocode', [GeocodeController::class, 'geocode']);
         Route::get('/reverse-geocode', [GeocodeController::class, 'reverse']);
+        // Доклад водителя о привязанном к устройству авто после входа
+        Route::post('/car-binding/report', [CarBindingController::class, 'report']);
     });
     // Привязка устройства водителя к авто при установке приложения:
     // без авторизации (экран входа), доступ по паролю привязки из
