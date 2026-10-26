@@ -19,13 +19,13 @@
 			<!-- PAGE-HEADER -->
 			<div class="page-header">
 				<div>
-					<h1 class="page-title">Добавление заказа</h1>
+					<h1 class="page-title">Водители на карте</h1>
 				</div>
 				<div class="ms-auto pageheader-btn">
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a href="/">Главная</a></li>
 						<li class="breadcrumb-item"><a href="{{route('order.index')}}">Заказы</a></li>
-						<li class="breadcrumb-item active" aria-current="page">Добавление заказа</li>
+						<li class="breadcrumb-item active" aria-current="page">Водители на карте</li>
 					</ol>
 				</div>
 			</div>
