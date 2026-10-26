@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use Illuminate\Http\Request;
 
 use App\Models\User;
@@ -15,7 +17,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        // Суперадмин нашей компании в списках у клиента не отображается
+        $users = User::visibleInAdmin(auth('web')->user())->get();
 
         return view('admin.user.index',compact('users'));
     }
@@ -31,7 +34,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
         
 
@@ -65,14 +68,25 @@ class UserController extends Controller
     {
         $user = User::find($id);
 
+        // Чужие суперадмины недоступны даже для просмотра формы
+        if ($user && $user->isSuperadmin() && !auth('web')->user()->isSuperadmin()) {
+            abort(403);
+        }
+
         return view('admin.user.edit',compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id)
     {
+        // Суперадмина нашей компании может менять только суперадмин
+        $target = User::find($id);
+        if ($target && $target->isSuperadmin() && !$request->user('web')->isSuperadmin()) {
+            abort(403);
+        }
+
         $user = User::find($id)->update([
             'last_name'=>$request->last_name,
             'first_name'=>$request->first_name,
@@ -94,6 +108,9 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::find($id);
+        if ($user && $user->isSuperadmin() && !auth('web')->user()->isSuperadmin()) {
+            abort(403);
+        }
         if($user->delete()){
             return 'true';
         }
