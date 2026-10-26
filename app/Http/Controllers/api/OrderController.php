@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Http;
 
 use App\Events\OrderCreated;
 use App\Events\OrderStatusChanged; // Добавлено RAY
+use App\Events\AdminAlert;
 
 class OrderController extends Controller
 {
@@ -124,6 +125,34 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
         }
         
+        // Водитель принимает заказ, который диспетчер назначил лично ему:
+        // это ответ на персональное предложение. Водитель остаётся тот же,
+        // меняется только статус; OrderSentClose не нужен - предложение
+        // персональное, другим водителям оно не уходило.
+        if ((int) $order->driver_id === (int) $user->id && $order->status === Order::STATUS_SEARCHING) {
+            $order->status = 'assigned';
+            $order->save();
+
+            $this->logOrderActivity('ADD_DRIVING_OWN_OFFER_SUCCESS', [
+                'order_id' => $order->id,
+                'driver_id' => $user->id,
+                'status' => $order->status
+            ], $user);
+
+            event(new OrderCreated());
+            event(new OrderStatusChanged($order, 'driver_accepted')); // Добавлено RAY
+
+            if($order->client_id){
+                event(new UserOrderSent($order->client_id));
+                $this->logOrderActivity('ADD_DRIVING_CLIENT_NOTIFIED', [
+                    'client_id' => $order->client_id,
+                    'order_id' => $order->id
+                ], $user);
+            }
+
+            return response()->json(['status' => true]);
+        }
+
         if ($order->driver_id) {
             $this->logOrderActivity('ADD_DRIVING_ALREADY_ASSIGNED', [
                 'order_id' => $order->id,
@@ -500,6 +529,38 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
         }
         
+        // Водитель принимает заказ, который диспетчер назначил лично ему:
+        // это ответ на персональное предложение. Водитель остаётся тот же,
+        // меняется только статус; OrderSentClose не нужен - предложение
+        // персональное, другим водителям оно не уходило.
+        if ((int) $order->driver_id === (int) $user->id && $order->status === Order::STATUS_SEARCHING) {
+            $order->status = 'assigned';
+            $order->save();
+
+            $this->logOrderActivity('ACCEPT_ORDER_BY_DRIVER_OWN_OFFER_SUCCESS', [
+                'order_id' => $order->id,
+                'driver_id' => $user->id,
+                'client_id' => $order->client_id,
+                'status' => $order->status
+            ], $user);
+
+            event(new OrderCreated());
+            event(new OrderStatusChanged($order, 'driver_accepted')); // Добавлено RAY
+
+            if($order->client_id){
+                event(new UserOrderSent($order->client_id));
+                $this->logOrderActivity('ACCEPT_ORDER_BY_DRIVER_CLIENT_NOTIFIED', [
+                    'client_id' => $order->client_id,
+                    'order_id' => $order->id
+                ], $user);
+            }
+
+            return response()->json([
+                'status' => true,
+                'order' => $order
+            ]);
+        }
+
         if ($order->driver_id) {
             $this->logOrderActivity('ACCEPT_ORDER_BY_DRIVER_ALREADY_ASSIGNED', [
                 'order_id' => $order->id,
@@ -539,8 +600,10 @@ class OrderController extends Controller
     }
 
     // Водитель отказался от предложенного заказа.
-    // Заказ остаётся без водителя и доступен другим; сам заказ не меняется,
-    // фиксируем только факт отказа (лог активности), чтобы диспетчер видел картину.
+    // Свободный заказ не меняется - фиксируем только факт отказа (лог
+    // активности). Если заказ был назначен диспетчером лично этому водителю,
+    // назначение снимается (заказ остаётся в поиске) и диспетчер сразу
+    // получает сигнал AdminAlert, что нужен новый водитель.
     public function declineOrderByDriver(Request $request)
     {
         $user = Auth::user();
@@ -561,6 +624,30 @@ class OrderController extends Controller
                 'order_id' => $request->input('orderId')
             ], $user);
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
+        }
+
+        // Отказ от персонального предложения диспетчера: снимаем назначение
+        // и метку предложения, статус не трогаем (заказ остаётся в поиске).
+        // Предложение другим водителям само не рассылается - переназначение
+        // делает диспетчер, для этого ему и уходит сигнал.
+        if ((int) $order->driver_id === (int) $user->id && $order->status === Order::STATUS_SEARCHING) {
+            $alert = AdminAlert::driverDeclined($order);
+
+            $order->driver_id = null;
+            $order->driver_offered_at = null;
+            $order->save();
+
+            $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_SUCCESS', [
+                'order_id' => $order->id,
+                'driver_id' => $user->id,
+                'client_id' => $order->client_id,
+                'status' => $order->status
+            ], $user);
+
+            event(new OrderStatusChanged($order, 'driver_declined'));
+            event($alert);
+
+            return response()->json(['status' => true]);
         }
 
         if ($order->driver_id) {
