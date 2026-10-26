@@ -272,6 +272,10 @@
             </button>
         </form>
 
+        @if(auth()->user()->role === 'superadmin')
+            @include('admin.settings._functional')
+        @endif
+
         @include('admin.settings._documents')
 
         @include('admin.settings._steps')
