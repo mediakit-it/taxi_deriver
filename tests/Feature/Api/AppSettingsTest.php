@@ -40,6 +40,23 @@ class AppSettingsTest extends TestCase
         $response->assertJsonPath('data.addresses', []);
     }
 
+    public function test_app_settings_exposes_functional_settings(): void
+    {
+        Setting::set('functional_price_mode', 'combined');
+        Setting::set('functional_assignment_mode', 'auto');
+        Setting::set('functional_preorders_enabled', '1');
+
+        $response = $this->getJson('/api/v1/app-settings');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.functional.price_mode', 'combined');
+        $response->assertJsonPath('data.functional.assignment_mode', 'auto');
+        $response->assertJsonPath('data.functional.preorders_enabled', true);
+        // Умолчания раздела «Функционал»
+        $response->assertJsonPath('data.functional.order_sources', 'both');
+        $response->assertJsonPath('data.functional.ratings_enabled', false);
+    }
+
     public function test_app_settings_returns_driver_accept_seconds(): void
     {
         Setting::set('driver_accept_seconds', '45');
