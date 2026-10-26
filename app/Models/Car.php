@@ -20,4 +20,10 @@ class Car extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Подпись автомобиля для списков и выбора при привязке: «Skoda Octavia»
+    public function getLabelAttribute(): string
+    {
+        return trim($this->brand . ' ' . ($this->model ?? ''));
+    }
 }

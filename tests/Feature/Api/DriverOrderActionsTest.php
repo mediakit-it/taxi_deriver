@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Events\AdminAlert;
+use App\Models\Car;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -199,6 +200,110 @@ class DriverOrderActionsTest extends TestCase
         // The dispatcher is signalled at once that a new driver is needed.
         Event::assertDispatched(AdminAlert::class, fn (AdminAlert $event) => $event->type === AdminAlert::TYPE_DRIVER_DECLINED
             && $event->orderId === $order->id);
+    }
+
+    public function test_accept_writes_bound_car_id_to_order(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $car = Car::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'driver_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $order->id,
+            'car_id' => $car->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+
+        $order->refresh();
+        $this->assertSame(Order::STATUS_ASSIGNED, $order->status);
+        $this->assertSame($car->id, $order->car_id);
+    }
+
+    public function test_accept_own_offer_writes_bound_car_id(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $car = Car::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_SEARCHING,
+            'driver_id' => $driver->id,
+            'driver_offered_at' => now()->subSeconds(30),
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $order->id,
+            'car_id' => $car->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame($car->id, $order->refresh()->car_id);
+    }
+
+    public function test_accept_without_car_id_leaves_order_car_empty(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'driver_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $order->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertNull($order->refresh()->car_id);
+    }
+
+    public function test_accept_with_unknown_car_id_is_rejected(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'driver_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $order->id,
+            'car_id' => 999999,
+        ], $this->authHeaders($driver));
+
+        $response->assertUnprocessable()->assertJson(['status' => false]);
+
+        // Заказ не тронут: ни водителя, ни авто, ни статуса.
+        $order->refresh();
+        $this->assertSame(Order::STATUS_PENDING, $order->status);
+        $this->assertNull($order->driver_id);
+        $this->assertNull($order->car_id);
+    }
+
+    public function test_start_ride_writes_bound_car_id_when_order_has_none(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $car = Car::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_ON_PLACE,
+            'driver_id' => $driver->id,
+        ]);
+
+        $response = $this->postJson('/api/orders/startRide', [
+            'orderId' => $order->id,
+            'car_id' => $car->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+
+        $order->refresh();
+        $this->assertSame(Order::STATUS_IN_PROGRESS, $order->status);
+        $this->assertSame($car->id, $order->car_id);
     }
 
     public function test_driver_cannot_decline_offer_assigned_to_another_driver(): void
