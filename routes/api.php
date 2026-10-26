@@ -71,7 +71,6 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 
 
-
     Route::post('/updateProfile', '\App\Http\Controllers\ProfileController@updateProfile');
 
     Route::post('/updatePassword', '\App\Http\Controllers\ProfileController@updatePassword');
@@ -87,13 +86,10 @@ Route::group(['middleware' => ['auth:api']], function () {
     
     // //Работа с акциями
 
-
     // //Работа с адресами пользователя
     
 
-
     // //Создание заказа
-
 
     // //Получение баннеров на главной 
 
@@ -139,8 +135,13 @@ Route::get('/suggest', function (Request $request) {
         return response()->json(['error' => 'Missing text parameter'], 400);
     }
 
+    $apiKey = config('services.yandex.suggest_key');
+    if (!$apiKey) {
+        return response()->json(['error' => 'Suggest service is not configured'], 503);
+    }
+
     $response = Http::get('https://suggest-maps.yandex.ru/v1/suggest', [
-        'apikey' => '97973d7d-a7b7-4674-8334-531a0dddb696',
+        'apikey' => $apiKey,
         'text' => $query,
         'lang' => 'ru_RU',
                 'll' => '30.240320,53.518235',   // Долгота,Широта (именно в таком порядке!)
@@ -161,7 +162,6 @@ Route::get('/suggest', function (Request $request) {
 
     return $response->json();
 });
-
 
 
 
