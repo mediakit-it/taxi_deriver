@@ -26,6 +26,7 @@ class AdminAlert implements ShouldBroadcastNow
     public const TYPE_DRIVER_NO_RESPONSE = 'driver_no_response';
     public const TYPE_NEW_ORDER = 'new_order';
     public const TYPE_NEW_MESSAGE = 'new_message';
+    public const TYPE_DRIVER_DECLINED = 'driver_declined';
 
     public function __construct(
         public string $type,
@@ -92,6 +93,28 @@ class AdminAlert implements ShouldBroadcastNow
             messageId: $message->id,
             clientName: self::userName($message->user),
             url: route('messenger'),
+        );
+    }
+
+    /**
+     * Водитель отказался от заказа, назначенного ему диспетчером лично:
+     * диспетчеру нужен новый водитель (сигнал аналогичен driver_no_response,
+     * но мгновенный - по факту отказа, а не по таймауту).
+     */
+    public static function driverDeclined(Order $order): self
+    {
+        $driverName = self::userName($order->driver);
+
+        return new self(
+            type: self::TYPE_DRIVER_DECLINED,
+            title: 'Водитель отказался от заказа',
+            text: "Водитель {$driverName} отказался от заказа #{$order->id} - нужен новый водитель.",
+            orderId: $order->id,
+            driverName: $driverName,
+            clientName: self::fullName($order->client_first_name, $order->client_last_name),
+            fromAddress: $order->from_address,
+            toAddress: $order->to_address,
+            url: route('order.edit', $order->id),
         );
     }
 
