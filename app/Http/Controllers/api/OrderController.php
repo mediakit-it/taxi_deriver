@@ -538,6 +538,50 @@ class OrderController extends Controller
         ]);
     }
 
+    // Водитель отказался от предложенного заказа.
+    // Заказ остаётся без водителя и доступен другим; сам заказ не меняется,
+    // фиксируем только факт отказа (лог активности), чтобы диспетчер видел картину.
+    public function declineOrderByDriver(Request $request)
+    {
+        $user = Auth::user();
+
+        $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_START', [
+            'order_id' => $request->input('orderId')
+        ], $user);
+
+        if (!$user) {
+            $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_FAILED', ['reason' => 'Unauthenticated']);
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $order = Order::find($request->input('orderId'));
+
+        if (!$order) {
+            $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_ORDER_NOT_FOUND', [
+                'order_id' => $request->input('orderId')
+            ], $user);
+            return response()->json(['status' => false, 'message' => 'Order not found'], 404);
+        }
+
+        if ($order->driver_id) {
+            $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_ALREADY_ASSIGNED', [
+                'order_id' => $order->id,
+                'current_driver_id' => $order->driver_id,
+                'attempted_driver_id' => $user->id
+            ], $user);
+            return response()->json(['status' => false, 'message' => 'Order already assigned']);
+        }
+
+        $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_SUCCESS', [
+            'order_id' => $order->id,
+            'driver_id' => $user->id,
+            'client_id' => $order->client_id,
+            'status' => $order->status
+        ], $user);
+
+        return response()->json(['status' => true]);
+    }
+
     // Добавлено RAY - водитель на месте
     public function onPlace(Request $request)
     {

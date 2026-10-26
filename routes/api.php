@@ -117,6 +117,7 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/orders/closeOrderUser', [OrderController::class, 'closeOrderUser']);
     Route::post('/orders/closeOrderUserDriving', [OrderController::class, 'closeOrderUserDriving']);
     Route::post('/orders/acceptOrderByDriver', [OrderController::class, 'acceptOrderByDriver']);
+    Route::post('/orders/declineOrderByDriver', [OrderController::class, 'declineOrderByDriver']);
 
     //два метода от RAY
     Route::post('/orders/onPlace',   [OrderController::class, 'onPlace']);

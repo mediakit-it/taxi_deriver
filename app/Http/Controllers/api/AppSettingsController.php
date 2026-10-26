@@ -28,6 +28,9 @@ class AppSettingsController extends Controller
                     : null,
                 'phones' => $this->jsonList($settings['phones'] ?? null),
                 'addresses' => $this->jsonList($settings['addresses'] ?? null),
+                'driver_accept_seconds' => isset($settings['driver_accept_seconds']) && $settings['driver_accept_seconds'] !== ''
+                    ? (int) $settings['driver_accept_seconds']
+                    : null,
                 'socials' => [
                     'telegram' => $settings['social_telegram'] ?? null,
                     'viber' => $settings['social_viber'] ?? null,

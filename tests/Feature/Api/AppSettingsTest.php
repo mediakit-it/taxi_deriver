@@ -39,4 +39,14 @@ class AppSettingsTest extends TestCase
         $response->assertJsonPath('data.phones', []);
         $response->assertJsonPath('data.addresses', []);
     }
+
+    public function test_app_settings_returns_driver_accept_seconds(): void
+    {
+        Setting::set('driver_accept_seconds', '45');
+
+        $response = $this->getJson('/api/v1/app-settings');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.driver_accept_seconds', 45);
+    }
 }
