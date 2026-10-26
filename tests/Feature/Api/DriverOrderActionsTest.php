@@ -191,9 +191,12 @@ class DriverOrderActionsTest extends TestCase
         $response->assertOk()->assertJson(['status' => true]);
 
         // The assignment is released; the order itself keeps searching.
+        // driver_offered_at is KEPT: it is the "was offered" evidence the
+        // dispatcher attention panel uses to tell a declined order apart
+        // from a fresh broadcast order (Order::scopeDeclinedByDriver).
         $order->refresh();
         $this->assertNull($order->driver_id);
-        $this->assertNull($order->driver_offered_at);
+        $this->assertNotNull($order->driver_offered_at);
         $this->assertSame(Order::STATUS_SEARCHING, $order->status);
 
         // The dispatcher is signalled at once that a new driver is needed.

@@ -10,8 +10,10 @@
       сообщение (new_message).
    Сигналы driver_no_response и driver_declined живут в панели
    «Требуют внимания» БЕЗ кнопки закрытия: карточка заказа исчезает
-   только когда заказ перестаёт быть проблемным (синхронизация с
-   GET /admin/data/overdue-orders раз в минуту и при загрузке).
+   только когда заказ перестаёт быть проблемным. Эндпоинт
+   GET /admin/data/overdue-orders возвращает оба типа проблем
+   (поле reason: no_response / declined), синхронизация с ним -
+   раз в минуту и при загрузке.
    Плюс: window.adminToast(title, text, type, url) - тосты для вьюх
    (замена not7/notif из удалённой темы). */
 (function () {
@@ -240,6 +242,14 @@
         var id = String(data.order_id);
         var type = data.type || "driver_no_response";
         var isNew = !attention[id];
+
+        if (!isNew && attention[id].type !== type) {
+            // Тип проблемы по заказу сменился (например, водитель после
+            // сигнала о молчании всё же отклонил заказ) - карточку
+            // пересоздаём, чтобы подпись и тип были актуальны.
+            removeAttentionCard(id);
+            isNew = true;
+        }
         var card;
 
         if (isNew) {
@@ -353,15 +363,18 @@
             list.forEach(function (item) {
                 if (item && item.order_id != null) {
                     seen[String(item.order_id)] = true;
-                    item.type = item.type || "driver_no_response";
+                    item.type = item.reason === "declined"
+                        ? "driver_declined"
+                        : "driver_no_response";
                     upsertAttentionCard(item, true);
                 }
             });
-            // Исчезновение из списка = проблема решена: карточку убираем.
-            // Управляем только карточками driver_no_response - declined-карточки
-            // эндпоинт не возвращает, их снимает только перезагрузка/новое событие.
+            // Исчезновение из списка = проблема решена (водитель
+            // переназначен, заказ принят или закрыт): карточку убираем.
+            // Эндпоинт возвращает оба типа проблем - и молчание, и
+            // отказ, - поэтому снимаем любую карточку вне свежего списка.
             Object.keys(attention).forEach(function (id) {
-                if (attention[id].type === "driver_no_response" && !seen[id]) {
+                if (!seen[id]) {
                     removeAttentionCard(id);
                 }
             });
