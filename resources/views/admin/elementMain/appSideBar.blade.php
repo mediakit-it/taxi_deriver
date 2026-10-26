@@ -3,9 +3,24 @@
     <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
     <div class="app-sidebar">
         <div class="side-header">
-            <a class="header-brand1" href="{{route('dashboard')}}">
-                <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img" alt="logo">
-            </a><!-- LOGO -->
+            @php
+                // Вордмарк текстом, как на mediakit.by: название из «Настроек» (company_name),
+                // последнее слово - в акцентной плашке; у одного слова в плашке последние 3 буквы.
+                $brandName = trim((string) (\App\Models\Setting::get('company_name') ?: config('app.name', 'Taxi')));
+                $brandName = mb_strtoupper($brandName, 'UTF-8');
+                $brandWords = preg_split('/\s+/u', $brandName) ?: [];
+                if (count($brandWords) > 1) {
+                    $brandTail = array_pop($brandWords);
+                    $brandHead = implode(' ', $brandWords);
+                } elseif (mb_strlen($brandName, 'UTF-8') > 3) {
+                    $brandHead = mb_substr($brandName, 0, -3, 'UTF-8');
+                    $brandTail = mb_substr($brandName, -3, null, 'UTF-8');
+                } else {
+                    $brandHead = '';
+                    $brandTail = $brandName;
+                }
+            @endphp
+            <a class="header-brand1 admin-brand" href="{{route('dashboard')}}">@if($brandHead !== '')<span class="admin-brand__head">{{ $brandHead }}</span>@endif<span class="admin-brand__box">{{ $brandTail }}</span></a><!-- LOGO -->
         </div>
         <div class="admin-user-card">
             <span class="admin-user-card__avatar-wrap">
