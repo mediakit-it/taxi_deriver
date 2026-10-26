@@ -80,6 +80,27 @@ class NewOrderUserTest extends TestCase
         $this->assertEqualsWithDelta(53.5250, (float) $order->from_lat, 0.0001);
     }
 
+    public function test_app_order_source_is_forced_to_app(): void
+    {
+        Http::fake();
+        Event::fake();
+        $user = User::factory()->create();
+
+        $response = $this->postJson('/api/orders/newOrderUser', [
+            'fromAddress' => 'Быхов, ул. Ленина, 1',
+            'fromLat' => 53.5203,
+            'fromLon' => 30.2371,
+            'toAddress' => 'Быхов, ул. Советская, 5',
+            'toLat' => 53.5250,
+            'toLon' => 30.2450,
+            // Приложение не может подменить источник заказа
+            'source' => 'phone',
+        ], $this->authHeaders($user));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame('app', Order::first()->source);
+    }
+
     public function test_requires_to_address(): void
     {
         $user = User::factory()->create();

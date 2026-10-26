@@ -84,6 +84,16 @@
 											</select>
 										</div>
 									</div>
+									<div class="col-sm-12 col-md-12 col-xl-5">
+										<div class="form-group">
+											<label class="form-label text-muted">Источник заказа:</label>
+											<select class="form-control form-select text-dark" name="source">
+												@foreach ($sources as $sourceValue => $sourceLabel)
+													<option value="{{ $sourceValue }}" @selected(old('source', 'phone') == $sourceValue)>{{ $sourceLabel }}</option>
+												@endforeach
+											</select>
+										</div>
+									</div>
 									<!-- Адрес клиента -->
 									<div class="col-sm-12 col-md-12 col-xl-6">
 										<div class="form-group">
