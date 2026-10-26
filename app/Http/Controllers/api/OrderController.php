@@ -372,6 +372,9 @@ class OrderController extends Controller
             'duration' => max(0, (int) $request->input('duration', 0)),
             'price' => null,
             'tariff' => $request->input('tariff'),
+            // Источник заказа из приложения проставляет сервер,
+            // входное значение приложения не принимается
+            'source' => Order::SOURCE_APP,
         ]);
 
         $this->logOrderActivity('NEW_ORDER_USER_CREATED', [

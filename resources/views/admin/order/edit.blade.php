@@ -57,6 +57,7 @@
 										<p><strong>Конечный адрес:</strong> <span id="summary-to-address">{{$order->to_address}}</span></p>
 										<p><strong>Класс обслуживания:</strong> <span id="summary-tariff">{{$order->tariffClass?->label ?? '—'}}</span></p>
 										<p><strong>Автомобиль:</strong> <span id="summary-car">{{$order->car ? $order->car->label . ' (' . $order->car->number_plate . ')' : '—'}}</span></p>
+										<p><strong>Источник:</strong> <span id="summary-source">{{$order->source_label}}</span></p>
 									</div>
 									<div class="col-sm-12 col-md-12 col-xl-6">
 										<div class="form-group">
@@ -79,6 +80,21 @@
 													<option value="{{ $tariff->name }}" @selected(old('tariff', $order->tariff) == $tariff->name)>{{ $tariff->label }}</option>
 												@endforeach
 											</select>
+										</div>
+									</div>
+									<div class="col-sm-12 col-md-12 col-xl-6">
+										<div class="form-group">
+											<label class="form-label text-muted">Источник заказа:</label>
+											@if($order->source === 'app')
+												<input type="text" class="form-control text-dark" value="{{ $order->source_label }}" disabled>
+												<small class="text-muted">Источник заказа из приложения не меняется</small>
+											@else
+												<select class="form-control form-select text-dark" name="source">
+													@foreach ($sources as $sourceValue => $sourceLabel)
+														<option value="{{ $sourceValue }}" @selected(old('source', $order->source) == $sourceValue)>{{ $sourceLabel }}</option>
+													@endforeach
+												</select>
+											@endif
 										</div>
 									</div>
 								<div class="row p-5">
