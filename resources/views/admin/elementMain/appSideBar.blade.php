@@ -4,10 +4,7 @@
     <div class="app-sidebar">
         <div class="side-header">
             <a class="header-brand1" href="{{route('dashboard')}}">
-                <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img desktop-logo" alt="logo">
-                <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img toggle-logo" alt="logo">
-                <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img light-logo" alt="logo">
-                <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img light-logo1" alt="logo">
+                <img src="{{asset('assets/images/logo/logo1.png')}}" class="header-brand-img" alt="logo">
             </a><!-- LOGO -->
         </div>
         <div class="admin-user-card">
