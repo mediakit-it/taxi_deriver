@@ -70,7 +70,7 @@
 											<td>{{ $order->source_label }}</td>
 											<td>
 												 <!-- раскоментить -->
-												@if($order->status=="pending")<a href="{{route('order.edit',['order'=>$order->id])}}" class="btn btn-warning"><i class="fa fa-pencil"></i></a>@endif
+												@if(in_array($order->status, ['pending', 'searching', 'searching_other']))<a href="{{route('order.edit',['order'=>$order->id])}}" class="btn btn-warning"><i class="fa fa-pencil"></i> Назначить</a>@endif
 												<button class="btn btn-danger" data-slug="{{$order->id}}" data-name="{{$order->id}}" id="deleteBtn"><i class="fe fe-trash"></i></button>
 											</td>
 										</tr>
