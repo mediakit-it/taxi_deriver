@@ -83,4 +83,15 @@ class OrderTariffTest extends TestCase
         $response->assertOk();
         $response->assertSee('value="Outside_the_City" selected', false);
     }
+
+    public function test_order_edit_form_preselects_current_driver(): void
+    {
+        $driver = User::factory()->driver()->create();
+        $order = Order::factory()->create(['driver_id' => $driver->id]);
+
+        $response = $this->actingAs($this->admin(), 'web')->get(route('order.edit', $order));
+
+        $response->assertOk();
+        $response->assertSee('value="' . $driver->id . '" selected', false);
+    }
 }
