@@ -16,6 +16,7 @@ class Order extends Model
         'client_last_name',
         'client_phone',
         'driver_id',
+        'driver_offered_at',
         'from_address',
         'from_lat',
         'from_lng',
@@ -46,6 +47,10 @@ class Order extends Model
     // Статус по умолчанию
     protected $attributes = [
         'status' => self::STATUS_PENDING,
+    ];
+
+    protected $casts = [
+        'driver_offered_at' => 'datetime',
     ];
 
     // Подписи статусов для админки (те же, что в списках заказов)
@@ -119,5 +124,36 @@ class Order extends Model
     public function tariffClass()
     {
         return $this->belongsTo(CostOfTrip::class, 'tariff', 'name');
+    }
+
+    /**
+     * Заказы, ожидающие ответа назначенного водителя дольше таймаута:
+     * заказ предложил диспетчер конкретному водителю, а тот не
+     * отреагировал (реакция = заказ ушёл из статуса searching).
+     */
+    public function scopeAwaitingDriverResponse($query, int $timeoutSeconds)
+    {
+        return $query->where('status', self::STATUS_SEARCHING)
+            ->whereNotNull('driver_id')
+            ->whereNotNull('driver_offered_at')
+            ->where('driver_offered_at', '<=', now()->subSeconds($timeoutSeconds));
+    }
+
+    /**
+     * Таймаут ответа водителя из настроек (driver_accept_seconds).
+     */
+    public static function driverAcceptTimeout(): int
+    {
+        $timeout = (int) Setting::get('driver_accept_seconds', 60);
+
+        return $timeout > 0 ? $timeout : 60;
+    }
+
+    // Сколько секунд заказ уже ждёт ответа назначенного водителя
+    public function getDriverWaitingSecondsAttribute(): int
+    {
+        return $this->driver_offered_at
+            ? (int) $this->driver_offered_at->diffInSeconds(now(), true)
+            : 0;
     }
 }

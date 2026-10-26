@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Broadcast;
 
 use App\Http\Controllers\admin\DriverLocationController;
+use App\Http\Controllers\admin\DispatcherAlertController;
 use App\Http\Controllers\admin\CostOfTripController;
 use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\DashboardController;
@@ -163,6 +164,9 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
 
     // API для получения всех локаций водителей (можно защитить middleware auth)
     Route::get('/data/driver-locations', [DriverLocationController::class, 'getAllDriverLocations'])->name('admin.driver-locations.api');
+
+    // API для панели диспетчерских сигналов: заказы без ответа водителя
+    Route::get('/data/overdue-orders', [DispatcherAlertController::class, 'overdue'])->name('admin.dispatcher-alerts.overdue');
 
 
 

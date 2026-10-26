@@ -72,6 +72,7 @@ class OrderController extends Controller
             $data = $request->all();
             if (!empty($data['driver_id'])) {
                 $data['status'] = Order::STATUS_SEARCHING;
+                $data['driver_offered_at'] = now();
                 }
             $order = Order::create($data);
     if ($order) {
@@ -140,6 +141,13 @@ class OrderController extends Controller
     $oldDriver = $order->driver_id;
 
     $order->update($request->all());
+
+    // Момент предложения заказа водителю (для сторожа ответов водителей):
+    // при смене водителя отсчёт начинается заново, при снятии - сбрасывается,
+    // без смены водителя не трогаем
+    if ((int) $order->driver_id !== (int) $oldDriver) {
+        $order->update(['driver_offered_at' => $order->driver_id ? now() : null]);
+    }
 
     // Если водитель изменился и он назначен — переводим в searching
     if ($order->driver_id && $order->driver_id !== $oldDriver) {
