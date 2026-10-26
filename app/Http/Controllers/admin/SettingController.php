@@ -7,14 +7,17 @@ use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Models\AppDeletionStep;
 use App\Models\PolicyDocument;
 use App\Models\Setting;
+use App\Services\FunctionalSettingsService;
 use App\Services\SettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class SettingController extends Controller
 {
-    public function __construct(private SettingsService $settingsService)
-    {
+    public function __construct(
+        private SettingsService $settingsService,
+        private FunctionalSettingsService $functionalSettings,
+    ) {
     }
 
     // Показать страницу настроек: скаляры, документы и шаги удаления приложения
@@ -23,8 +26,9 @@ class SettingController extends Controller
         $settings = Setting::allCached();
         $documents = PolicyDocument::ordered()->get();
         $steps = AppDeletionStep::ordered()->get();
+        $functional = $this->functionalSettings->all();
 
-        return view('admin.settings.edit', compact('settings', 'documents', 'steps'));
+        return view('admin.settings.edit', compact('settings', 'documents', 'steps', 'functional'));
     }
 
     // Сохранить скалярные настройки и загруженные файлы оформления
