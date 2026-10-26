@@ -137,6 +137,7 @@ class User extends Authenticatable implements JWTSubject
         'phone',
         'password',
         'role',
+        'current_car_id',
     ];
 
     /**
@@ -163,6 +164,16 @@ class User extends Authenticatable implements JWTSubject
     public function car()
     {
         return $this->hasOne(Car::class);
+    }
+
+    // Автомобиль, к которому привязано устройство, на котором
+    // водитель сейчас авторизован: водительское приложение после
+    // входа докладывает выбранное при установке авто на сервер
+    // (CarBindingService::reportCurrentCar), диспетчер видит его
+    // в админке.
+    public function currentCar()
+    {
+        return $this->belongsTo(Car::class, 'current_car_id');
     }
 
     public function location()

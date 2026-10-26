@@ -16,7 +16,7 @@ class DriverLocationController extends Controller
 
     public function getAllDriverLocations()
     {
-        $locations = DriverLocation::with(['user', 'order'])
+        $locations = DriverLocation::with(['user.currentCar', 'order'])
             ->get(['user_id', 'lat', 'lng', 'is_zakaz', 'order_id']);
 
         return response()->json([

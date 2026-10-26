@@ -18,7 +18,7 @@ class UserController extends Controller
     public function index()
     {
         // Суперадмин нашей компании в списках у клиента не отображается
-        $users = User::visibleInAdmin(auth('web')->user())->get();
+        $users = User::visibleInAdmin(auth('web')->user())->with('currentCar')->get();
 
         return view('admin.user.index',compact('users'));
     }

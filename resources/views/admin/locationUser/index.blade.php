@@ -184,9 +184,11 @@
                     existingIds.add(driver.user_id);
 
                     const coords = [driver.lat, driver.lng];
+                    const currentCar = driver.user.current_car;
+                    const carLine = currentCar ? `<br>Авто: ${currentCar.brand} ${currentCar.model} · ${currentCar.number_plate}` : '';
                     const balloonContent = `
                         <b>Водитель ID:${driver.user_id}. ФИО: ${driver.user.last_name} ${driver.user.first_name}</b><br>
-                        Статус: ${driver.is_zakaz ? 'Занят' : 'Свободен'}<br>
+                        Статус: ${driver.is_zakaz ? 'Занят' : 'Свободен'}${carLine}<br>
                         Заказ: ${driver.order_id ? '# '+driver.order_id : 'Нет'}
                     `;
 

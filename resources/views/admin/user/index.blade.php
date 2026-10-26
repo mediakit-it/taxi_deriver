@@ -41,6 +41,7 @@
 										<th class="wd-15p border-bottom-0">Телефон</th>
 										<th class="wd-15p border-bottom-0">Почта</th>
 										<th class="wd-20p border-bottom-0">Роль</th>
+										<th class="wd-15p border-bottom-0">Авто</th>
 										<th class="wd-15p border-bottom-0">Действие</th>
 									</tr>
 								</thead>
@@ -65,6 +66,12 @@
 												}
 											@endphp
 											<td>{{ $roleName }}</td>
+											<td>
+												@if($user->role === 'driving' && $user->currentCar)
+													{{ $user->currentCar->label }}<br>
+													<span class="text-muted">{{ $user->currentCar->number_plate }}</span>
+												@endif
+											</td>
 											<td>
 												<a href="{{route('user.edit',['user'=>$user->id])}}" class="btn btn-warning"><i class="fa fa-pencil"></i></a>
 												<button class="btn btn-danger" data-slug="{{$user->id}}" data-name="{{$user->name}}" id="deleteBtn"><i class="fe fe-trash"></i></button>
