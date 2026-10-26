@@ -33,6 +33,8 @@ return [
 
     'yandex' => [
         'geocoder_key' => env('YANDEX_GEOCODER_KEY'),
+        'suggest_key' => env('YANDEX_SUGGEST_KEY'),
+        'js_key' => env('YANDEX_JS_KEY'),
     ],
 
 ];
