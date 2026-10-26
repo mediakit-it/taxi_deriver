@@ -61,8 +61,7 @@
   		autoclose: true,
 	});</script>
 
-<!-- <script src="//api-maps.yandex.ru/2.1/?apikey=ad38720a-e8c9-443c-b454-1f4d2499ad78&suggest_apikey=871a8f7b-85ec-4bc7-b5cb-f336458187b6&lang=ru_RU&load=SuggestView&onload=onLoad"></script> -->
-<script src="https://api-maps.yandex.ru/2.1/?apikey=ad38720a-e8c9-443c-b454-1f4d2499ad78&suggest_apikey=871a8f7b-85ec-4bc7-b5cb-f336458187b6&lang=ru_RU&load=SuggestView,geocode,route,Map,Placemark"></script>
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ config('services.yandex.js_key') }}&suggest_apikey={{ config('services.yandex.suggest_key') }}&lang=ru_RU&load=SuggestView,geocode,route,Map,Placemark"></script>
 
 
 <script>

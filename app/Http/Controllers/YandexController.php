@@ -18,14 +18,14 @@ class YandexController extends Controller
         ]);
 
         try {
-            $apiKey = env('YANDEX_API_KEY');
+            $apiKey = config('services.yandex.suggest_key');
             
             // Проверяем наличие API ключа
             if (empty($apiKey)) {
                 Log::channel('yandex')->error('YANDEX_API_KEY_MISSING', [
-                    'message' => 'API ключ не найден в .env файле'
+                    'message' => 'API ключ не найден в конфигурации (services.yandex.suggest_key)'
                 ]);
-                return response()->json(['error' => 'API ключ не настроен'], 500);
+                return response()->json(['error' => 'API ключ не настроен'], 503);
             }
 
             $text = $request->input('text');
