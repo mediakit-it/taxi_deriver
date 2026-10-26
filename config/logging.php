@@ -98,13 +98,14 @@ return [
         'path' => storage_path('logs/orders.log'),
         'level' => 'debug',
         'days' => 30,
+        'permission' => 0666,
     ],
     'yandex' => [
         'driver' => 'daily',
         'path' => storage_path('logs/yandex.log'),
         'level' => 'debug',
         'days' => 30,
-        'permission' => 0664,
+        'permission' => 0666,
     ],
 
         'stderr' => [
@@ -144,6 +145,7 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/driver_location.log'),
             'level' => 'info',
+            'permission' => 0666,
         ],
     ],
 
