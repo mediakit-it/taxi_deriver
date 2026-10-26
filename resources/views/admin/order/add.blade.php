@@ -65,7 +65,7 @@
 									<div class="col-sm-12 col-md-12 col-xl-7">
 										<div class="form-group">
 											<label class="form-label text-muted">Выберите водителя(Не обязательно):</label>
-											<select class="form-control select2 form-select select2-hidden-accessible text-dark" value="{{old('driver_id')}}" name="driver_id" id="client-salution1" data-placeholder="Выберите водителя" tabindex="-1" aria-hidden="true">
+											<select class="form-control form-select text-dark" value="{{old('driver_id')}}" name="driver_id" id="client-salution1" data-placeholder="Выберите водителя">
 												<option value="" selected>-</option>
 												@foreach ($users as $user)
 													<option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }}</option>
