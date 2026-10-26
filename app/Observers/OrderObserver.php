@@ -2,12 +2,19 @@
 
 namespace App\Observers;
 
+use App\Events\AdminAlert;
 use App\Events\ClientOrderUpdated;
 use App\Models\Order;
 use App\Services\ClientNotificationService;
 
 class OrderObserver
 {
+    public function created(Order $order): void
+    {
+        // Диспетчеры видят новый заказ в админке сразу (сигнал админки).
+        event(AdminAlert::newOrder($order));
+    }
+
     public function updated(Order $order): void
     {
         if ($order->wasChanged('status')) {

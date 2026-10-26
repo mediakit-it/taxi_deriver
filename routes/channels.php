@@ -24,3 +24,7 @@ Broadcast::channel('chat.{userId}', function ($user, $userId) {
 Broadcast::channel('admin', function () {
     return true;
 });
+
+Broadcast::channel('admin.alerts', function ($user) {
+    return in_array($user->role, ['admin', 'superadmin', 'manager'], true);
+});
