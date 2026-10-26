@@ -70,9 +70,7 @@ Route::middleware(['auth:web'])->group(function () {
 
 
 
-
     Route::get('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout');
-
 
 
 
@@ -99,45 +97,23 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::resource('order', 'App\Http\Controllers\admin\OrderController');
     Route::get('orderAjax', 'App\Http\Controllers\admin\OrderController@indexAjax')->name('orderAjax');
     Route::get('/yandex-suggest', [YandexController::class, 'suggest']);
-    
 
-    
-    //     $params = [
-    //         'text' => $query,
-    //         'lang' => $lang,
-    //         'results' => $results,
-    //         'highlight' => $highlight,
-    //         'apikey' => '871a8f7b-85ec-4bc7-b5cb-f336458187b6', // актуальный suggest API key
-    //     ];
-    
-    //     if ($types) $params['types'] = $types;
-    //     if ($print_address) $params['print_address'] = $print_address;
-    //     if ($attrs) $params['attrs'] = $attrs;
-    //     if ($ll) $params['ll'] = $ll;
-    //     if ($spn) $params['spn'] = $spn;
-    //     if ($bbox) $params['bbox'] = $bbox;
-    
-    //     $url = 'https://suggest-maps.yandex.ru/v1/suggest';
-    
-    //     $response = Http::get($url, $params);
-    
-    //     return response()->json($response->json());
-    // })->name('ysndexSug');
-    
     Route::get('proxy/yandex-suggest', function () {
+        $suggestKey = config('services.yandex.suggest_key');
+        if (!$suggestKey) {
+            return response()->json(['error' => 'Suggest service is not configured'], 503);
+        }
+
         $query = request('text');
-        // https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=<ваш ключ для JS API>&suggest_apikey=<ваш ключ для Suggest API>
-        // $url = 'https://suggest-maps.yandex.ru/v1/suggest';
         $url = 'https://api-maps.yandex.ru/2.1';
         $response = Http::get($url, [
             'text' => $query,
-            'suggest_apikey'=>'871a8f7b-85ec-4bc7-b5cb-f336458187b6',
-            'apikey' => 'ad38720a-e8c9-443c-b454-1f4d2499ad78',
-            'lang'=>'ru_RU',
+            'suggest_apikey' => $suggestKey,
+            'apikey' => config('services.yandex.js_key'),
+            'lang' => 'ru_RU',
         ]);
         return response()->json($response->json());
     });
-    
 
     //выход из аккаунта
 
@@ -147,16 +123,12 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
 
 
 
-
-
     Route::get('mainPage', 'App\Http\Controllers\admin\MainPageController@index')->name('mainPage');
-
 
     Route::get('messenger', 'App\Http\Controllers\admin\MessengerController@index')->name('messenger');
     Route::post('getMessagesUser', 'App\Http\Controllers\admin\MessengerController@getMessagesUser');
     Route::post('addNewMessageUser', 'App\Http\Controllers\admin\MessengerController@addNewMessageUser');
     Route::post('readMessageUser', 'App\Http\Controllers\admin\MessengerController@readMessageUser');
-
 
 
 
@@ -177,4 +149,3 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
 
 
 });
-
