@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AdminMiddleware
 {
@@ -16,7 +17,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('web')->check() && in_array(Auth::guard('web')->user()->role, ['admin','superadmin','manager'])) {
+        if (Auth::guard('web')->check() && in_array(Auth::guard('web')->user()->role, User::PANEL_ROLES, true)) {
             return $next($request);
         }
 

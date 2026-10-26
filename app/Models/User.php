@@ -12,6 +12,94 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
+    // Все роли системы (users.role - строка)
+    public const ROLE_SUPERADMIN = 'superadmin';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_MANAGER = 'manager';
+    public const ROLE_DISPATCHER = 'dispatcher';
+    public const ROLE_DRIVER = 'driving';
+    public const ROLE_CLIENT = 'user';
+
+    // Подписи ролей для админки
+    public const ROLE_LABELS = [
+        self::ROLE_SUPERADMIN => 'Суперадмин',
+        self::ROLE_ADMIN => 'Администратор',
+        self::ROLE_MANAGER => 'Менеджер',
+        self::ROLE_DISPATCHER => 'Диспетчер',
+        self::ROLE_DRIVER => 'Водитель',
+        self::ROLE_CLIENT => 'Клиент',
+    ];
+
+    // Роли, которым открыт вход в веб-панель (/authorization)
+    public const PANEL_ROLES = [
+        self::ROLE_SUPERADMIN,
+        self::ROLE_ADMIN,
+        self::ROLE_MANAGER,
+        self::ROLE_DISPATCHER,
+    ];
+
+    // Роли, которые можно назначить через админку. superadmin -
+    // только представитель нашей компании: через интерфейс не
+    // назначается (создаётся сидером/командой при установке коробки)
+    public const ASSIGNABLE_ROLES = [
+        self::ROLE_ADMIN,
+        self::ROLE_MANAGER,
+        self::ROLE_DISPATCHER,
+        self::ROLE_DRIVER,
+        self::ROLE_CLIENT,
+    ];
+
+    /**
+     * Подписи всех ролей: значение => подпись.
+     *
+     * @return array<string, string>
+     */
+    public static function roleLabels(): array
+    {
+        return self::ROLE_LABELS;
+    }
+
+    /**
+     * Роли, доступные для назначения в админке: значение => подпись.
+     *
+     * @return array<string, string>
+     */
+    public static function assignableRoles(): array
+    {
+        return array_intersect_key(self::ROLE_LABELS, array_flip(self::ASSIGNABLE_ROLES));
+    }
+
+    // Открыт ли пользователю вход в веб-панель
+    public function hasPanelAccess(): bool
+    {
+        return in_array($this->role, self::PANEL_ROLES, true);
+    }
+
+    public function isSuperadmin(): bool
+    {
+        return $this->role === self::ROLE_SUPERADMIN;
+    }
+
+    // Подпись текущей роли
+    public function getRoleLabelAttribute(): ?string
+    {
+        return self::ROLE_LABELS[$this->role] ?? $this->role;
+    }
+
+    /**
+     * Кого видит в списке пользователей конкретный сотрудник панели:
+     * суперадмин нашей компании не отображается никому, кроме
+     * другого суперадмина.
+     */
+    public function scopeVisibleInAdmin($query, User $viewer)
+    {
+        if (!$viewer->isSuperadmin()) {
+            $query->where('role', '!=', self::ROLE_SUPERADMIN);
+        }
+
+        return $query;
+    }
+
    
     // Реализация методов интерфейса JWTSubject
     public function getJWTIdentifier()
