@@ -191,7 +191,7 @@
 						if(data == 'true'){
 							$("tr[data-slug=" + slug + "]").remove();
 							$('#modaldemo1').modal('hide');
-							not7("Заказ был успешно удален");
+							window.adminToast("Заказ был успешно удален", "", "success");
 						}else{
 							$('#modaldemo1').modal('hide');
 						}
@@ -221,10 +221,7 @@
             success: function(response) {
                 // let newTbody = $(response).find("#orders-table").html();
                 $("#orders-table").html(response);
-                notif({
-                    msg: "Список заказов обновлён",
-                    type: "success"
-                });
+                window.adminToast("Список заказов обновлён", "", "success");
             },
             error: function(xhr) {
                 console.error("Ошибка обновления:", xhr);

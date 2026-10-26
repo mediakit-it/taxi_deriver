@@ -153,7 +153,7 @@
 						if(data == 'true'){
 							$("tr[data-slug=" + slug + "]").remove();
 							$('#modaldemo1').modal('hide');
-							not7("Пользователь был успешно удален");
+							window.adminToast("Пользователь был успешно удален", "", "success");
 						}else{
 							$('#modaldemo1').modal('hide');
 						}

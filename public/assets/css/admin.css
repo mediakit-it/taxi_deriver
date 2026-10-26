@@ -1387,3 +1387,194 @@ table.dataTable tbody tr.selected { background: var(--admin-accent-light); }
     .dataTables_wrapper .dataTables_filter { float: none; text-align: left; }
     .dataTables_wrapper .dataTables_length { float: none; }
 }
+
+/* ---------- 19. Realtime-сигналы диспетчера: панель внимания и тосты ---------- */
+
+/* Панель «Требуют внимания»: висит справа под шапкой, пока есть проблемные
+   заказы (водитель не ответил / отклонил). Карточки без кнопки закрытия -
+   снимаются только синхронизацией, когда заказ перестаёт быть проблемным. */
+.admin-alerts-panel {
+    position: fixed;
+    top: calc(var(--admin-header-h) + 12px);
+    right: 20px;
+    z-index: 1040;
+    width: 360px;
+    max-width: calc(100vw - 40px);
+    background: var(--admin-panel);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-card-radius);
+    box-shadow: var(--admin-shadow);
+    padding: 14px;
+}
+
+.admin-alerts-panel[hidden] { display: none; }
+
+.admin-alerts-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--admin-danger);
+    margin-bottom: 10px;
+}
+
+.admin-alerts-panel__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--admin-danger);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.admin-alerts-panel__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(100vh - 190px);
+    overflow-y: auto;
+}
+
+.admin-alert-card {
+    background: var(--admin-danger-bg);
+    border: 1px solid rgba(229, 72, 77, 0.35);
+    border-left: 4px solid var(--admin-danger);
+    border-radius: var(--admin-radius);
+    padding: 12px 14px;
+    animation: admin-card-in 0.25s ease-out;
+}
+
+.admin-alert-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.admin-alert-card__title { font-weight: 700; color: var(--admin-danger); }
+
+.admin-alert-card__wait {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #101019;
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-alert-card__wait::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--admin-danger);
+    animation: admin-pulse 1.2s ease-in-out infinite;
+}
+
+.admin-alert-card__text { margin-top: 6px; font-size: 0.92rem; }
+
+.admin-alert-card__route { margin-top: 4px; color: var(--admin-muted); font-size: 0.9rem; }
+
+.admin-alert-card__arrow { color: var(--admin-danger); font-weight: 700; }
+
+.admin-alert-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.admin-alert-card__driver { color: var(--admin-muted); font-size: 0.88rem; }
+
+.admin-alert-card__link { font-weight: 600; white-space: nowrap; }
+
+/* Тосты: тёмные, как legacy-growl; акцентная полоса по типу события */
+.admin-toasts {
+    position: fixed;
+    right: 20px;
+    bottom: 78px;
+    z-index: 1041;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 340px;
+    max-width: calc(100vw - 40px);
+}
+
+.admin-toast {
+    position: relative;
+    background: #101019;
+    color: #fff;
+    border-left: 4px solid var(--admin-info);
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(16, 16, 25, 0.3);
+    padding: 13px 38px 13px 16px;
+    animation: admin-toast-in 0.25s ease-out;
+}
+
+.admin-toast--success { border-left-color: var(--admin-success); }
+.admin-toast--danger { border-left-color: var(--admin-danger); }
+.admin-toast--info { border-left-color: var(--admin-info); }
+
+.admin-toast--hide { opacity: 0; transition: opacity 0.3s ease; }
+
+.admin-toast__title { font-weight: 700; margin-bottom: 2px; }
+
+.admin-toast__text { color: rgba(255, 255, 255, 0.75); font-size: 0.92rem; }
+
+.admin-toast__link {
+    display: inline-block;
+    margin-top: 6px;
+    color: var(--admin-accent-light);
+    font-weight: 600;
+}
+
+.admin-toast__link:hover { color: #fff; }
+
+.admin-toast__close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: 0;
+    color: #fff;
+    font-size: 1.1rem;
+    line-height: 1;
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.admin-toast__close:hover { opacity: 1; }
+
+@keyframes admin-toast-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes admin-card-in {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes admin-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+/* узкие экраны: панель и тосты - на всю ширину с отступами */
+@media (max-width: 575.98px) {
+    .admin-alerts-panel { left: 12px; right: 12px; width: auto; max-width: none; }
+    .admin-toasts { left: 12px; right: 12px; width: auto; max-width: none; }
+}

@@ -147,7 +147,7 @@
 						if(data == 'true'){
 							$("tr[data-slug=" + slug + "]").remove();
 							$('#modaldemo1').modal('hide');
-							not7("Машина была успешно удален");
+							window.adminToast("Машина была успешно удален", "", "success");
 						}else{
 							$('#modaldemo1').modal('hide');
 						}
