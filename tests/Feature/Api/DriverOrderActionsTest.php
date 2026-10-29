@@ -331,4 +331,169 @@ class DriverOrderActionsTest extends TestCase
         $this->assertSame(Order::STATUS_SEARCHING, $order->status);
         $this->assertNotNull($order->driver_offered_at);
     }
+
+    public function test_driver_with_assigned_order_cannot_claim_second_pending_order(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $activeOrder = Order::factory()->create([
+            'status' => Order::STATUS_ASSIGNED,
+            'driver_id' => $driver->id,
+        ]);
+        $secondOrder = Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'driver_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $secondOrder->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson([
+            'status' => false,
+            'message' => 'У вас уже есть активный заказ',
+        ]);
+
+        // The second order stays unclaimed; the active one is untouched.
+        $secondOrder->refresh();
+        $this->assertSame(Order::STATUS_PENDING, $secondOrder->status);
+        $this->assertNull($secondOrder->driver_id);
+        $this->assertSame(Order::STATUS_ASSIGNED, $activeOrder->refresh()->status);
+    }
+
+    public function test_driver_with_in_progress_order_cannot_accept_offered_searching_order(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        Order::factory()->create([
+            'status' => Order::STATUS_IN_PROGRESS,
+            'driver_id' => $driver->id,
+        ]);
+        $offeredOrder = Order::factory()->create([
+            'status' => Order::STATUS_SEARCHING,
+            'driver_id' => $driver->id,
+            'driver_offered_at' => now()->subSeconds(30),
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $offeredOrder->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson([
+            'status' => false,
+            'message' => 'У вас уже есть активный заказ',
+        ]);
+
+        // The offer stays open (searching); it was not silently accepted.
+        $offeredOrder->refresh();
+        $this->assertSame(Order::STATUS_SEARCHING, $offeredOrder->status);
+        $this->assertSame($driver->id, $offeredOrder->driver_id);
+    }
+
+    public function test_driver_with_active_order_cannot_claim_via_add_driving(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        Order::factory()->create([
+            'status' => Order::STATUS_ON_PLACE,
+            'driver_id' => $driver->id,
+        ]);
+        $secondOrder = Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'driver_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/add', [
+            'orderId' => $secondOrder->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson([
+            'status' => false,
+            'message' => 'У вас уже есть активный заказ',
+        ]);
+
+        $secondOrder->refresh();
+        $this->assertSame(Order::STATUS_PENDING, $secondOrder->status);
+        $this->assertNull($secondOrder->driver_id);
+    }
+
+    public function test_driver_without_active_order_claims_via_add_driving(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_PENDING,
+            'driver_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/add', [
+            'orderId' => $order->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+
+        $order->refresh();
+        $this->assertSame(Order::STATUS_ASSIGNED, $order->status);
+        $this->assertSame($driver->id, $order->driver_id);
+    }
+
+    public function test_driver_reaccepting_own_assigned_order_is_idempotent(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_ASSIGNED,
+            'driver_id' => $driver->id,
+        ]);
+
+        $response = $this->postJson('/api/orders/acceptOrderByDriver', [
+            'orderId' => $order->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+
+        $order->refresh();
+        $this->assertSame(Order::STATUS_ASSIGNED, $order->status);
+        $this->assertSame($driver->id, $order->driver_id);
+    }
+
+    public function test_close_driving_with_canceled_returns_status_true(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_IN_PROGRESS,
+            'driver_id' => $driver->id,
+        ]);
+
+        $response = $this->postJson('/api/orders/close', [
+            'orderId' => $order->id,
+            'zakaz' => Order::STATUS_CANCELED,
+            'time' => 300,
+        ], $this->authHeaders($driver));
+
+        // The cancel WAS saved on the server, so the answer is status=true:
+        // status=false would tell the app the close failed (zombie trip).
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame(Order::STATUS_CANCELED, $order->refresh()->status);
+    }
+
+    public function test_close_driving_with_completed_returns_status_true(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_IN_PROGRESS,
+            'driver_id' => $driver->id,
+        ]);
+
+        $response = $this->postJson('/api/orders/close', [
+            'orderId' => $order->id,
+            'zakaz' => Order::STATUS_COMPLETED,
+            'time' => 300,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame(Order::STATUS_COMPLETED, $order->refresh()->status);
+    }
 }
