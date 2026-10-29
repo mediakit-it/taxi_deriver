@@ -17,7 +17,7 @@ class LandingSettingsTest extends TestCase
         $response = $this->get('/');
 
         $response->assertOk();
-        $response->assertSee('СитиТакси');
+        $response->assertSee('Такси');
         $response->assertSee('7777');
         $response->assertSee('zakaz@example.com');
         $response->assertSee('Ваш город');

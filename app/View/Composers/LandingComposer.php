@@ -15,7 +15,7 @@ class LandingComposer
      * главная страница показывает их вместо пустых мест.
      */
     private const FALLBACKS = [
-        'company_name' => 'СитиТакси',
+        'company_name' => 'Такси',
         'city' => 'Ваш город',
         'email' => 'zakaz@example.com',
         'currency_label' => 'руб.',

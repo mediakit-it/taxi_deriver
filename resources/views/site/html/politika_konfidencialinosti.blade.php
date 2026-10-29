@@ -12,7 +12,7 @@
     <meta name="description" content="Ridek Online Taxi Booking HTML5 Template">
     <meta name="author" content="DynamicLayers">
 
-    <title>ОК Такси - заказ такси в Быхове</title>
+    <title>{{ \App\Models\Setting::get('company_name', 'Такси') }} - заказ такси в Быхове</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{asset('assetsSite2/img/favicon.png')}}">
 	
@@ -345,7 +345,7 @@
         <!--/.footer-mid-wrap-->
         <div class="copyright-wrap">
             <div class="container">
-                <p>© <span id="currentYear"></span> ОК Такси. Все права защищены. Разработано в <a style="color: #ccc" href="https://mediakit.by/">Mediakit</a></p>
+                <p>© <span id="currentYear"></span> {{ \App\Models\Setting::get('company_name', 'Такси') }}. Все права защищены. Разработано в <a style="color: #ccc" href="https://mediakit.by/">Mediakit</a></p>
             </div>
         </div>
         <!--/.copyright-wrap-->

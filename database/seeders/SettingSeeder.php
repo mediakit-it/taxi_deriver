@@ -14,7 +14,7 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $defaults = [
-            'company_name' => 'СитиТакси',
+            'company_name' => 'Такси',
             'city' => 'Ваш город',
             'timezone' => 'Europe/Minsk',
             'currency_label' => 'руб.',
