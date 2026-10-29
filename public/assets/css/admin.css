@@ -1578,3 +1578,16 @@ table.dataTable tbody tr.selected { background: var(--admin-accent-light); }
     .admin-alerts-panel { left: 12px; right: 12px; width: auto; max-width: none; }
     .admin-toasts { left: 12px; right: 12px; width: auto; max-width: none; }
 }
+
+/* ---------- 20. Страница «Сообщения»: переключение панелей чата ---------- */
+
+/* Панели чата (.empty_message_area - заглушка «выберите человека»,
+   .message_area - открытый диалог) и точка непрочитанного сообщения
+   переключаются классом .d-none из инлайн-скрипта вьюхи messenger/index.
+   Собственные стили этой вьюхи задают .empty_message_area { display: flex },
+   а её <style> в каскаде идёт после admin.css при равной специфичности,
+   поэтому без !important заглушка не прячется и обе панели встают друг
+   под другом на двойную высоту. В Bootstrap (до перехода на admin.css)
+   .d-none была !important - возвращаем это поведение точечно для чата. */
+.message_area_block .d-none,
+.message_list .d-none { display: none !important; }
