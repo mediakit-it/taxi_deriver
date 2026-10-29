@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Car;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Events\OrderSentClose;
@@ -123,6 +124,23 @@ class OrderController extends Controller
                 'order_id' => $request->input('orderId')
             ], $user);
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
+        }
+
+        // Повторное принятие своего активного заказа: заказ уже у этого
+        // водителя - успешный идемпотентный ответ, состояние не меняем.
+        if ((int) $order->driver_id === (int) $user->id
+            && in_array($order->status, [Order::STATUS_ASSIGNED, Order::STATUS_ON_PLACE, Order::STATUS_IN_PROGRESS], true)) {
+            return response()->json(['status' => true]);
+        }
+
+        // Один водитель - один активный заказ: пока есть незавершённая
+        // поездка, другой заказ не выдаём.
+        if ($this->driverHasActiveOrder($user, $order)) {
+            $this->logOrderActivity('ADD_DRIVING_HAS_ACTIVE_ORDER', [
+                'order_id' => $order->id,
+                'driver_id' => $user->id
+            ], $user);
+            return response()->json(['status' => false, 'message' => 'У вас уже есть активный заказ']);
         }
 
         if (!$this->applyBoundCar($order, $request)) {
@@ -243,7 +261,11 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'reason' => $request->input('zakaz')
             ], $user);
-            return response()->json(['status' => false]);
+            // Запрошенный статус уже сохранён выше, поэтому отвечаем
+            // status=true, как и за завершение: для приложения
+            // status=false значит «закрытие отклонено». Настоящие отказы
+            // у этого метода - только 401 и 404 выше.
+            return response()->json(['status' => true]);
         }
     }
 
@@ -536,6 +558,26 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
         }
 
+        // Повторное принятие своего активного заказа: заказ уже у этого
+        // водителя - успешный идемпотентный ответ, состояние не меняем.
+        if ((int) $order->driver_id === (int) $user->id
+            && in_array($order->status, [Order::STATUS_ASSIGNED, Order::STATUS_ON_PLACE, Order::STATUS_IN_PROGRESS], true)) {
+            return response()->json([
+                'status' => true,
+                'order' => $order
+            ]);
+        }
+
+        // Один водитель - один активный заказ: пока есть незавершённая
+        // поездка, другой заказ не выдаём.
+        if ($this->driverHasActiveOrder($user, $order)) {
+            $this->logOrderActivity('ACCEPT_ORDER_BY_DRIVER_HAS_ACTIVE_ORDER', [
+                'order_id' => $order->id,
+                'driver_id' => $user->id
+            ], $user);
+            return response()->json(['status' => false, 'message' => 'У вас уже есть активный заказ']);
+        }
+
         if (!$this->applyBoundCar($order, $request)) {
             return response()->json(['status' => false, 'message' => 'Car not found'], 422);
         }
@@ -722,6 +764,17 @@ class OrderController extends Controller
         event(new OrderStatusChanged($order, 'ride_started'));
 
         return response()->json(['status' => true]);
+    }
+
+    // Есть ли у водителя другой активный заказ (назначен, на месте или
+    // в поездке). $except - заказ, который принимают прямо сейчас: он сам
+    // препятствием не считается.
+    private function driverHasActiveOrder(User $user, Order $except): bool
+    {
+        return Order::where('driver_id', $user->id)
+            ->whereIn('status', [Order::STATUS_ASSIGNED, Order::STATUS_ON_PLACE, Order::STATUS_IN_PROGRESS])
+            ->where('id', '!=', $except->id)
+            ->exists();
     }
 
     // Привязка авто при установке: водительское приложение шлёт car_id
