@@ -16,8 +16,13 @@ class DriverLocationController extends Controller
 
     public function getAllDriverLocations()
     {
+        // updated_at нужен в выборке: без него work_status у каждой
+        // строки считается от null и всегда выходит «Не работает»,
+        // хотя статус - часть данных карты.
         $locations = DriverLocation::with(['user.currentCar', 'order'])
-            ->get(['user_id', 'lat', 'lng', 'is_zakaz', 'order_id']);
+            ->get(['user_id', 'lat', 'lng', 'is_zakaz', 'order_id', 'updated_at']);
+
+        $locations->each->append(['work_status', 'work_status_label']);
 
         return response()->json([
             'status' => true,
