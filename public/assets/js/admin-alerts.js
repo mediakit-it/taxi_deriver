@@ -15,7 +15,14 @@
    (поле reason: no_response / declined), синхронизация с ним -
    раз в минуту и при загрузке.
    Плюс: window.adminToast(title, text, type, url) - тосты для вьюх
-   (замена not7/notif из удалённой темы). */
+   (замена not7/notif из удалённой темы).
+   Сигналы о новом проблемном заказе (signalNewAlert) общие для
+   живого события и для ежеминутной синхронизации, если та увидела
+   РОСТ числа карточек (включая первую загрузку страницы, когда
+   карточки уже ждут): звук; системное уведомление Notifications
+   API (разрешение - по кнопке «Включить уведомления» в шапке
+   панели); пока карточки живы, вкладка браузера мигает
+   заголовком и красной фавиконкой. */
 (function () {
     "use strict";
 
@@ -118,46 +125,103 @@
         }
     }
 
-    /* ---------- браузерные уведомления (только для скрытой вкладки) ---------- */
+    /* ---------- системные уведомления (Notifications API) ---------- */
 
-    var notifyAsked = false;
-
-    function requestNotifyPermission() {
-        if (notifyAsked) {
-            return;
-        }
-        notifyAsked = true;
-        if ("Notification" in window && Notification.permission === "default") {
-            try {
-                var p = Notification.requestPermission();
-                if (p && p.catch) {
-                    p.catch(function () {});
-                }
-            } catch (e) {
-                /* старые браузеры - пропускаем */
-            }
-        }
-    }
-
-    function browserNotify(title, text) {
-        if (!document.hidden) {
-            return;
-        }
+    function systemNotify(title, text, tag, url) {
         if (!("Notification" in window) || Notification.permission !== "granted") {
             return;
         }
         try {
-            new Notification(title || "ОК ТАКСИ", { body: text || "" });
+            var n = new Notification(title || "ОК ТАКСИ", {
+                body: text || "",
+                tag: tag || undefined
+            });
+            if (url) {
+                n.onclick = function () {
+                    try {
+                        window.focus();
+                    } catch (e) {}
+                    window.location.href = url;
+                    n.close();
+                };
+            }
         } catch (e) {
             /* пропускаем */
         }
     }
 
+    // Общий некритичный сигнал (новый заказ, новое сообщение):
+    // попытка разбудить звук + системное уведомление.
+    function signalInfo(title, text, tag, url) {
+        ensureAudio();
+        beep();
+        systemNotify(title, text, tag, url);
+    }
+
+    // Общий сигнал «новый проблемный заказ» панели внимания: звук +
+    // системное уведомление. Тег уведомления - по id заказа, поэтому
+    // повторный сигнал по тому же заказу заменяет уведомление,
+    // а не складывает стопку дублей.
+    function signalNewAlert(info) {
+        info = info || {};
+        var body = info.text || "";
+        if (info.from_address || info.to_address) {
+            var route = (info.from_address || "…") + " → " + (info.to_address || "…");
+            body = body ? body + "\n" + route : route;
+        }
+        if (!body && info.order_id != null) {
+            body = "Заказ №" + info.order_id;
+        }
+        signalInfo(
+            info.title || "ОК ТАКСИ",
+            body,
+            info.order_id != null ? "admin-attention-" + info.order_id : undefined,
+            info.url
+        );
+    }
+
+    /* Кнопка «Включить уведомления» в шапке панели: разрешение на
+       системные уведомления браузер даёт только по явному клику,
+       сам по себе скрипт его не запрашивает. Кнопка видна, только
+       пока разрешение ещё не выдано и не отклонено. */
+    var notifyBtn = null;
+
+    function syncNotifyButton() {
+        var head = document.querySelector(".admin-alerts-panel__title");
+        if (!head) {
+            return;
+        }
+        var show = ("Notification" in window) && Notification.permission === "default";
+        if (show && !notifyBtn) {
+            notifyBtn = document.createElement("button");
+            notifyBtn.type = "button";
+            notifyBtn.className = "admin-alerts-panel__notify";
+            notifyBtn.style.marginLeft = "8px";
+            notifyBtn.style.cursor = "pointer";
+            notifyBtn.textContent = "Включить уведомления";
+            notifyBtn.addEventListener("click", function () {
+                try {
+                    var p = Notification.requestPermission();
+                    if (p && p.then) {
+                        p.then(syncNotifyButton, syncNotifyButton);
+                    } else {
+                        setTimeout(syncNotifyButton, 300);
+                    }
+                } catch (e) {
+                    syncNotifyButton();
+                }
+            });
+            head.appendChild(notifyBtn);
+        } else if (!show && notifyBtn && notifyBtn.parentNode) {
+            notifyBtn.parentNode.removeChild(notifyBtn);
+            notifyBtn = null;
+        }
+    }
+
     function onFirstInteraction() {
         ensureAudio();
-        requestNotifyPermission();
     }
-    document.addEventListener("click", onFirstInteraction);
+    document.addEventListener("pointerdown", onFirstInteraction);
     document.addEventListener("keydown", onFirstInteraction);
 
     /* ---------- тосты ---------- */
@@ -205,6 +269,64 @@
         }, TOAST_TTL);
     };
 
+    /* ---------- мигание вкладки, пока есть живые карточки ---------- */
+
+    var originalTitle = null;
+    var faviconState = null; // {el, href}
+    var flashTimer = null;
+    var flashAlt = false;
+    var RED_FAVICON = "data:image/svg+xml," + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+        + '<circle cx="32" cy="32" r="30" fill="#e3342f"/>'
+        + '<rect x="29" y="13" width="6" height="29" rx="3" fill="#ffffff"/>'
+        + '<circle cx="32" cy="50" r="4.5" fill="#ffffff"/></svg>'
+    );
+
+    function captureTitleAndFavicon() {
+        originalTitle = document.title;
+        var el = document.querySelector('link[rel~="icon"]');
+        if (!el) {
+            el = document.createElement("link");
+            el.setAttribute("rel", "icon");
+            document.head.appendChild(el);
+        }
+        faviconState = { el: el, href: el.getAttribute("href") };
+    }
+
+    function setFaviconAlert(on) {
+        if (!faviconState) {
+            return;
+        }
+        if (on) {
+            faviconState.el.setAttribute("href", RED_FAVICON);
+        } else if (faviconState.href) {
+            faviconState.el.setAttribute("href", faviconState.href);
+        } else {
+            faviconState.el.removeAttribute("href");
+        }
+    }
+
+    function updateTabFlash() {
+        var n = Object.keys(attention).length;
+        if (n > 0) {
+            if (!flashTimer) {
+                setFaviconAlert(true);
+                flashAlt = false;
+                flashTimer = setInterval(function () {
+                    flashAlt = !flashAlt;
+                    document.title = flashAlt
+                        ? "🔴 Требуют внимания: " + Object.keys(attention).length
+                        : originalTitle;
+                }, 1000);
+            }
+        } else if (flashTimer) {
+            clearInterval(flashTimer);
+            flashTimer = null;
+            document.title = originalTitle;
+            setFaviconAlert(false);
+        }
+    }
+
     /* ---------- панель «Требуют внимания» ---------- */
 
     // order_id -> {el, waitEl, baseWaiting, setAt, type}
@@ -219,6 +341,8 @@
     }
 
     function syncPanelVisibility() {
+        updateTabFlash();
+        syncNotifyButton();
         var els = panelEls();
         if (!els.panel) {
             return;
@@ -314,8 +438,14 @@
                 "danger",
                 data.url
             );
-            beep();
-            browserNotify(data.title || defaultCardTitle(type), data.text || ("Заказ №" + id));
+            signalNewAlert({
+                title: data.title || defaultCardTitle(type),
+                text: data.text || ("Заказ №" + id + " ждёт назначения нового водителя."),
+                order_id: id,
+                url: data.url,
+                from_address: data.from_address,
+                to_address: data.to_address
+            });
         }
         return isNew;
     }
@@ -359,6 +489,8 @@
             if (!Array.isArray(list)) {
                 return;
             }
+            var countBefore = Object.keys(attention).length;
+            var newOnes = [];
             var seen = {};
             list.forEach(function (item) {
                 if (item && item.order_id != null) {
@@ -366,7 +498,9 @@
                     item.type = item.reason === "declined"
                         ? "driver_declined"
                         : "driver_no_response";
-                    upsertAttentionCard(item, true);
+                    if (upsertAttentionCard(item, true)) {
+                        newOnes.push(item);
+                    }
                 }
             });
             // Исчезновение из списка = проблема решена (водитель
@@ -378,6 +512,23 @@
                     removeAttentionCard(id);
                 }
             });
+            // Синхронизация карточки рисует молча (silent), но если
+            // число карточек ВЫРОСЛО против прошлого снимка - это
+            // новые проблемные заказы, о них сигналим как о живых
+            // событиях. Сюда же попадает первая загрузка страницы:
+            // карточки уже ждут - диспетчер получает сигнал сразу.
+            if (newOnes.length && Object.keys(attention).length > countBefore) {
+                newOnes.forEach(function (item) {
+                    signalNewAlert({
+                        title: item.title || defaultCardTitle(item.type),
+                        text: item.text || ("Заказ №" + item.order_id + " ждёт назначения нового водителя."),
+                        order_id: item.order_id,
+                        url: item.url,
+                        from_address: item.from_address,
+                        to_address: item.to_address
+                    });
+                });
+            }
         }).catch(function () {
             /* эндпоинта может ещё не быть (бэк придёт отдельным PR) - молчим */
         });
@@ -394,8 +545,7 @@
         } else if (data.type === "new_order" || data.type === "new_message") {
             var title = data.title || (data.type === "new_order" ? "Новый заказ" : "Новое сообщение");
             window.adminToast(title, data.text || "", "info", data.url);
-            beep();
-            browserNotify(title, data.text || "");
+            signalInfo(title, data.text || "", "admin-info-" + data.type, data.url);
         }
     }
 
@@ -461,8 +611,7 @@
                 }
             } else {
                 window.adminToast("Новое сообщение", "Новое сообщение для тех. поддержки", "info");
-                beep();
-                browserNotify("Новое сообщение", "Новое сообщение для тех. поддержки");
+                signalInfo("Новое сообщение", "Новое сообщение для тех. поддержки", "admin-mail", null);
             }
         });
 
@@ -474,6 +623,8 @@
     /* ---------- старт ---------- */
 
     function init() {
+        captureTitleAndFavicon();
+        syncNotifyButton();
         initPusher();
         syncOverdue();
         setInterval(syncOverdue, SYNC_INTERVAL);
