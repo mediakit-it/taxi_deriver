@@ -1,4 +1,4 @@
-/* ОК ТАКСИ - realtime-сигналы диспетчера в админ-панели.
+/* Realtime-сигналы диспетчера в админ-панели.
    Единственная глобальная точка Pusher для мастера (window.adminPusher):
    1) публичный канал 'admin' / событие 'sendMailAdmin' - новые сообщения
       тех. поддержки (логика перенесена из инлайн-блока мастера без
@@ -127,12 +127,21 @@
 
     /* ---------- системные уведомления (Notifications API) ---------- */
 
+    /* Запасной заголовок уведомления: название компании из шапки
+       админки (.admin-brand в сайдбаре - то же название из «Настроек»,
+       что видит диспетчер); нет элемента или он пуст - «Такси». */
+    function fallbackNotifyTitle() {
+        var brand = document.querySelector(".admin-brand");
+        var name = brand ? (brand.textContent || "").trim() : "";
+        return name || "Такси";
+    }
+
     function systemNotify(title, text, tag, url) {
         if (!("Notification" in window) || Notification.permission !== "granted") {
             return;
         }
         try {
-            var n = new Notification(title || "ОК ТАКСИ", {
+            var n = new Notification(title || fallbackNotifyTitle(), {
                 body: text || "",
                 tag: tag || undefined
             });
@@ -173,7 +182,7 @@
             body = "Заказ №" + info.order_id;
         }
         signalInfo(
-            info.title || "ОК ТАКСИ",
+            info.title || fallbackNotifyTitle(),
             body,
             info.order_id != null ? "admin-attention-" + info.order_id : undefined,
             info.url
