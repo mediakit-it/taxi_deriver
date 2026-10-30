@@ -76,7 +76,7 @@ class AuthController extends Controller
 
             return response()->json([
                     'status' => 'success',
-                    'user' => $user,
+                    'user' => $user->profilePayload(),
                     'authorisation' => [
                         'token' => $token,
                         'type' => 'bearer',
@@ -255,7 +255,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Token is valid',
-                'user' => $user // Возвращаем пользователя вместе с ответом
+                'user' => $user->profilePayload() // Возвращаем пользователя вместе с ответом
             ], 200);
         } catch (TokenExpiredException $e) {
             // Если токен истек, возвращаем сообщение об ошибке
@@ -279,7 +279,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            return response()->json($user);
+            return response()->json($user->profilePayload());
         } else {
             // Проверяем, истек ли срок действия токена
             $token = Auth::getToken();

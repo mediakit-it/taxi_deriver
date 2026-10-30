@@ -76,6 +76,19 @@
 											</select>
 										</div>
 									</div>
+									@if($user->role === 'driving')
+									<div class="col-sm-12 col-md-12 col-xl-4">
+										<div class="form-group">
+											<label class="form-label text-muted">Автомобиль (привязка устройства):</label>
+											<select class="form-control form-select text-dark" name="current_car_id">
+												<option value="">Не привязано</option>
+												@foreach($cars as $car)
+													<option value="{{ $car->id }}" @selected(old('current_car_id', $user->current_car_id) == $car->id)>{{ $car->label }} · {{ $car->number_plate }}</option>
+												@endforeach
+											</select>
+										</div>
+									</div>
+									@endif
 									<div class="col-sm-12 col-md-12 col-xl-4">
 										<div class="form-group">
 											<label class="form-label text-muted">Дата верификации:</label>

@@ -19,7 +19,7 @@
 				</div>
 			</div>
 			<!-- PAGE-HEADER END -->
-			<form action="{{route('car.update',['car'=>$car->id])}}" method="POST">
+			<form action="{{route('car.update',['car'=>$car->id])}}" method="POST" enctype="multipart/form-data">
 				@csrf
 				@method('PUT')
 				<!--ROW OPENED-->
@@ -54,13 +54,25 @@
 									</div>
 									<div class="col-sm-12 col-md-12 col-xl-4">
 										<div class="form-group">
-											<label class="form-label text-muted">Водители:</label>
-											<select class="form-control form-select text-dark" value="{{old('user_id')}}" name="user_id" id="client-salution1" data-placeholder="Выберите водителя">
+											<label class="form-label text-muted">Водитель (привязка устройства):</label>
+											<select class="form-control form-select text-dark" value="{{old('driver_id')}}" name="driver_id" id="client-salution1" data-placeholder="Выберите водителя">
 											<option value="" selected>-</option>	
 												@foreach($users as $user)
-													<option value="{{ $user->id }}" {{$car->user_id == $user->id ? 'selected' : ''}}>{{ $user->last_name }} {{ $user->first_name }}</option>
+													<option value="{{ $user->id }}" {{old('driver_id', $car->boundDriver?->id) == $user->id ? 'selected' : ''}}>{{ $user->last_name }} {{ $user->first_name }}</option>
 												@endforeach
 											</select>
+										</div>
+									</div>
+									<div class="col-sm-12 col-md-12 col-xl-4">
+										<div class="form-group">
+											<label class="form-label text-muted">Фото автомобиля</label>
+											@if($car->photo)
+												<div style="margin-bottom:8px;">
+													<img src="{{ $car->photo_url }}" alt="{{ $car->label }}" style="max-height:80px; width:auto; border-radius:4px;">
+												</div>
+											@endif
+											<input type="file" class="form-control text-dark @error('photo') is-invalid @enderror" name="photo" accept="image/*">
+											<div id="validationServer03Feedback" class="invalid-feedback">@error('photo') {{$message}} @enderror</div>
 										</div>
 									</div>
 								</div>

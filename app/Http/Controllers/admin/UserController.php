@@ -7,11 +7,17 @@ use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use Illuminate\Http\Request;
 
+use App\Models\Car;
 use App\Models\User;
+use App\Services\AssignDriverCar;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct(private readonly AssignDriverCar $assignDriverCar)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -73,7 +79,9 @@ class UserController extends Controller
             abort(403);
         }
 
-        return view('admin.user.edit',compact('user'));
+        $cars = Car::orderBy('brand')->orderBy('model')->get();
+
+        return view('admin.user.edit', compact('user', 'cars'));
     }
 
     /**
@@ -95,6 +103,17 @@ class UserController extends Controller
             // 'password'=> !empty($request->password) ? Hash::make($request->password) : ,
             'role'=>$request->role,
         ]);
+
+        // Привязка автомобиля к устройству водителя: поле
+        // current_car_id присылает только форма водителя. Одна
+        // машина - один водитель: у прежнего владельца привязка
+        // снимется внутри AssignDriverCar.
+        if ($user && $request->has('current_car_id')) {
+            $this->assignDriverCar->execute(
+                $target,
+                $request->filled('current_car_id') ? (int) $request->input('current_car_id') : null
+            );
+        }
 
         if($user)
             return redirect(route('user.index'));

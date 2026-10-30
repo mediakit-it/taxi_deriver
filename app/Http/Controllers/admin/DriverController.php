@@ -20,7 +20,7 @@ class DriverController extends Controller
     public function index(): View
     {
         $drivers = User::where('role', 'driving')
-            ->with(['car', 'location'])
+            ->with(['currentCar', 'location'])
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get()
