@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Actions\Admin\AssignOrderDriver;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AssignOrderDriverRequest;
+use App\Http\Requests\Admin\UpdateOrderPriceRequest;
+use App\Queries\AdminOrdersQuery;
 use Illuminate\Http\Request;
 
 use App\Models\Car;
@@ -16,21 +20,85 @@ class OrderController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * Список строит AdminOrdersQuery (фильтры + сортировка), данные
+     * для полной страницы и AJAX-фрагмента одни и те же. С параметром
+     * fragment=1 отдаётся только admin.order.fragment (плашки +
+     * таблица, без макета) - его подменяет admin-orders-live.js при
+     * живом обновлении.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('tariffClass')->orderBy('id','desc')->paginate(30);
+        if ($request->boolean('fragment')) {
+            return $this->renderListFragment($request);
+        }
 
-        return view('admin.order.index',compact('orders'));
+        return view('admin.order.index', $this->listViewData($request));
     }
 
-    public function indexAjax()
+    /**
+     * Историческая точка AJAX-обновления таблицы: теперь отдаёт тот
+     * же фрагмент, что и живой список (плашки + таблица).
+     */
+    public function indexAjax(Request $request)
     {
-        $orders = Order::with('tariffClass')->orderBy('id','desc')->paginate(30);
-
-        return view('admin.order.table', compact('orders'));
+        return $this->renderListFragment($request);
     }
-    
+
+    private function renderListFragment(Request $request)
+    {
+        return view('admin.order.fragment', $this->listViewData($request));
+    }
+
+    /**
+     * Данные списка заказов: отфильтрованная страница, нормализованные
+     * фильтры для формы, подписи статусов, глобальные счётчики плашек
+     * и список водителей для фильтров и быстрого назначения.
+     */
+    private function listViewData(Request $request): array
+    {
+        $query = AdminOrdersQuery::fromRequest($request);
+
+        return [
+            'orders' => $query->paginate(),
+            'filters' => $query->filters(),
+            'statusLabels' => Order::statusLabels(),
+            'statusCounts' => AdminOrdersQuery::activeStatusCounts(),
+            'drivers' => User::where('role', 'driving')
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->get(),
+        ];
+    }
+
+    /**
+     * Быстрое назначение водителя прямо из списка, без карточки
+     * заказа. Сама операция - AssignOrderDriver, та же, что у формы
+     * редактирования: метка предложения и события не расходятся.
+     */
+    public function assignDriver(AssignOrderDriverRequest $request, Order $order, AssignOrderDriver $assignOrderDriver)
+    {
+        $assignOrderDriver($order, $request->validated()['driver_id'] ?? null);
+
+        return response()->json([
+            'ok' => true,
+            'driver_id' => $order->driver_id,
+            'status' => $order->status,
+        ]);
+    }
+
+    /**
+     * Быстрая правка цены прямо из списка, без карточки заказа.
+     */
+    public function updatePrice(UpdateOrderPriceRequest $request, Order $order)
+    {
+        $order->update(['price' => $request->validated()['price']]);
+
+        return response()->json([
+            'ok' => true,
+            'price' => $order->price,
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -88,7 +156,7 @@ class OrderController extends Controller
         // $order = Order::find(244);
 
         // dd($order);
-        
+
         // поменяла тут метод RAY
         // $order = Order::create($request->all());
         // if($order){
@@ -150,56 +218,30 @@ class OrderController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * Назначение водителя вынесено в AssignOrderDriver - тот же
+     * путь проходит быстрое назначение из списка заказов.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id, AssignOrderDriver $assignOrderDriver)
     {
-        // dd($request->all());
+        $order = Order::findOrFail($id);
 
-        // меняю этот метод RAY
-        // $order = Order::find($id)->update($request->all());
-        // $order = Order::find($id);
-        // if($order){
+        $data = $request->all();
+        $data['source'] = $this->resolveSource($request, $order);
 
-        //     if($order->driver_id){
-        //         event(new OrderSent($order,$order->driver_id));
-        //     }
-        //     else{
-        //         event(new OrderSent($order, role: 'driving'));
-               
-        //     }
+        // Водителя из общих данных убираем: его ставит действие, со
+        // всеми сопутствующими эффектами (метка предложения, статус,
+        // события). Поля в запросе нет - действие получает текущего
+        // водителя и повторяет историческое поведение update.
+        $hasDriverField = array_key_exists('driver_id', $data);
+        $driverId = $hasDriverField && $data['driver_id'] ? (int) $data['driver_id'] : null;
+        unset($data['driver_id']);
 
-        //     return redirect(route('order.index'));
-        // }else{
-        //     return back();
-        // }
+        $order->update($data);
 
-        //на вот этот метод RAY
+        $assignOrderDriver($order, $hasDriverField ? $driverId : ($order->driver_id !== null ? (int) $order->driver_id : null));
 
-            $order = Order::findOrFail($id);
-    $oldDriver = $order->driver_id;
-
-    $data = $request->all();
-    $data['source'] = $this->resolveSource($request, $order);
-    $order->update($data);
-
-    // Момент предложения заказа водителю (для сторожа ответов водителей):
-    // при смене водителя отсчёт начинается заново, при снятии - сбрасывается,
-    // без смены водителя не трогаем
-    if ((int) $order->driver_id !== (int) $oldDriver) {
-        $order->update(['driver_offered_at' => $order->driver_id ? now() : null]);
-    }
-
-    // Если водитель изменился и он назначен — переводим в searching
-    if ($order->driver_id && $order->driver_id !== $oldDriver) {
-        $order->update(['status' => Order::STATUS_SEARCHING]);
-        event(new OrderSent($order, $order->driver_id));
-        event(new OrderStatusChanged($order, 'reassigned_by_dispatcher'));
-    } elseif (!$order->driver_id) {
-        event(new OrderSent($order, role: 'driving'));
-    }
-
-    return redirect(route('order.index'));
-
+        return redirect(route('order.index'));
     }
 
     /**
