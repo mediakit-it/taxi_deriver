@@ -94,6 +94,11 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::resource('order', 'App\Http\Controllers\admin\OrderController');
     Route::get('orderAjax', 'App\Http\Controllers\admin\OrderController@indexAjax')->name('orderAjax');
 
+    // Быстрые действия из списка заказов (без карточки заказа):
+    // назначение водителя и правка цены, оба - AJAX с JSON-ответом
+    Route::post('order/{order}/assign-driver', 'App\Http\Controllers\admin\OrderController@assignDriver')->name('order.assign-driver');
+    Route::post('order/{order}/update-price', 'App\Http\Controllers\admin\OrderController@updatePrice')->name('order.update-price');
+
     Route::get('messenger', 'App\Http\Controllers\admin\MessengerController@index')->name('messenger');
     Route::post('getMessagesUser', 'App\Http\Controllers\admin\MessengerController@getMessagesUser');
     Route::post('addNewMessageUser', 'App\Http\Controllers\admin\MessengerController@addNewMessageUser');
