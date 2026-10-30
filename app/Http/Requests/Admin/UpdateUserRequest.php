@@ -35,6 +35,7 @@ class UpdateUserRequest extends FormRequest
             ],
             'phone' => 'nullable|string|max:64',
             'role' => ['required', Rule::in(User::ASSIGNABLE_ROLES)],
+            'current_car_id' => 'nullable|integer|exists:cars,id',
         ];
     }
 }

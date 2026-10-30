@@ -39,6 +39,7 @@
 										<th class="wd-15p border-bottom-0">Марка</th>
 										<th class="wd-15p border-bottom-0">Модель</th>
 										<th class="wd-15p border-bottom-0">Номер машины</th>
+										<th class="wd-15p border-bottom-0">Фото</th>
 										<th class="wd-15p border-bottom-0">Пользователь</th>
 										<th class="wd-15p border-bottom-0">Действие</th>
 									</tr>
@@ -51,9 +52,16 @@
 											<td>{{$car->model}}</td>
 											<td>{{$car->number_plate}}</td>
 											<td>
-												@if($car->user)
-													<a href="{{ route('user.edit', ['user' => $car->user->id]) }}" class="btn btn-warning">
-														{{ $car->user->last_name }} {{ $car->user->first_name }}
+												@if($car->photo)
+													<img src="{{ $car->photo_url }}" alt="{{ $car->label }}" style="height:40px; width:auto; border-radius:4px;">
+												@else
+													—
+												@endif
+											</td>
+											<td>
+												@if($car->boundDriver)
+													<a href="{{ route('user.edit', ['user' => $car->boundDriver->id]) }}" class="btn btn-warning">
+														{{ $car->boundDriver->last_name }} {{ $car->boundDriver->first_name }}
 													</a>
 												@else
 													Пользователь не привязан

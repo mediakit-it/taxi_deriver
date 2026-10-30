@@ -184,6 +184,30 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Car::class, 'current_car_id');
     }
 
+    /**
+     * Профиль пользователя для приложений (вход, /auth/me,
+     * проверка токена): обычная сериализация модели плюс
+     * привязанный автомобиль ключом current_car - только id,
+     * марка, модель и госномер; null, когда привязки нет.
+     * Исторический ключ car (связь по cars.user_id) не трогаем.
+     *
+     * @return array<string, mixed>
+     */
+    public function profilePayload(): array
+    {
+        $data = $this->toArray();
+
+        $car = $this->currentCar;
+        $data['current_car'] = $car ? [
+            'id' => $car->id,
+            'brand' => $car->brand,
+            'model' => $car->model,
+            'number_plate' => $car->number_plate,
+        ] : null;
+
+        return $data;
+    }
+
     public function location()
     {
         return $this->hasOne(DriverLocation::class);

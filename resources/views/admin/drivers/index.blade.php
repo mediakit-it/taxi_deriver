@@ -49,9 +49,9 @@
                                             <td>{{ trim($driver->first_name . ' ' . $driver->last_name) }}</td>
                                             <td>{{ $driver->phone }}</td>
                                             <td>
-                                                @if($driver->car)
-                                                    {{ trim($driver->car->brand . ' ' . $driver->car->model) }}<br>
-                                                    <span class="text-muted">{{ $driver->car->number_plate }}</span>
+                                                @if($driver->currentCar)
+                                                    {{ trim($driver->currentCar->brand . ' ' . $driver->currentCar->model) }}<br>
+                                                    <span class="text-muted">{{ $driver->currentCar->number_plate }}</span>
                                                 @else
                                                     —
                                                 @endif
