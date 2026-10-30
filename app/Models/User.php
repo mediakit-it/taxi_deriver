@@ -195,6 +195,10 @@ class User extends Authenticatable implements JWTSubject
      */
     public function profilePayload(): array
     {
+        // JWT-путь (me) даёт пользователя без загруженных связей:
+        // без loadMissing исторический ключ car пропадает из ответа.
+        $this->loadMissing('car');
+
         $data = $this->toArray();
 
         $car = $this->currentCar;
