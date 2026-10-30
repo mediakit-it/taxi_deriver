@@ -73,6 +73,7 @@ Route::middleware(['auth:web'])->group(function () {
 
 
     Route::get('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout');
+    Route::post('/logout', 'App\Http\Controllers\admin\AuthController@logout')->name('logout.post');
 
 
 
