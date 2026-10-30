@@ -3,34 +3,7 @@
     <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
     <div class="app-sidebar">
         <div class="side-header">
-            @php
-                // Вордмарк текстом, как на mediakit.by: название из «Настроек» (company_name),
-                // последнее слово - в акцентной плашке; у одного слова в плашке последние 3 буквы.
-                $brandName = trim((string) (\App\Models\Setting::get('company_name') ?: config('app.name', 'Taxi')));
-                $brandName = mb_strtoupper($brandName, 'UTF-8');
-                $brandWords = preg_split('/\s+/u', $brandName) ?: [];
-                if (count($brandWords) > 1) {
-                    $brandTail = array_pop($brandWords);
-                    $brandHead = implode(' ', $brandWords);
-                } elseif (mb_strlen($brandName, 'UTF-8') > 3) {
-                    $brandHead = mb_substr($brandName, 0, -3, 'UTF-8');
-                    $brandTail = mb_substr($brandName, -3, null, 'UTF-8');
-                } else {
-                    $brandHead = '';
-                    $brandTail = $brandName;
-                }
-            @endphp
-            <a class="header-brand1 admin-brand" href="{{route('dashboard')}}">@if($brandHead !== '')<span class="admin-brand__head">{{ $brandHead }}</span>@endif<span class="admin-brand__box">{{ $brandTail }}</span></a><!-- LOGO -->
-        </div>
-        <div class="admin-user-card">
-            <span class="admin-user-card__avatar-wrap">
-                <span class="admin-user-card__avatar-fallback">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
-                <img src="{{asset('assets/images/faces/6.jpg')}}" alt="profile-user" class="admin-user-card__avatar">
-            </span>
-            <div class="admin-user-card__meta">
-                <span class="admin-user-card__name">{{auth()->user()->name}}</span>
-                <span class="admin-user-card__email">{{auth()->user()->email}}</span>
-            </div>
+            <a class="header-brand1 admin-brand" href="{{route('dashboard')}}">@include('partials.brand-wordmark')</a><!-- LOGO -->
         </div>
         <div class="main-sidemenu">
             <div class="slide-left disabled" id="slide-left"><svg xmlns="http://www.w3.org/2000/svg"
@@ -127,6 +100,31 @@
                     width="24" height="24" viewBox="0 0 24 24">
                     <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z" />
                 </svg>
+            </div>
+        </div>
+        <div class="admin-user-card">
+            @php
+                // Блок авторизованного пользователя внизу сайдбара: инициалы
+                // (имя + фамилия), под именем - выход. Имени в users нет одной
+                // колонкой - собираем из first_name и last_name.
+                $sidebarUser = auth()->user();
+                $sidebarUserName = trim(($sidebarUser->first_name ?? '') . ' ' . ($sidebarUser->last_name ?? ''));
+                if ($sidebarUserName === '') {
+                    $sidebarUserName = (string) $sidebarUser->email;
+                }
+                $sidebarUserInitials = mb_strtoupper(
+                    mb_substr((string) ($sidebarUser->first_name ?: $sidebarUserName), 0, 1, 'UTF-8')
+                        . mb_substr((string) ($sidebarUser->last_name ?? ''), 0, 1, 'UTF-8'),
+                    'UTF-8'
+                );
+            @endphp
+            <span class="admin-user-card__avatar">{{ $sidebarUserInitials }}</span>
+            <div class="admin-user-card__meta">
+                <span class="admin-user-card__name">{{ $sidebarUserName }}</span>
+                <form method="POST" action="{{ route('logout.post') }}" class="admin-user-card__logout">
+                    @csrf
+                    <button type="submit" class="admin-user-card__logout-btn">Выйти</button>
+                </form>
             </div>
         </div>
     </div>

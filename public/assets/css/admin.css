@@ -160,7 +160,7 @@ button, input, select, textarea {
 
 .admin-brand:hover { color: #fff; }
 
-.admin-brand__box {
+.brand-wordmark__box {
     background: var(--admin-accent);
     color: #fff;
     padding: 4px 8px;
@@ -294,7 +294,7 @@ button, input, select, textarea {
     body.sidenav-toggled .admin-user-card { justify-content: center; padding: 14px 0; }
     body.sidenav-toggled .side-header { justify-content: center; padding: 0; }
     body.sidenav-toggled .admin-brand { gap: 0; font-size: 1rem; }
-    body.sidenav-toggled .admin-brand__head { display: none; }
+    body.sidenav-toggled .brand-wordmark__head { display: none; }
 }
 
 /* Мобильная раскладка: сайдбар уезжает за экран */
@@ -326,19 +326,13 @@ button, input, select, textarea {
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.admin-user-card__avatar-wrap {
-    position: relative;
+.admin-user-card__avatar {
     flex: none;
     width: 44px;
     height: 44px;
-}
-
-.admin-user-card__avatar-fallback {
-    position: absolute;
-    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -346,16 +340,7 @@ button, input, select, textarea {
     background: var(--admin-accent);
     color: #fff;
     font-weight: 700;
-    font-size: 1.05rem;
-}
-
-.admin-user-card__avatar {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
+    font-size: 0.95rem;
 }
 
 .admin-user-card__meta {
@@ -373,13 +358,18 @@ button, input, select, textarea {
     text-overflow: ellipsis;
 }
 
-.admin-user-card__email {
+.admin-user-card__logout { margin: 0; }
+
+.admin-user-card__logout-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
     color: var(--admin-sidebar-muted);
     font-size: 0.78rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
+
+.admin-user-card__logout-btn:hover { color: #fff; }
 
 .main-sidemenu {
     flex: 1;

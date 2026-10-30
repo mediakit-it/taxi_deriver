@@ -36,12 +36,25 @@
         min-height: 480px;
     }
 
-    .login-visual__logo {
-        width: 72px;
-        height: 72px;
-        border-radius: 20px;
-        object-fit: cover;
-        background: #ffffff;
+    /* Вордмарк как в админке: название компании текстом, последнее
+       слово - в акцентной плашке (та же разметка - partials.brand-wordmark) */
+    .login-visual__brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        line-height: 1;
+        color: #ffffff;
+        white-space: nowrap;
+    }
+
+    .login-visual__brand .brand-wordmark__box {
+        background: #4b5cff;
+        color: #ffffff;
+        padding: 4px 8px;
+        border-radius: 6px;
     }
 
     .login-visual__title {
@@ -136,7 +149,7 @@
 <section class="login-page">
     <div class="login-card">
         <div class="login-visual">
-            <img src="{{asset('assets/images/logo/logo1.png')}}" class="login-visual__logo" alt="logo">
+            <div class="login-visual__brand">@include('partials.brand-wordmark')</div>
             <p class="login-visual__title">Панель управления</p>
             <p class="login-visual__text">Заказы, водители и машины службы такси в одном месте.</p>
         </div>
