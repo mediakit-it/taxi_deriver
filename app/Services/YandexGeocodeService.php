@@ -13,6 +13,18 @@ class YandexGeocodeService
     /** The client app shows at most this many address suggestions. */
     public const MAX_RESULTS = 5;
 
+    /**
+     * When house suggestions are merged in for a bare street query,
+     * the list may grow to this many entries.
+     */
+    public const MAX_RESULTS_WITH_HOUSES = 8;
+
+    /** How many houses of the top street lead the merged list. */
+    private const MAX_HOUSES = 5;
+
+    /** How many houses the follow-up kind=house request asks for. */
+    private const HOUSE_FETCH_RESULTS = 6;
+
     /** Service-area defaults: the whole of Belarus. */
     private const DEFAULT_AREA_LAT = '53.7';
 
@@ -50,7 +62,9 @@ class YandexGeocodeService
     {
         $limit = max(1, min($limit, self::MAX_RESULTS));
 
-        $geoObjects = $this->fetch($address, $limit, $this->serviceAreaParams());
+        $areaParams = $this->serviceAreaParams();
+
+        $geoObjects = $this->fetch($address, $limit, $areaParams);
 
         if ($geoObjects === null) {
             return [];
@@ -66,7 +80,94 @@ class YandexGeocodeService
             }
         }
 
+        $houses = $this->housePoints($address, $geoObjects, $areaParams);
+
+        if ($houses !== []) {
+            $seen = [];
+
+            foreach ($houses as $house) {
+                $seen[$house['lat'].','.$house['lng']] = true;
+            }
+
+            $rest = array_values(array_filter(
+                $points,
+                fn ($point) => ! isset($seen[$point['lat'].','.$point['lng']]),
+            ));
+
+            return array_slice(array_merge($houses, $rest), 0, self::MAX_RESULTS_WITH_HOUSES);
+        }
+
         return array_slice($points, 0, $limit);
+    }
+
+    /**
+     * House-level suggestions for a bare street query («Фурманова»):
+     * the geocoder answers such a query with the streets themselves,
+     * so the houses of the top street result are fetched with a
+     * follow-up kind=house request in the same service area. Any
+     * failure or empty answer returns an empty list and the caller
+     * keeps the original results unchanged.
+     */
+    private function housePoints(string $address, array $geoObjects, array $areaParams): array
+    {
+        // A digit in the query means the user is already narrowing
+        // the address down (a house number) - no expansion needed.
+        if (preg_match('/\\d/u', $address)) {
+            return [];
+        }
+
+        $streetObject = null;
+
+        foreach ($geoObjects as $geoObject) {
+            if (($geoObject['metaDataProperty']['GeocoderMetaData']['kind'] ?? null) === 'street') {
+                $streetObject = $geoObject;
+                break;
+            }
+        }
+
+        if ($streetObject === null) {
+            return [];
+        }
+
+        $byKind = $this->addressComponents($streetObject);
+
+        $streetName = $byKind['street'] ?? $byKind['thoroughfare'] ?? null;
+
+        if (! $streetName) {
+            return [];
+        }
+
+        $query = trim(($this->localityName($byKind) ?? '').' '.$streetName);
+
+        $houseObjects = $this->fetch(
+            $query,
+            self::HOUSE_FETCH_RESULTS,
+            array_merge($areaParams, ['kind' => 'house']),
+        );
+
+        if ($houseObjects === null) {
+            return [];
+        }
+
+        $points = [];
+
+        foreach ($houseObjects as $houseObject) {
+            if (($houseObject['metaDataProperty']['GeocoderMetaData']['kind'] ?? null) !== 'house') {
+                continue;
+            }
+
+            $point = $this->toPoint($houseObject);
+
+            if ($point !== null) {
+                $points[] = $point;
+            }
+
+            if (count($points) >= self::MAX_HOUSES) {
+                break;
+            }
+        }
+
+        return $points;
     }
 
     /**
