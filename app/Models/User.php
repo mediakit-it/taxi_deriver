@@ -80,6 +80,13 @@ class User extends Authenticatable implements JWTSubject
         return $this->role === self::ROLE_SUPERADMIN;
     }
 
+    // Заблокирован ли пользователь: вход запрещён и в веб-панель,
+    // и в приложения, выданные API-токены перестают работать
+    public function isBlocked(): bool
+    {
+        return (bool) $this->is_blocked;
+    }
+
     // Подпись текущей роли
     public function getRoleLabelAttribute(): ?string
     {
@@ -157,6 +164,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'password' => 'hashed',
+        'is_blocked' => 'boolean',
     ];
 
     protected $with = ['car'];

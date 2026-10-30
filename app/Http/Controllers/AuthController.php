@@ -62,6 +62,18 @@ class AuthController extends Controller
             }
     
             $user = auth()->user();
+
+            // Заблокированному пользователю токен не выдаётся: только
+            // что созданный сразу инвалидируется.
+            if ($user->isBlocked()) {
+                auth()->logout();
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Пользователь заблокирован',
+                ], 403);
+            }
+
             return response()->json([
                     'status' => 'success',
                     'user' => $user,

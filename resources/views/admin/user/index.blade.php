@@ -65,7 +65,11 @@
 														$roleName = 'Клиент';
 												}
 											@endphp
-											<td>{{ $roleName }}</td>
+											<td>{{ $roleName }}
+												@if($user->is_blocked)
+													<br><span class="badge bg-danger">Заблокирован</span>
+												@endif
+											</td>
 											<td>
 												@if($user->role === 'driving' && $user->currentCar)
 													{{ $user->currentCar->label }}<br>
@@ -74,6 +78,16 @@
 											</td>
 											<td>
 												<a href="{{route('user.edit',['user'=>$user->id])}}" class="btn btn-warning"><i class="fa fa-pencil"></i></a>
+												@if(!$user->isSuperadmin() && $user->id !== auth('web')->id())
+													<form action="{{route('user.toggle-block',['user'=>$user->id])}}" method="POST" style="display:inline-block" onsubmit="return confirm('{{$user->is_blocked ? 'Разблокировать пользователя' : 'Заблокировать пользователя'}} {{$user->first_name}} {{$user->last_name}}?')">
+														@csrf
+														@if($user->is_blocked)
+															<button class="btn btn-success" title="Разблокировать"><i class="fe fe-unlock"></i></button>
+														@else
+															<button class="btn btn-secondary" title="Заблокировать"><i class="fe fe-lock"></i></button>
+														@endif
+													</form>
+												@endif
 												<button class="btn btn-danger" data-slug="{{$user->id}}" data-name="{{$user->name}}" id="deleteBtn"><i class="fe fe-trash"></i></button>
 											</td>
 										</tr>

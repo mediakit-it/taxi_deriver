@@ -30,6 +30,12 @@ class AuthController extends Controller
         // для них веб-вход закрыт, даже если пароль верный.
         $user = User::where('email', $request->email)->first();
 
+        if ($user && $user->isBlocked()) {
+            return redirect()->back()->withInput($request->only('email'))->withErrors([
+                'email' => 'Пользователь заблокирован',
+            ]);
+        }
+
         if ($user && !$user->hasPanelAccess()) {
             return redirect()->back()->withInput($request->only('email'))->withErrors([
                 'email' => 'Учётная запись не имеет доступа в панель управления',
