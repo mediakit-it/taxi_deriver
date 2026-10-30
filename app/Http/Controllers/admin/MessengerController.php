@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Message;
 use App\Models\User;
 use App\Events\MessageSent;
+use Illuminate\Http\JsonResponse;
 
 class MessengerController extends Controller
 {
@@ -30,6 +31,16 @@ class MessengerController extends Controller
         $sortedUsers = $sortedUsersWithMessages->merge($usersWithoutMessages);
 
         return view('messenger.index', ['users' => $sortedUsers]);
+    }
+
+    // Счётчик непрочитанных сообщений для бейджа «Сообщения»
+    // в сайдбаре админки (admin-alerts.js пересчитывает его при
+    // загрузке страницы, по новым сообщениям и раз в минуту).
+    public function unreadCount(): JsonResponse
+    {
+        return response()->json([
+            'count' => Message::unreadForAdmin()->count(),
+        ]);
     }
 
     public function readMessageUser(Request $request) {

@@ -33,6 +33,19 @@ class MessageAdminSent implements ShouldBroadcastNow
 
     public function broadcastWith()
     {
-        return ['message' => $this->message];
+        $user = $this->message->user;
+
+        return [
+            'message' => $this->message,
+            // Отправитель для тоста в админке: имя + превью текста
+            // позволяют диспетчеру понять, кто написал, без открытия
+            // страницы сообщений.
+            'user' => [
+                'id' => (int) $this->message->user_id,
+                'name' => $user
+                    ? trim($user->first_name.' '.$user->last_name)
+                    : '',
+            ],
+        ];
     }
 }
