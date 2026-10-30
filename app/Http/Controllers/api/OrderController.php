@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\Car;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\DriverLocation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Events\OrderSentClose;
 use App\Events\UserOrderSent;
 use App\Events\OrderSentNewDriving;
+use App\Events\ClientOrderUpdated;
 use App\Events\UserOrderUpdate;
 
 use Illuminate\Support\Facades\Http;
@@ -58,6 +60,7 @@ class OrderController extends Controller
             ], $user);
         } else {
             $orders = Order::where('client_id',$user->id)->orderBy('id','desc')->with('driver')->get();
+            $this->attachClientTripData($orders);
             $this->logOrderActivity('INDEX_ORDERS_CLIENT', [
                 'client_id' => $user->id,
                 'orders_count' => $orders->count()
@@ -65,6 +68,70 @@ class OrderController extends Controller
         }
 
         return response()->json(['data' => $orders]);
+    }
+
+
+    // Клиентское представление поездки в списке заказов клиента.
+    // Машина, которую парсит приложение (driver.car), должна быть
+    // машиной ЭТОЙ поездки: сначала orders.car_id, затем текущая
+    // привязка водителя (users.current_car_id - у каждого
+    // водительского устройства авто привязано) и только в конце
+    // legacy-связь User::car(). Плюс последняя известная позиция
+    // водителя (driver_location) для активных поездок: приложение
+    // ставит по ней метку машины до первого живого события.
+    private function attachClientTripData($orders): void
+    {
+        $activeStatuses = [Order::STATUS_ASSIGNED, Order::STATUS_ON_PLACE, Order::STATUS_IN_PROGRESS];
+
+        $carIds = $orders->flatMap(function (Order $order) {
+            return [$order->car_id, $order->driver?->current_car_id];
+        })->filter()->unique();
+
+        $cars = $carIds->isEmpty()
+            ? collect()
+            : Car::whereIn('id', $carIds)->get()->keyBy('id');
+
+        $driverIds = $orders
+            ->filter(fn (Order $order) => $order->driver_id && in_array($order->status, $activeStatuses, true))
+            ->pluck('driver_id')
+            ->unique();
+
+        $locations = $driverIds->isEmpty()
+            ? collect()
+            : DriverLocation::whereIn('user_id', $driverIds)->get()->keyBy('user_id');
+
+        foreach ($orders as $order) {
+            $driver = $order->driver;
+
+            if (!$driver) {
+                continue;
+            }
+
+            $tripCar = null;
+
+            if ($order->car_id) {
+                $tripCar = $cars->get($order->car_id);
+            }
+
+            if (!$tripCar && $driver->current_car_id) {
+                $tripCar = $cars->get($driver->current_car_id);
+            }
+
+            if ($tripCar) {
+                $driver->setRelation('car', $tripCar);
+            }
+
+            if ($order->driver_id && in_array($order->status, $activeStatuses, true)) {
+                $location = $locations->get($order->driver_id);
+
+                if ($location) {
+                    $order->setAttribute('driver_location', [
+                        'lat' => (float) $location->lat,
+                        'lng' => (float) $location->lng,
+                    ]);
+                }
+            }
+        }
     }
 
     public function newOrderUserIndex()
@@ -693,6 +760,14 @@ class OrderController extends Controller
 
             $order->driver_id = null;
             $order->save();
+
+            // Статус при отказе не меняется, поэтому Observer
+            // молчит: сигнал клиенту шлём сами, иначе карточка
+            // заказа в приложении навсегда показывает
+            // отказавшегося водителя.
+            if ($order->client_id) {
+                event(new ClientOrderUpdated($order));
+            }
 
             $this->logOrderActivity('DECLINE_ORDER_BY_DRIVER_SUCCESS', [
                 'order_id' => $order->id,
