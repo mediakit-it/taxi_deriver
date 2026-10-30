@@ -15,4 +15,14 @@ class Message extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Непрочитанные админом сообщения пользователей. Признак
+    // прочтения - is_active: 0, пока диспетчер не открыл диалог
+    // (MessengerController помечает сообщения прочитанными);
+    // у сообщений админа та же колонка работает в обратную
+    // сторону - прочтение пользователем в приложениях.
+    public function scopeUnreadForAdmin($query)
+    {
+        return $query->where('type', 'user')->where('is_active', 0);
+    }
 }

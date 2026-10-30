@@ -98,6 +98,7 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::post('getMessagesUser', 'App\Http\Controllers\admin\MessengerController@getMessagesUser');
     Route::post('addNewMessageUser', 'App\Http\Controllers\admin\MessengerController@addNewMessageUser');
     Route::post('readMessageUser', 'App\Http\Controllers\admin\MessengerController@readMessageUser');
+    Route::get('/data/unread-messages', 'App\Http\Controllers\admin\MessengerController@unreadCount')->name('admin.messages.unread');
 
     Route::get('/driver-locations', [DriverLocationController::class, 'index'])->name('admin.driver-locations.index');
     Route::get('/data/driver-locations', [DriverLocationController::class, 'getAllDriverLocations'])->name('admin.driver-locations.api');

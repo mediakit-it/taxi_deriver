@@ -9,6 +9,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key') }}">
+<meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster') }}">
 
 	<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 

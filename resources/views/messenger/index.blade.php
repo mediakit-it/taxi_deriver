@@ -321,6 +321,12 @@
 
 		$(document).ready(function() {
 
+			// переход из тоста о новом сообщении: /admin/messenger?user={id}
+            var openUserId = new URLSearchParams(window.location.search).get('user');
+            if (openUserId) {
+                $('.message_item_user[data-id="' + openUserId + '"]').first().trigger('click');
+            }
+
 			$(document).on('click', '.message_item_user', function () {
                 var userId = $(this).data('id');
                 var element = $(this);

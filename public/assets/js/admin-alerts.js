@@ -22,7 +22,17 @@
    карточки уже ждут): звук; системное уведомление Notifications
    API (разрешение - по кнопке «Включить уведомления» в шапке
    панели); пока карточки живы, вкладка браузера мигает
-   заголовком и красной фавиконкой. */
+   заголовком и красной фавиконкой.
+   Тост о новом сообщении содержит имя отправителя и превью
+   текста, ссылка «Открыть» ведёт в его диалог
+   (/admin/messenger?user={id} - страница сама открывает диалог).
+   Бейдж непрочитанных на пункте «Сообщения» в сайдбаре:
+   источник правды - GET /admin/data/unread-messages (сообщения
+   пользователей с is_active = 0), пересчёт при загрузке, по
+   каждому событию sendMailAdmin и раз в минуту.
+   Ключ и кластер Pusher берутся из meta-тегов мастера
+   (config broadcasting - тот же набор, которым вещает сервер);
+   константы ниже - только запасной вариант. */
 (function () {
     "use strict";
 
@@ -30,6 +40,7 @@
     var PUSHER_CLUSTER = "mt1";
     var ALERTS_AUTH_ENDPOINT = "/admin/broadcasting/auth";
     var OVERDUE_URL = "/admin/data/overdue-orders";
+    var UNREAD_URL = "/admin/data/unread-messages";
     var SYNC_INTERVAL = 60000;
     var TICK_INTERVAL = 30000;
     var TOAST_TTL = 12000;
@@ -558,7 +569,56 @@
         }
     }
 
+    /* ---------- бейдж непрочитанных сообщений в сайдбаре ---------- */
+
+    function renderMessageBadge(count) {
+        var badge = document.getElementById("admin-messages-unread");
+        if (!badge) {
+            return;
+        }
+        if (count > 0) {
+            badge.textContent = count > 99 ? "99+" : String(count);
+            badge.classList.remove("d-none");
+        } else {
+            badge.textContent = "";
+            badge.classList.add("d-none");
+        }
+    }
+
+    function refreshMessageBadge() {
+        if (!window.fetch || !document.getElementById("admin-messages-unread")) {
+            return;
+        }
+        fetch(UNREAD_URL, {
+            credentials: "same-origin",
+            headers: { "Accept": "application/json" }
+        }).then(function (resp) {
+            return resp.ok ? resp.json() : null;
+        }).then(function (data) {
+            if (data && typeof data.count === "number") {
+                renderMessageBadge(data.count);
+            }
+        }).catch(function () {
+            /* эндпоинт мог ещё не задеплоиться - молчим */
+        });
+    }
+
     /* ---------- Pusher: единственная глобальная точка мастера ---------- */
+
+    // Ключ/кластер - из meta-тегов мастера (конфиг вещания сервера):
+    // захардкоженная пара в константах выше принадлежит донорскому
+    // приложению Pusher и с сервером не совпадает.
+    function pusherKey() {
+        var meta = document.querySelector('meta[name="pusher-key"]');
+        var value = meta && meta.getAttribute("content");
+        return value ? value : PUSHER_KEY;
+    }
+
+    function pusherCluster() {
+        var meta = document.querySelector('meta[name="pusher-cluster"]');
+        var value = meta && meta.getAttribute("content");
+        return value ? value : PUSHER_CLUSTER;
+    }
 
     function initPusher() {
         if (typeof Pusher === "undefined") {
@@ -566,8 +626,8 @@
         }
         Pusher.logToConsole = false;
 
-        var pusher = new Pusher(PUSHER_KEY, {
-            cluster: PUSHER_CLUSTER,
+        var pusher = new Pusher(pusherKey(), {
+            cluster: pusherCluster(),
             authEndpoint: ALERTS_AUTH_ENDPOINT,
             auth: {
                 headers: {
@@ -594,7 +654,7 @@
                     if ($(".message_area").find(".message_area_footer .send_button_area button").data("id") == outUserId) {
                         var elementAdminMessage = `<div class="w-100 mb-2">
                                                 <div class="user_message">
-                                                    ${data.message.message}
+                                                    ${escapeHtml(data.message.message)}
                                                     <div style="text-align: right; font-size: 10px;">${getCurrentTime()}</div>
                                                 </div>
                                             </div>`;
@@ -619,9 +679,15 @@
                     }
                 }
             } else {
-                window.adminToast("Новое сообщение", "Новое сообщение для тех. поддержки", "info");
-                signalInfo("Новое сообщение", "Новое сообщение для тех. поддержки", "admin-mail", null);
+                var senderName = (data.user && data.user.name) ? data.user.name : "";
+                var rawText = (data.message && data.message.message) ? String(data.message.message) : "";
+                var preview = rawText.length > 120 ? rawText.slice(0, 120) + "…" : rawText;
+                var toastText = senderName ? senderName + ": " + preview : preview;
+                var chatUrl = "/admin/messenger" + (data.message && data.message.user_id ? "?user=" + data.message.user_id : "");
+                window.adminToast("Новое сообщение", toastText, "info", chatUrl);
+                signalInfo("Новое сообщение", toastText, "admin-mail-" + (data.message && data.message.id ? data.message.id : "new"), chatUrl);
             }
+            refreshMessageBadge();
         });
 
         // Приватный канал сигналов диспетчера.
@@ -636,8 +702,18 @@
         syncNotifyButton();
         initPusher();
         syncOverdue();
+        refreshMessageBadge();
         setInterval(syncOverdue, SYNC_INTERVAL);
+        setInterval(refreshMessageBadge, SYNC_INTERVAL);
         setInterval(tickAllCards, TICK_INTERVAL);
+        if (window.location.pathname.startsWith("/admin/messenger") && window.jQuery) {
+            // Открытие диалога на странице сообщений помечает его
+            // прочитанным (getMessagesUser на стороне страницы) -
+            // пересчитать бейдж следом за кликом.
+            window.jQuery(document).on("click", ".message_item_user", function () {
+                setTimeout(refreshMessageBadge, 800);
+            });
+        }
     }
 
     if (document.readyState === "loading") {
