@@ -22,14 +22,22 @@ class LogisticController extends Controller
             // в никуда - диспетчер не видел машину на карте.
             $userId = $request->user()?->id ?? $request->input('user_id');
 
+            // isZakaz и orderId - необязательные поля пинга: приложение
+            // шлёт их всегда, но запрос без них не должен падать на
+            // NOT NULL колонках driver_locations.
+            $locationValues = [
+                'lat' => $request->input('lat'),
+                'lng' => $request->input('lng'),
+                'is_zakaz' => $request->input('isZakaz', false),
+            ];
+
+            if ($request->filled('orderId')) {
+                $locationValues['order_id'] = $request->input('orderId');
+            }
+
             DriverLocation::updateOrCreate(
                 ['user_id' => $userId],
-                [
-                    'lat' => $request->input('lat'),
-                    'lng' => $request->input('lng'),
-                    'is_zakaz' => $request->input('isZakaz'),
-                    'order_id' => $request->input('orderId'),
-                ]
+                $locationValues
             );
             $this->broadcastToActiveClient($request);
 
