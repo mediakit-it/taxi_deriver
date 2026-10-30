@@ -121,4 +121,19 @@ class SettingsTest extends TestCase
         $response->assertRedirect();
         $this->assertDatabaseMissing('app_deletion_steps', ['id' => $step->id]);
     }
+
+    public function test_admin_can_update_service_area_settings(): void
+    {
+        $response = $this->actingAs($this->admin(), 'web')->put('/admin/settings', [
+            'company_name' => 'Такси Тест',
+            'service_area_lat' => '53.9',
+            'service_area_lon' => '27.5667',
+            'service_area_radius_km' => '30',
+        ]);
+
+        $response->assertRedirect(route('settings.edit'));
+        $this->assertSame('53.9', Setting::get('service_area_lat'));
+        $this->assertSame('27.5667', Setting::get('service_area_lon'));
+        $this->assertSame('30', Setting::get('service_area_radius_km'));
+    }
 }

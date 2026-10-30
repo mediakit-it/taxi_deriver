@@ -11,14 +11,16 @@ use Illuminate\Support\Str;
 class ClientNotificationService
 {
     /**
-     * Order statuses the client should hear about,
-     * with their notification titles.
+     * Order statuses that get a notification feed entry, with their
+     * titles. Deliberately only the two moments the client must react
+     * to (a driver is coming / the driver is waiting) plus the
+     * cancellation: the in-progress and completed transitions used to
+     * add two more entries per trip, which was noise - the app learns
+     * every status live from the ClientOrderUpdated broadcast anyway.
      */
     private const ORDER_STATUS_TITLES = [
         Order::STATUS_ASSIGNED => 'Водитель назначен',
         Order::STATUS_ON_PLACE => 'Водитель на месте',
-        Order::STATUS_IN_PROGRESS => 'Поездка началась',
-        Order::STATUS_COMPLETED => 'Поездка завершена',
         Order::STATUS_CANCELED => 'Заказ отменён',
     ];
 

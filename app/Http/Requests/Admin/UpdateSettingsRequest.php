@@ -30,6 +30,10 @@ class UpdateSettingsRequest extends FormRequest
             'driver_accept_seconds' => 'nullable|integer|min:10|max:600',
             'car_bind_password' => 'nullable|string|max:255',
 
+            'service_area_lat' => 'nullable|numeric|between:-90,90',
+            'service_area_lon' => 'nullable|numeric|between:-180,180',
+            'service_area_radius_km' => 'nullable|numeric|min:1|max:5000',
+
             'color_primary' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'color_accent' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'logo' => 'nullable|image|max:2048',

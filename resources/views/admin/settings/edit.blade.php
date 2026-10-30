@@ -78,6 +78,25 @@
                                placeholder="{{ !empty($settings['car_bind_password']) ? 'Пароль задан' : 'Пароль не задан' }}">
                         <small class="text-muted">По этому паролю установщик водительского приложения при установке на устройство в автомобиле выбирает, к какому авто привязано устройство. Оставьте поле пустым, чтобы не менять пароль. @if(!empty($settings['car_bind_password']))Сейчас пароль задан.@elseСейчас пароль не задан - привязка недоступна.@endif</small>
                     </div>
+                    <div class="mb-3">
+                        <label for="service_area_lat" class="form-label fw-bold">Зона обслуживания: широта центра</label>
+                        <input type="text" inputmode="decimal" class="form-control" id="service_area_lat" name="service_area_lat"
+                               value="{{ old('service_area_lat', $settings['service_area_lat'] ?? '53.7') }}"
+                               placeholder="53.7">
+                    </div>
+                    <div class="mb-3">
+                        <label for="service_area_lon" class="form-label fw-bold">Зона обслуживания: долгота центра</label>
+                        <input type="text" inputmode="decimal" class="form-control" id="service_area_lon" name="service_area_lon"
+                               value="{{ old('service_area_lon', $settings['service_area_lon'] ?? '28.0') }}"
+                               placeholder="28.0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="service_area_radius_km" class="form-label fw-bold">Зона обслуживания: радиус, км</label>
+                        <input type="number" class="form-control" id="service_area_radius_km" name="service_area_radius_km"
+                               value="{{ old('service_area_radius_km', $settings['service_area_radius_km'] ?? '350') }}"
+                               min="1" max="5000" step="any">
+                        <small class="text-muted">Поиск адресов в клиентском приложении ограничен кругом с этим центром и радиусом: адреса за пределами зоны не предлагаются. По умолчанию - вся Беларусь (центр 53.7, 28.0, радиус 350 км). Очистите все три поля и сохраните, чтобы снять ограничение.</small>
+                    </div>
                 </div>
             </div>
 
@@ -325,3 +344,4 @@
         });
     </script>
 @endsection
+

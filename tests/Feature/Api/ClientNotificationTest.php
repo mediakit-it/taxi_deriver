@@ -113,4 +113,36 @@ class ClientNotificationTest extends TestCase
     {
         $this->getJson('/api/v1/notifications')->assertUnauthorized();
     }
+
+    public function test_on_place_status_change_creates_notification_for_client(): void
+    {
+        $order = Order::factory()->pending()->create();
+
+        $order->update(['status' => Order::STATUS_ON_PLACE]);
+
+        $this->assertDatabaseHas('client_notifications', [
+            'user_id' => $order->client_id,
+            'order_id' => $order->id,
+            'type' => 'order_status',
+            'title' => 'Водитель на месте',
+        ]);
+    }
+
+    public function test_in_progress_status_change_creates_no_notification(): void
+    {
+        $order = Order::factory()->pending()->create();
+
+        $order->update(['status' => Order::STATUS_IN_PROGRESS]);
+
+        $this->assertDatabaseCount('client_notifications', 0);
+    }
+
+    public function test_completed_status_change_creates_no_notification(): void
+    {
+        $order = Order::factory()->pending()->create();
+
+        $order->update(['status' => Order::STATUS_COMPLETED]);
+
+        $this->assertDatabaseCount('client_notifications', 0);
+    }
 }
