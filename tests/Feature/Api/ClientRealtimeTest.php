@@ -48,12 +48,17 @@ class ClientRealtimeTest extends TestCase
 
         Event::assertDispatched(
             ClientDriverLocation::class,
-            fn (ClientDriverLocation $event) => $event->clientId === $client->id
-                && $event->orderId === $order->id
-                && abs($event->lat - 53.5210) < 0.0001
-                && abs($event->lng - 30.2400) < 0.0001
-                && $event->broadcastAs() === 'driverLocation'
-                && $event->broadcastOn()[0]->name === 'user.' . $client->id
+            function (ClientDriverLocation $event) use ($client, $order) {
+                $channels = $event->broadcastOn();
+                $channel = is_array($channels) ? $channels[0] : $channels;
+
+                return $event->clientId === $client->id
+                    && $event->orderId === $order->id
+                    && abs($event->lat - 53.5210) < 0.0001
+                    && abs($event->lng - 30.2400) < 0.0001
+                    && $event->broadcastAs() === 'driverLocation'
+                    && $channel->name === 'user.' . $client->id;
+            }
         );
     }
 

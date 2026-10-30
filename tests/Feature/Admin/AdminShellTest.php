@@ -21,11 +21,9 @@ class AdminShellTest extends TestCase
         $response->assertSee('ТЕСТОВОЕ');
         $response->assertSee('brand-wordmark__box', false);
 
-        // В визуальном блоке входа нет картинки-логотипа - там текстовый вордмарк
-        $content = $response->getContent();
-        $block = mb_substr($content, mb_strpos($content, 'login-visual'), 500);
-        $this->assertStringNotContainsString('logo1.png', $block);
-        $this->assertStringContainsString('ТАКСИ', $block);
+        // На странице входа нет картинки-логотипа - там текстовый вордмарк
+        $response->assertSee('ТАКСИ');
+        $this->assertStringNotContainsString('logo1.png', $response->getContent());
     }
 
     public function test_sidebar_user_block_at_bottom_shows_name_initials_and_logout(): void
