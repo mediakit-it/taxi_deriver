@@ -603,6 +603,30 @@
         });
     }
 
+    /* ---------- сигнал «заказы изменились» для страницы заказов ---------- */
+
+    var ordersChangedHandlers = [];
+
+    // Страница списка заказов (admin-orders-live.js) подписывается
+    // сюда, чтобы перечитывать свой фрагмент без перезагрузки.
+    // Событие orders.changed приходит в тот же приватный канал
+    // admin.alerts (AdminOrdersChanged из OrderObserver).
+    window.onOrdersChanged = function (fn) {
+        if (typeof fn === "function") {
+            ordersChangedHandlers.push(fn);
+        }
+    };
+
+    function handleOrdersChanged(data) {
+        ordersChangedHandlers.forEach(function (fn) {
+            try {
+                fn(data || {});
+            } catch (e) {
+                /* подписчик не должен ломать остальные сигналы */
+            }
+        });
+    }
+
     /* ---------- Pusher: единственная глобальная точка мастера ---------- */
 
     // Ключ/кластер - из meta-тегов мастера (конфиг вещания сервера):
@@ -693,6 +717,7 @@
         // Приватный канал сигналов диспетчера.
         var alertsChannel = pusher.subscribe("private-admin.alerts");
         alertsChannel.bind("admin.alert", handleAlert);
+        alertsChannel.bind("orders.changed", handleOrdersChanged);
     }
 
     /* ---------- старт ---------- */
