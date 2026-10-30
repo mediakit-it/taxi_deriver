@@ -17,8 +17,20 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('web')->check() && in_array(Auth::guard('web')->user()->role, User::PANEL_ROLES, true)) {
-            return $next($request);
+        if (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+
+            // Заблокированный сотрудник теряет доступ в панель на
+            // следующем же запросе: сессия завершается сразу.
+            if ($user->isBlocked()) {
+                Auth::guard('web')->logout();
+
+                return redirect('/');
+            }
+
+            if (in_array($user->role, User::PANEL_ROLES, true)) {
+                return $next($request);
+            }
         }
 
         return redirect('/');

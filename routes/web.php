@@ -131,6 +131,7 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     // авто, тарифы и все настройки, включая документы и шаги удаления
     Route::middleware('role:admin,superadmin,manager')->group(function () {
         Route::resource('user', 'App\Http\Controllers\admin\UserController');
+        Route::post('user/{user}/toggle-block', 'App\Http\Controllers\admin\UserController@toggleBlock')->name('user.toggle-block');
         Route::resource('car', 'App\Http\Controllers\admin\CarController')->except(['index']);
 
         Route::get('/cost-of-trip', [CostOfTripController::class, 'edit'])->name('cost-of-trip.edit');

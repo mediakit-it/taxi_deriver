@@ -103,6 +103,34 @@ class UserController extends Controller
     }
 
     /**
+     * Заблокировать / разблокировать пользователя. Заблокированный
+     * не может войти ни в панель, ни в приложения, а выданные ему
+     * API-токены перестают работать (middleware EnsureUserNotBlocked).
+     * Защиты: собственную учётную запись заблокировать нельзя,
+     * суперадмина нашей компании - тоже.
+     */
+    public function toggleBlock(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+        $actor = $request->user('web');
+
+        if ($actor && $user->id === $actor->id) {
+            return back()->with('error', 'Нельзя заблокировать собственную учётную запись');
+        }
+
+        if ($user->isSuperadmin()) {
+            return back()->with('error', 'Суперадмин не может быть заблокирован');
+        }
+
+        $user->is_blocked = !$user->isBlocked();
+        $user->save();
+
+        return back()->with('success', $user->isBlocked()
+            ? 'Пользователь заблокирован'
+            : 'Пользователь разблокирован');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)

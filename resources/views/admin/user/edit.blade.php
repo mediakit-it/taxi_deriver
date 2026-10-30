@@ -98,6 +98,37 @@
 				</div>
 				<!--ROW CLOSED-->
 			</form>
+			<!-- Блокировка доступа: отдельная форма, основная уже закрыта -->
+			@if(!$user->isSuperadmin() && $user->id !== auth('web')->id())
+				<div class="row">
+					<div class="col-lg-12 col-md-12">
+						<div class="card">
+							<div class="card-header border-bottom">
+								<h4 class="mb-0">Доступ в систему</h4>
+							</div>
+							<div class="card-body">
+								<p class="mb-3">
+									Статус:
+									@if($user->is_blocked)
+										<span class="badge bg-danger">Заблокирован</span>
+									@else
+										<span class="badge bg-success">Активен</span>
+									@endif
+								</p>
+								<form action="{{route('user.toggle-block',['user'=>$user->id])}}" method="POST" onsubmit="return confirm('{{$user->is_blocked ? 'Разблокировать пользователя' : 'Заблокировать пользователя'}} {{$user->first_name}} {{$user->last_name}}?')">
+									@csrf
+									@if($user->is_blocked)
+										<button class="btn btn-success" type="submit"><i class="fe fe-unlock"></i> Разблокировать</button>
+									@else
+										<button class="btn btn-danger" type="submit"><i class="fe fe-lock"></i> Заблокировать</button>
+									@endif
+								</form>
+								<p class="text-muted mt-2 mb-0">Заблокированный пользователь не сможет войти в панель и приложения, а выданные ему API-токены перестанут работать.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			@endif
 		</div>
 	</div>
 @endsection

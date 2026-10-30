@@ -26,7 +26,7 @@ use App\Http\Controllers\api\EmailVerificationController;
 Route::prefix('v1')->group(function () {
     Route::get('/app-settings', [AppSettingsController::class, 'index']);
     Route::post('/auth/verify-email', [EmailVerificationController::class, 'verify']);
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['auth:api', 'blocked'])->group(function () {
         Route::get('/notifications', [ClientNotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [ClientNotificationController::class, 'unreadCount']);
         Route::post('/notifications/read', [ClientNotificationController::class, 'markRead']);
@@ -71,7 +71,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
     Route::get('me', '\App\Http\Controllers\AuthController@me');
 });
 
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api', 'blocked']], function () {
     Route::post('/check-token-validity', '\App\Http\Controllers\AuthController@checkTokenValidity');
 
 
