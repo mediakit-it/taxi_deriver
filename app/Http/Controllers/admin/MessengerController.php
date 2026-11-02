@@ -16,7 +16,12 @@ class MessengerController extends Controller
     
         $users = User::where('role','driving')->get();
 
-        $usersWithMessages = User::where('role', 'driving')->whereHas('messages')
+        // Диалоги с сообщениями - без фильтра по роли: из приложения
+        // пишут клиенты (role=user), а список раньше строился только по
+        // водителям, поэтому клиентские сообщения нельзя было открыть
+        // и бейдж непрочитанных залипал. Адресная книга без сообщений
+        // ниже по-прежнему водительская.
+        $usersWithMessages = User::whereHas('messages')
             ->with(['messages' => function ($query) {
                 $query->latest()->first();
             }])
