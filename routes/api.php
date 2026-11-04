@@ -8,6 +8,7 @@ use App\Http\Controllers\api\LogisticController;
 use App\Http\Controllers\api\CostOfTripController;
 use App\Http\Controllers\api\AppSettingsController;
 use App\Http\Controllers\api\CarBindingController;
+use App\Http\Controllers\api\DriverOrderController;
 use App\Http\Controllers\api\ClientNotificationController;
 use App\Http\Controllers\api\GeocodeController;
 use App\Http\Controllers\api\EmailVerificationController;
@@ -34,6 +35,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/reverse-geocode', [GeocodeController::class, 'reverse']);
         // Доклад водителя о привязанном к устройству авто после входа
         Route::post('/car-binding/report', [CarBindingController::class, 'report']);
+        // Заказ «от борта»: водитель сам создаёт заказ при посадке
+        // пассажира с улицы (роль водителя проверяет FormRequest)
+        Route::post('/driver/orders', [DriverOrderController::class, 'store']);
     });
     // Привязка устройства водителя к авто при установке приложения:
     // без авторизации (экран входа), доступ по паролю привязки из
