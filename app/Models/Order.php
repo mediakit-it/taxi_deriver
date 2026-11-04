@@ -46,14 +46,17 @@ class Order extends Model
     const STATUS_ON_PLACE         = 'on_place';
     const STATUS_IN_PROGRESS      = 'in_progress';
 
-    // Источники заказа: телефон (диспетчер) / приложение (клиент)
+    // Источники заказа: телефон (диспетчер) / приложение (клиент) /
+    // от борта (водитель сам создал заказ при посадке пассажира)
     const SOURCE_PHONE = 'phone';
     const SOURCE_APP = 'app';
+    const SOURCE_CURB = 'curb';
 
     // Подписи источников для админки
     const SOURCE_LABELS = [
         self::SOURCE_PHONE => 'Телефон',
         self::SOURCE_APP => 'Приложение',
+        self::SOURCE_CURB => 'От борта',
     ];
 
     /**
