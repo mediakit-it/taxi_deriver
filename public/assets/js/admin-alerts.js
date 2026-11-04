@@ -576,11 +576,18 @@
         if (!badge) {
             return;
         }
+        // Показ и скрытие - инлайн-стилем, а не классом d-none:
+        // в admin.css правило .badge { display: inline-flex } стоит
+        // после .d-none при равной специфичности и без !important,
+        // поэтому класс визуально не срабатывал и пустая плашка
+        // висела всегда. Класс оставляем для порядка, механизм - стиль.
         if (count > 0) {
             badge.textContent = count > 99 ? "99+" : String(count);
+            badge.style.display = "inline-flex";
             badge.classList.remove("d-none");
         } else {
             badge.textContent = "";
+            badge.style.display = "none";
             badge.classList.add("d-none");
         }
     }
