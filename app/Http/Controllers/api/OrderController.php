@@ -323,7 +323,11 @@ class OrderController extends Controller
             ], $user);
             return response()->json(['status' => true]);
         }else{
-            event(new UserOrderUpdate($order->client_id,'Заказ отменен'));
+            // У заказа может не быть клиента (заказ «от борта» или клиент удалён) -
+            // уведомлять некого, а конструктор события требует int.
+            if ($order->client_id) {
+                event(new UserOrderUpdate($order->client_id,'Заказ отменен'));
+            }
             $this->logOrderActivity('CLOSE_DRIVING_CANCELED', [
                 'order_id' => $order->id,
                 'reason' => $request->input('zakaz')
@@ -388,7 +392,11 @@ class OrderController extends Controller
             ], $user);
         }
 
-        event(new UserOrderUpdate($order->client_id,'Заказ успешно завершен'));
+        // У заказа может не быть клиента (заказ «от борта» или клиент удалён) -
+        // уведомлять некого, а конструктор события требует int.
+        if ($order->client_id) {
+            event(new UserOrderUpdate($order->client_id,'Заказ успешно завершен'));
+        }
 
         $this->logOrderActivity('CLOSE_DRIVING_PRICE_COMPLETED', [
             'order_id' => $order->id
@@ -605,7 +613,11 @@ class OrderController extends Controller
             'new_status' => $order->status
         ], $user);
       
-        event(new UserOrderUpdate($order->client_id,'Заказ отменен'));
+        // У заказа может не быть клиента (заказ «от борта» или клиент удалён) -
+        // уведомлять некого, а конструктор события требует int.
+        if ($order->client_id) {
+            event(new UserOrderUpdate($order->client_id,'Заказ отменен'));
+        }
         event(new OrderCreated());
         event(new OrderStatusChanged($order, 'driver_canceled')); // Добавлено RAY
 

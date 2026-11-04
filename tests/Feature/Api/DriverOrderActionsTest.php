@@ -555,4 +555,65 @@ class DriverOrderActionsTest extends TestCase
         $response->assertOk()->assertJson(['status' => true]);
         $this->assertSame(15.0, (float) $order->refresh()->price);
     }
+
+    public function test_close_price_for_order_without_client_saves_price(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        // Заказ без клиента: «от борта» или клиент удалён (client_id = null).
+        // Раньше событие UserOrderUpdate падало на null уже ПОСЛЕ сохранения
+        // цены, и приложение видело 500 («Не удалось сохранить цену») при
+        // фактически сохранённой цене.
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_COMPLETED,
+            'driver_id' => $driver->id,
+            'client_id' => null,
+            'price' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/closePrice', [
+            'orderId' => $order->id,
+            'price' => 30,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame(30.0, (float) $order->refresh()->price);
+    }
+
+    public function test_close_price_without_price_for_order_without_client_returns_ok(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_COMPLETED,
+            'driver_id' => $driver->id,
+            'client_id' => null,
+            'price' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/closePrice', [
+            'orderId' => $order->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertNull($order->refresh()->price);
+    }
+
+    public function test_driver_cancel_for_order_without_client_does_not_fail(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_IN_PROGRESS,
+            'driver_id' => $driver->id,
+            'client_id' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/closeOrderUserDriving', [
+            'orderId' => $order->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame(Order::STATUS_CANCELED, $order->refresh()->status);
+    }
 }

@@ -202,4 +202,21 @@ class DriverCurbOrderTest extends TestCase
 
         $this->assertSame(0, Order::count());
     }
+
+    public function test_curb_order_response_contains_from_address(): void
+    {
+        $car = Car::factory()->create();
+        $driver = User::factory()->driver()->create(['current_car_id' => $car->id]);
+
+        $response = $this->postJson('/api/v1/driver/orders', $this->payload([
+            'from_address' => 'г. Быхов, ул. Советская, 1',
+        ]), $this->authHeaders($driver));
+
+        // Адрес подачи хранится на заказе и должен уезжать в ответе:
+        // без него приложение показывает точку отправления пустой.
+        $response->assertCreated()
+            ->assertJsonPath('order.from_address', 'г. Быхов, ул. Советская, 1');
+
+        $this->assertSame('г. Быхов, ул. Советская, 1', Order::first()->from_address);
+    }
 }
