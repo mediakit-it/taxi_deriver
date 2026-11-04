@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Broadcast;
 
 use App\Http\Controllers\admin\DriverLocationController;
+use App\Http\Controllers\admin\GeocodeController;
 use App\Http\Controllers\admin\DispatcherAlertController;
 use App\Http\Controllers\admin\CostOfTripController;
 use App\Http\Controllers\admin\SettingController;
@@ -104,6 +105,11 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->group(function () {
     Route::post('addNewMessageUser', 'App\Http\Controllers\admin\MessengerController@addNewMessageUser');
     Route::post('readMessageUser', 'App\Http\Controllers\admin\MessengerController@readMessageUser');
     Route::get('/data/unread-messages', 'App\Http\Controllers\admin\MessengerController@unreadCount')->name('admin.messages.unread');
+
+    // Подсказки адресов для форм панели: тот же бэкенд-геокодер,
+    // что и у мобильного API, но под сессионной авторизацией
+    // (API-роут закрыт JWT и из браузера панели недоступен)
+    Route::get('/data/geocode-search', [GeocodeController::class, 'search'])->name('admin.geocode.search');
 
     Route::get('/driver-locations', [DriverLocationController::class, 'index'])->name('admin.driver-locations.index');
     Route::get('/data/driver-locations', [DriverLocationController::class, 'getAllDriverLocations'])->name('admin.driver-locations.api');

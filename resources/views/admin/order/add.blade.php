@@ -9,6 +9,36 @@
     overflow: visible !important;
 }
 
+.address-suggest {
+    display: none;
+    margin-top: 4px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #e6ebf1;
+    border-radius: 6px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.address-suggest .suggest-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.address-suggest .suggest-item:hover {
+    background: #f2f6ff;
+}
+
+.address-suggest .suggest-title {
+    color: #1d273b;
+    font-weight: 600;
+}
+
+.address-suggest .suggest-sub {
+    color: #8492a6;
+    font-size: 12px;
+}
+
 </style>
 
 
@@ -101,6 +131,7 @@
 											<input type="text" id="from_address" name="from_address"
 												class="form-control text-dark @error('from_address') is-invalid @enderror"
 												value="{{ old('from_address') }}" placeholder="Введите адрес клиента">
+												<div class="address-suggest" id="from_address_suggest"></div>
 											<div class="invalid-feedback">@error('from_address') {{ $message }} @enderror</div>
 										</div>
 									</div>
@@ -112,6 +143,7 @@
 											<input type="text" id="to_address" name="to_address"
 												class="form-control text-dark @error('to_address') is-invalid @enderror"
 												value="{{ old('to_address') }}" placeholder="Введите конечный адрес клиента">
+												<div class="address-suggest" id="to_address_suggest"></div>
 											<div class="invalid-feedback">@error('to_address') {{ $message }} @enderror</div>
 										</div>
 									</div>
@@ -191,10 +223,11 @@
   		autoclose: true,
 	});</script>
 
-<script src="https://api-maps.yandex.ru/2.1/?apikey={{ config('services.yandex.js_key') }}&suggest_apikey={{ config('services.yandex.suggest_key') }}&lang=ru_RU&load=SuggestView,geocode,route,Map,Placemark"></script>
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ config('services.yandex.js_key') }}&lang=ru_RU&load=geocode,route,Map,Placemark"></script>
 
 <script>
 $(document).ready(function () {
+	const GEOCODE_SEARCH_URL = '{{ route('admin.geocode.search') }}';
 	// Обработчик для изменения фамилии клиента
     $('input[name="client_first_name"]').on('input', function() {
         const clientFirstName = $(this).val();
@@ -232,8 +265,6 @@ $(document).ready(function () {
         const fromInput = document.getElementById('from_address');
         const toInput = document.getElementById('to_address');
 
-        const suggestFrom = new ymaps.SuggestView('from_address');
-        const suggestTo = new ymaps.SuggestView('to_address');
 
         let coordsFrom = null;
         let coordsTo = null;
@@ -274,46 +305,146 @@ $(document).ready(function () {
             }
         }
 
-        suggestFrom.events.add('select', function (e) {
-            const selected = e.get('item').value;
-            ymaps.geocode(selected).then(function (res) {
-                const firstGeoObject = res.geoObjects.get(0);
-                const coords = firstGeoObject.geometry.getCoordinates();
-                const address = firstGeoObject.getAddressLine();
+        function clearDistance() {
+            $('#distance').val('');
+            $('#duration').val('');
+            $('#summary-distance').text('---');
+            $('#summary-duration').text('---');
+        }
 
-                console.log('Откуда:', address, coords);
-                coordsFrom = coords;
+        // Подсказки адресов - от собственного бэкенд-геокодера
+        // (GET /admin/data/geocode-search -> YandexGeocodeService),
+        // а не от SuggestView: его suggest_apikey (Geosuggest)
+        // отвечает 403, и список не появлялся вовсе. Выбор пункта
+        // сразу пишет адрес и координаты в скрытые поля; ручная
+        // правка текста после выбора сбрасывает координаты этого
+        // поля, чтобы текст и точка не разъезжались.
+        function bindAddressSuggest(opts) {
+            const $input = $(opts.input);
+            const $box = $(opts.box);
+            let timer = null;
+            let requestSeq = 0;
+            let lastSelected = null;
 
-                // Заполняем скрытые поля с координатами
-                $('#from_lat').val(coords[1]);
-                $('#from_lng').val(coords[0]);
+            function hide() {
+                $box.hide().empty();
+            }
 
-                // Обновляем информацию о заказе
-                $('#summary-from-address').text(address);
+            function select(point) {
+                const address = point.display_address || point.address || '';
+                lastSelected = address;
+                $input.val(address);
+                $(opts.latField).val(point.lat);
+                $(opts.lngField).val(point.lng);
+                $(opts.summary).text(address);
+                hide();
+                opts.onSelect([point.lat, point.lng]);
+            }
 
-                calculateDistance(); // Пересчитываем дистанцию
+            function render(points) {
+                $box.empty();
+
+                if (!points.length) {
+                    hide();
+                    return;
+                }
+
+                points.forEach(function (point) {
+                    const isOrg = point.kind === 'org' && point.name;
+                    const title = isOrg ? point.name : (point.display_address || point.address || '');
+                    const sub = isOrg ? (point.display_address || '') : (point.locality || '');
+                    const $item = $('<div class="suggest-item"></div>');
+
+                    $('<div class="suggest-title"></div>').text(title).appendTo($item);
+
+                    if (sub && sub !== title) {
+                        $('<div class="suggest-sub"></div>').text(sub).appendTo($item);
+                    }
+
+                    $item.on('mousedown', function (e) {
+                        e.preventDefault();
+                        select(point);
+                    });
+
+                    $box.append($item);
+                });
+
+                $box.show();
+            }
+
+            $input.on('input', function () {
+                const value = $input.val();
+
+                if (lastSelected !== null && value !== lastSelected) {
+                    lastSelected = null;
+                    $(opts.latField).val('');
+                    $(opts.lngField).val('');
+                    opts.onClear();
+                }
+
+                clearTimeout(timer);
+
+                const query = value.trim();
+
+                if (query.length < 3) {
+                    hide();
+                    return;
+                }
+
+                timer = setTimeout(function () {
+                    const seq = ++requestSeq;
+
+                    fetch(GEOCODE_SEARCH_URL + '?address=' + encodeURIComponent(query) + '&limit=5', {
+                        headers: { 'Accept': 'application/json' }
+                    }).then(function (response) {
+                        return response.ok ? response.json() : null;
+                    }).then(function (json) {
+                        if (seq !== requestSeq || !json || !json.success) {
+                            return;
+                        }
+
+                        render(json.data || []);
+                    }).catch(function () {
+                        // Подсказки - best-effort: форма работает и без них
+                    });
+                }, 300);
             });
+
+            $input.on('blur', function () {
+                setTimeout(hide, 150);
+            });
+        }
+
+        bindAddressSuggest({
+            input: fromInput,
+            box: document.getElementById('from_address_suggest'),
+            latField: '#from_lat',
+            lngField: '#from_lng',
+            summary: '#summary-from-address',
+            onSelect: function (coords) {
+                coordsFrom = coords;
+                calculateDistance();
+            },
+            onClear: function () {
+                coordsFrom = null;
+                clearDistance();
+            }
         });
 
-        suggestTo.events.add('select', function (e) {
-            const selected = e.get('item').value;
-            ymaps.geocode(selected).then(function (res) {
-                const firstGeoObject = res.geoObjects.get(0);
-                const coords = firstGeoObject.geometry.getCoordinates();
-                const address = firstGeoObject.getAddressLine();
-
-                console.log('Куда:', address, coords);
+        bindAddressSuggest({
+            input: toInput,
+            box: document.getElementById('to_address_suggest'),
+            latField: '#to_lat',
+            lngField: '#to_lng',
+            summary: '#summary-to-address',
+            onSelect: function (coords) {
                 coordsTo = coords;
-
-                // Заполняем скрытые поля с координатами
-                $('#to_lat').val(coords[1]);
-                $('#to_lng').val(coords[0]);
-
-                // Обновляем информацию о заказе
-                $('#summary-to-address').text(address);
-
-                calculateDistance(); // Пересчитываем дистанцию
-            });
+                calculateDistance();
+            },
+            onClear: function () {
+                coordsTo = null;
+                clearDistance();
+            }
         });
     });
 
