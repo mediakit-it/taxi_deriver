@@ -496,4 +496,63 @@ class DriverOrderActionsTest extends TestCase
         $response->assertOk()->assertJson(['status' => true]);
         $this->assertSame(Order::STATUS_COMPLETED, $order->refresh()->status);
     }
+    public function test_close_price_with_literal_null_string_returns_422_and_keeps_price_empty(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_COMPLETED,
+            'driver_id' => $driver->id,
+            'price' => null,
+        ]);
+
+        // The literal string "null" is what the app used to send when the
+        // driver left the price field untouched. Before validation existed
+        // it landed in the decimal column and strict MySQL answered 500;
+        // now it must be a clean 422 and the order stays untouched.
+        $response = $this->postJson('/api/orders/closePrice', [
+            'orderId' => $order->id,
+            'price' => 'null',
+        ], $this->authHeaders($driver));
+
+        $response->assertStatus(422)->assertJsonValidationErrors('price');
+        $this->assertNull($order->refresh()->price);
+    }
+
+    public function test_close_price_with_numeric_price_stores_it(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_COMPLETED,
+            'driver_id' => $driver->id,
+            'price' => null,
+        ]);
+
+        $response = $this->postJson('/api/orders/closePrice', [
+            'orderId' => $order->id,
+            'price' => 25.5,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame(25.5, (float) $order->refresh()->price);
+    }
+
+    public function test_close_price_without_price_key_leaves_price_untouched(): void
+    {
+        Event::fake();
+        $driver = User::factory()->create();
+        $order = Order::factory()->create([
+            'status' => Order::STATUS_COMPLETED,
+            'driver_id' => $driver->id,
+            'price' => 15,
+        ]);
+
+        $response = $this->postJson('/api/orders/closePrice', [
+            'orderId' => $order->id,
+        ], $this->authHeaders($driver));
+
+        $response->assertOk()->assertJson(['status' => true]);
+        $this->assertSame(15.0, (float) $order->refresh()->price);
+    }
 }
