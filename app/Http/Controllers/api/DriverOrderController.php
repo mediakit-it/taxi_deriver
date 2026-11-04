@@ -82,6 +82,7 @@ class DriverOrderController extends Controller
                 'source' => $order->source,
                 'driver_id' => $order->driver_id,
                 'car_id' => $order->car_id,
+                'from_address' => $order->from_address,
                 'from_lat' => $order->from_lat,
                 'from_lng' => $order->from_lng,
                 'to_address' => $order->to_address,
