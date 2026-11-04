@@ -18,6 +18,7 @@ class GeocodeHouseSuggestionsTest extends TestCase
         parent::setUp();
 
         config(['services.yandex.geocoder_key' => 'test-geocoder-key']);
+        config(['services.osm.enabled' => false]);
 
         $this->client = User::factory()->create(['role' => 'client']);
     }
