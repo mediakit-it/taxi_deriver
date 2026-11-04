@@ -350,6 +350,15 @@ class OrderController extends Controller
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
+        // Цена необязательна, но если передана - только число и не ниже
+        // нуля. Раньше валидации не было: строка "null" из приложения
+        // писалась прямо в decimal-колонку, и strict-режим MySQL отвечал
+        // ошибкой 500 вместо внятного отказа. Теперь мусор получает 422,
+        // а заказ остаётся нетронутым.
+        $request->validate([
+            'price' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
         $order = Order::find($request->input('orderId'));
 
         if (!$order) {
