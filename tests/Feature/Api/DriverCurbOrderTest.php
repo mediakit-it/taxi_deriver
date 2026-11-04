@@ -141,4 +141,65 @@ class DriverCurbOrderTest extends TestCase
         $this->assertSame('От борта', $order->source_label);
         $this->assertSame('От борта', Order::sourceLabels()[Order::SOURCE_CURB]);
     }
+
+    public function test_zero_destination_gets_422(): void
+    {
+        $car = Car::factory()->create();
+        $driver = User::factory()->driver()->create(['current_car_id' => $car->id]);
+
+        // (0, 0) - не адрес, а «точку так и не выбрали»: такой заказ
+        // не должен падать в базу (раньше валидация его пропускала).
+        $response = $this->postJson('/api/v1/driver/orders', $this->payload([
+            'to_lat' => 0,
+            'to_lng' => 0,
+        ]), $this->authHeaders($driver));
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrorFor('to_lat');
+
+        $this->assertSame(0, Order::count());
+    }
+
+    public function test_destination_equal_to_pickup_gets_422(): void
+    {
+        $car = Car::factory()->create();
+        $driver = User::factory()->driver()->create(['current_car_id' => $car->id]);
+
+        // Назначение = точка подачи из запроса: ехать некуда.
+        $response = $this->postJson('/api/v1/driver/orders', $this->payload([
+            'to_lat' => 53.511111,
+            'to_lng' => 28.230001,
+        ]), $this->authHeaders($driver));
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrorFor('to_lat');
+
+        $this->assertSame(0, Order::count());
+    }
+
+    public function test_destination_equal_to_fallback_pickup_gets_422(): void
+    {
+        $car = Car::factory()->create();
+        $driver = User::factory()->driver()->create(['current_car_id' => $car->id]);
+        DriverLocation::create([
+            'user_id' => $driver->id,
+            'lat' => 53.600001,
+            'lng' => 28.300002,
+        ]);
+
+        // Координат подачи в запросе нет - сравнение идёт с последней
+        // известной геопозицией водителя, как и создание заказа.
+        $payload = $this->payload([
+            'to_lat' => 53.600001,
+            'to_lng' => 28.300002,
+        ]);
+        unset($payload['from_lat'], $payload['from_lng']);
+
+        $response = $this->postJson('/api/v1/driver/orders', $payload, $this->authHeaders($driver));
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrorFor('to_lat');
+
+        $this->assertSame(0, Order::count());
+    }
 }
