@@ -37,4 +37,11 @@ return [
         'js_key' => env('YANDEX_JS_KEY'),
     ],
 
+    'osm' => [
+        // Поиск организаций по названию («Дана Молл») для подсказок
+        // адресов: бесплатный OpenStreetMap Nominatim вместо платного
+        // Геопоиска Яндекса. Отключается флагом OSM_SEARCH_ENABLED=false.
+        'enabled' => env('OSM_SEARCH_ENABLED', true),
+    ],
+
 ];

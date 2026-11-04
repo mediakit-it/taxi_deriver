@@ -25,6 +25,21 @@ class YandexGeocodeService
     /** How many houses the follow-up kind=house request asks for. */
     private const HOUSE_FETCH_RESULTS = 6;
 
+    /** Free organization search (OpenStreetMap Nominatim). */
+    private const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
+    /** Nominatim must never slow the address search down. */
+    private const NOMINATIM_TIMEOUT_SECONDS = 3;
+
+    /** Nominatim usage policy requires a UA that identifies the app. */
+    private const NOMINATIM_USER_AGENT = 'TaxiDeriver geocode service (Laravel backend)';
+
+    /** How many organization candidates Nominatim is asked for. */
+    private const ORG_FETCH_LIMIT = 5;
+
+    /** Points closer than this are the same place (dedupe radius). */
+    private const ORG_DEDUPE_RADIUS_M = 50;
+
     /** Service-area defaults: the whole of Belarus. */
     private const DEFAULT_AREA_LAT = '53.7';
 
@@ -94,10 +109,12 @@ class YandexGeocodeService
                 fn ($point) => ! isset($seen[$point['lat'].','.$point['lng']]),
             ));
 
-            return array_slice(array_merge($houses, $rest), 0, self::MAX_RESULTS_WITH_HOUSES);
+            $points = array_slice(array_merge($houses, $rest), 0, self::MAX_RESULTS_WITH_HOUSES);
+        } else {
+            $points = array_slice($points, 0, $limit);
         }
 
-        return array_slice($points, 0, $limit);
+        return $this->withOrganizations($address, $points);
     }
 
     /**
@@ -190,26 +207,43 @@ class YandexGeocodeService
      */
     private function serviceAreaParams(): array
     {
+        $area = $this->serviceArea();
+
+        if ($area === null) {
+            return [];
+        }
+
+        // Yandex spn is "longitude span, latitude span" in degrees.
+        $dLat = $area['radius_km'] / 110.57;
+        $dLon = min($area['radius_km'] / (111.32 * cos(deg2rad($area['lat']))), 360.0);
+
+        return [
+            'll' => $this->formatDegrees($area['lon']).','.$this->formatDegrees($area['lat']),
+            'spn' => $this->formatDegrees($dLon).','.$this->formatDegrees($dLat),
+            'rspn' => 1,
+        ];
+    }
+
+    /**
+     * The configured service area as centre + radius, or null when
+     * the restriction is switched off (fields cleared by the admin).
+     * Shared by the Yandex restriction above and the OpenStreetMap
+     * organization search below.
+     */
+    private function serviceArea(): ?array
+    {
         $lat = Setting::get('service_area_lat', self::DEFAULT_AREA_LAT);
         $lon = Setting::get('service_area_lon', self::DEFAULT_AREA_LON);
         $radiusKm = Setting::get('service_area_radius_km', self::DEFAULT_AREA_RADIUS_KM);
 
         if (! is_numeric($lat) || ! is_numeric($lon) || ! is_numeric($radiusKm) || (float) $radiusKm <= 0) {
-            return [];
+            return null;
         }
 
-        $lat = (float) $lat;
-        $lon = (float) $lon;
-        $radiusKm = (float) $radiusKm;
-
-        // Yandex spn is "longitude span, latitude span" in degrees.
-        $dLat = $radiusKm / 110.57;
-        $dLon = min($radiusKm / (111.32 * cos(deg2rad($lat))), 360.0);
-
         return [
-            'll' => $this->formatDegrees($lon).','.$this->formatDegrees($lat),
-            'spn' => $this->formatDegrees($dLon).','.$this->formatDegrees($dLat),
-            'rspn' => 1,
+            'lat' => (float) $lat,
+            'lon' => (float) $lon,
+            'radius_km' => (float) $radiusKm,
         ];
     }
 
@@ -404,5 +438,188 @@ class YandexGeocodeService
         }
 
         return $parts === [] ? null : implode(', ', $parts);
+    }
+
+    /**
+     * Named places (organizations) from OpenStreetMap, merged ahead
+     * of the address results, so a search by name («Дана Молл»)
+     * finds the place and not just streets. The Yandex organizations
+     * API (Геопоиск) is paid, so free Nominatim is used instead.
+     *
+     * Attribution: org points carry source='osm' - every interface
+     * that displays them MUST keep the OpenStreetMap attribution
+     * visible: «© OpenStreetMap contributors».
+     *
+     * Any Nominatim problem (disabled via OSM_SEARCH_ENABLED,
+     * timeout, error, garbage) silently keeps the Yandex-only list:
+     * the address search never depends on OSM being up.
+     */
+    private function withOrganizations(string $address, array $points): array
+    {
+        $orgs = $this->organizationPoints($address);
+
+        if ($orgs === []) {
+            return $points;
+        }
+
+        $rest = array_values(array_filter($points, function ($point) use ($orgs) {
+            foreach ($orgs as $org) {
+                if ($this->distanceMeters($org['lat'], $org['lng'], $point['lat'], $point['lng']) < self::ORG_DEDUPE_RADIUS_M) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
+
+        return array_slice(array_merge($orgs, $rest), 0, self::MAX_RESULTS_WITH_HOUSES);
+    }
+
+    private function organizationPoints(string $query): array
+    {
+        if (! config('services.osm.enabled', true)) {
+            return [];
+        }
+
+        $params = [
+            'q' => $query,
+            'format' => 'jsonv2',
+            'limit' => self::ORG_FETCH_LIMIT,
+            'countrycodes' => 'by',
+            'addressdetails' => 1,
+        ];
+
+        $area = $this->serviceArea();
+
+        if ($area !== null) {
+            // The same service-area restriction as the Yandex search:
+            // a viewbox around the centre, bounded so results stay in.
+            $dLat = $area['radius_km'] / 110.57;
+            $dLon = min($area['radius_km'] / (111.32 * cos(deg2rad($area['lat']))), 360.0);
+
+            $params['viewbox'] = implode(',', [
+                $this->formatDegrees($area['lon'] - $dLon),
+                $this->formatDegrees($area['lat'] + $dLat),
+                $this->formatDegrees($area['lon'] + $dLon),
+                $this->formatDegrees($area['lat'] - $dLat),
+            ]);
+            $params['bounded'] = 1;
+        }
+
+        try {
+            $response = Http::timeout(self::NOMINATIM_TIMEOUT_SECONDS)
+                ->withHeaders(['User-Agent' => self::NOMINATIM_USER_AGENT])
+                ->get(self::NOMINATIM_URL, $params);
+        } catch (\Throwable $e) {
+            Log::warning('OSM Nominatim request failed', ['error' => $e->getMessage()]);
+
+            return [];
+        }
+
+        if ($response->failed()) {
+            Log::warning('OSM Nominatim returned an error', ['status' => $response->status()]);
+
+            return [];
+        }
+
+        $items = $response->json();
+
+        if (! is_array($items)) {
+            return [];
+        }
+
+        $points = [];
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $point = $this->toOrganizationPoint($item, $area);
+
+            if ($point === null) {
+                continue;
+            }
+
+            foreach ($points as $existing) {
+                if ($this->distanceMeters($existing['lat'], $existing['lng'], $point['lat'], $point['lng']) < self::ORG_DEDUPE_RADIUS_M) {
+                    continue 2;
+                }
+            }
+
+            $points[] = $point;
+        }
+
+        return $points;
+    }
+
+    /**
+     * One Nominatim result -> a suggestion point in the same shape
+     * as the Yandex points, extended with kind='org' and
+     * source='osm'. Returns null for results that are not named
+     * places (a bare address wears its street as the name) and for
+     * points outside the service area.
+     */
+    private function toOrganizationPoint(array $item, ?array $area): ?array
+    {
+        $name = trim((string) ($item['name'] ?? ''));
+
+        if ($name === '' || ! isset($item['lat'], $item['lon'])
+            || ! is_numeric($item['lat']) || ! is_numeric($item['lon'])) {
+            return null;
+        }
+
+        // Settlements, districts, streets and the like are not
+        // organizations even when Nominatim names them.
+        if (in_array($item['class'] ?? '', ['place', 'boundary', 'highway', 'natural', 'waterway', 'landuse'], true)) {
+            return null;
+        }
+
+        $lat = (float) $item['lat'];
+        $lng = (float) $item['lon'];
+
+        $address = is_array($item['address'] ?? null) ? $item['address'] : [];
+
+        $road = $address['road'] ?? null;
+        $house = $address['house_number'] ?? null;
+
+        $streetAddress = trim(implode(' ', array_filter([$road, $house])));
+
+        if ($streetAddress !== '' && mb_strtolower($name) === mb_strtolower($streetAddress)) {
+            return null;
+        }
+
+        if ($area !== null
+            && $this->distanceMeters($area['lat'], $area['lon'], $lat, $lng) > $area['radius_km'] * 1000) {
+            return null;
+        }
+
+        $locality = $address['city'] ?? $address['town'] ?? $address['village'] ?? $address['state'] ?? null;
+
+        $displayParts = array_filter([$locality, $road, $house]);
+        $shortParts = array_filter([$road, $house, $locality]);
+
+        return [
+            'lat' => $lat,
+            'lng' => $lng,
+            'name' => $name,
+            'address' => (string) ($item['display_name'] ?? $name),
+            'short_address' => $shortParts === [] ? null : implode(', ', $shortParts),
+            'display_address' => $displayParts === [] ? (string) ($item['display_name'] ?? $name) : implode(', ', $displayParts),
+            'locality' => $locality,
+            'kind' => 'org',
+            'source' => 'osm',
+        ];
+    }
+
+    private function distanceMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+
+        $a = sin($dLat / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return 2 * 6371000.0 * asin(min(1.0, sqrt($a)));
     }
 }
