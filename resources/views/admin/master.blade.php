@@ -81,7 +81,7 @@
 	<script src="{{asset('assets/js/admin.js')}}"></script>
 
 	<!-- Realtime-сигналы диспетчера: Pusher, панель внимания, тосты, звук -->
-	<script src="{{asset('assets/js/admin-alerts.js')}}"></script>
+	<script src="{{asset('assets/js/admin-alerts.js')}}?v={{ file_exists(public_path('assets/js/admin-alerts.js')) ? filemtime(public_path('assets/js/admin-alerts.js')) : 1 }}"></script>
 
 	@yield('scripts')
 

@@ -67,8 +67,12 @@ class CarBindingService
             return ['status' => self::STATUS_CAR_NOT_FOUND, 'car' => null];
         }
 
-        $user->current_car_id = $car->id;
-        $user->save();
+        // Привязка - только через общий механизм единоличного
+        // владения: если авто было закреплено за другим водителем,
+        // у него оно снимается в той же транзакции. Прямая запись
+        // current_car_id здесь раньше оставляла одно авто за двумя
+        // водителями сразу.
+        app(AssignDriverCar::class)->execute($user, $car->id);
 
         return ['status' => self::STATUS_OK, 'car' => [
             'car_id' => $car->id,

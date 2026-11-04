@@ -48,6 +48,20 @@ class AdminShellTest extends TestCase
         );
     }
 
+    public function test_sidebar_messages_badge_starts_hidden_with_inline_style(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->actingAs($admin, 'web')->get('/admin/dashboard');
+
+        $response->assertOk();
+        // Плашка непрочитанных стартует скрытой инлайн-стилем: класс
+        // d-none в admin.css перекрывается более поздним правилом
+        // .badge { display: inline-flex }, поэтому механизм показа -
+        // инлайн-стиль, который выставляет admin-alerts.js.
+        $response->assertSee('<span id="admin-messages-unread" class="badge bg-danger d-none" style="display:none"></span>', false);
+    }
+
     public function test_user_can_logout_via_post(): void
     {
         $admin = User::factory()->admin()->create();

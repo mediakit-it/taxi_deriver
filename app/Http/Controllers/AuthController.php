@@ -23,6 +23,7 @@ use App\Exports\UsersExport;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
+use App\Services\AssignDriverCar;
 
 class AuthController extends Controller
 {
@@ -46,10 +47,12 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
-            
+            // Необязательное авто смены: водительское приложение шлёт
+            // выбранное до входа авто; привязка применяется ниже только
+            // водителю и только после успешной авторизации.
+            'car_id' => 'nullable|integer|exists:cars,id',
         ]);
 
-        Log::info($request->all());
         $credentials = $request->only('email', 'password');
 
         if(User::where([['email',$request->input('email')],['role',$request->input('user_type')]])->exists()){
@@ -72,6 +75,14 @@ class AuthController extends Controller
                     'status' => 'error',
                     'message' => 'Пользователь заблокирован',
                 ], 403);
+            }
+
+            // Вход водителя с выбранным авто: привязка на смену через
+            // общий механизм единоличного владения - у предыдущего
+            // водителя это авто снимается в той же транзакции. Для
+            // остальных ролей car_id в запросе игнорируется.
+            if ($user->role === User::ROLE_DRIVER && $request->filled('car_id')) {
+                app(AssignDriverCar::class)->execute($user, (int) $request->input('car_id'));
             }
 
             return response()->json([
@@ -298,6 +309,15 @@ class AuthController extends Controller
      */
     public function logout()
     {
+        $user = auth()->user();
+
+        // Выход водителя завершает смену: привязка к авто снимается
+        // ДО инвалидации токена, чтобы авто не числилось за
+        // водителем, которого уже нет в системе.
+        if ($user && $user->role === User::ROLE_DRIVER && $user->current_car_id !== null) {
+            app(AssignDriverCar::class)->execute($user, null);
+        }
+
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
