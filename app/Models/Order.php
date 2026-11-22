@@ -179,7 +179,8 @@ class Order extends Model
     }
 
     /**
-     * Заказы, от которых назначенный водитель отказался: назначение снято
+     * Заказы, от которых назначенный водитель отказался или которые
+     * принявший водитель отпустил: назначение снято
      * (driver_id пуст), но метка предложения driver_offered_at сохранена -
      * это и есть признак «заказ предлагался конкретному водителю».
      * Свежие broadcast-заказы сюда не попадают (метки у них нет), как и
@@ -189,7 +190,10 @@ class Order extends Model
      */
     public function scopeDeclinedByDriver($query)
     {
-        return $query->where('status', self::STATUS_SEARCHING)
+        // Отказ оставляет заказ в searching, отпускание принятого
+        // заказа уводит его в searching_other - панель «Требуют
+        // внимания» показывает оба исхода одинаково.
+        return $query->whereIn('status', [self::STATUS_SEARCHING, self::STATUS_SEARCHING_OTHER])
             ->whereNull('driver_id')
             ->whereNotNull('driver_offered_at');
     }
