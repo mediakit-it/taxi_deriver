@@ -35,6 +35,14 @@ class LogisticController extends Controller
                 $locationValues['order_id'] = $request->input('orderId');
             }
 
+            // is_online - уход с линии (пакет №160): приложение шлёт
+            // флаг в каждом пинге. Поле необязательное: пинг без него
+            // колонку не трогает, чтобы старые версии приложения не
+            // сбрасывали статус водителя.
+            if ($request->has('is_online')) {
+                $locationValues['is_online'] = $request->boolean('is_online');
+            }
+
             DriverLocation::updateOrCreate(
                 ['user_id' => $userId],
                 $locationValues
