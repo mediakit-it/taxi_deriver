@@ -343,6 +343,10 @@
                         $('.message_area').html(data.htmlMessage);
                         $('.message_area').removeClass('d-none');
                         element.find('.unread_message').addClass('d-none');
+                        // Открытый диалог для admin-alerts.js: пока он
+                        // открыт, тост и звук о новых сообщениях этого
+                        // пользователя не нужны - они и так в ленте.
+                        window.__messengerOpenUserId = userId;
 
                         scrollToBottom();
                     },

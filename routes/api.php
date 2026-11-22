@@ -42,6 +42,9 @@ Route::prefix('v1')->group(function () {
         // вынужден отказаться - заказ возвращается в поиск другого
         // водителя (роль водителя проверяет FormRequest).
         Route::post('/driver/orders/release', [DriverOrderController::class, 'release']);
+        // Отмена заказа в поездке с причиной и комментарием
+        // (роль водителя проверяет FormRequest).
+        Route::post('/driver/orders/cancel', [DriverOrderController::class, 'cancel']);
     });
     // Привязка устройства водителя к авто при установке приложения:
     // без авторизации (экран входа), доступ по паролю привязки из

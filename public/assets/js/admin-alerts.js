@@ -563,6 +563,16 @@
         if (data.type === "driver_no_response" || data.type === "driver_declined") {
             upsertAttentionCard(data, false);
         } else if (data.type === "new_order" || data.type === "new_message") {
+            // Диалог с этим пользователем уже открыт в мессенджере:
+            // сообщение подгружается прямо в ленту диалога, и тост со
+            // звуком о нём же - лишний шум (замечание Кати 22.11.2026).
+            // Открытый диалог помечает messenger/index.blade.php в
+            // window.__messengerOpenUserId.
+            if (data.type === "new_message"
+                && window.__messengerOpenUserId != null
+                && Number(data.user_id) === Number(window.__messengerOpenUserId)) {
+                return;
+            }
             var title = data.title || (data.type === "new_order" ? "Новый заказ" : "Новое сообщение");
             window.adminToast(title, data.text || "", "info", data.url);
             signalInfo(title, data.text || "", "admin-info-" + data.type, data.url);

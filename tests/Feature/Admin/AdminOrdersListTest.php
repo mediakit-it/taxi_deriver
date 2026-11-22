@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\DriverLocation;
 use App\Models\Order;
 use App\Models\User;
 use App\Queries\AdminOrdersQuery;
@@ -93,6 +94,13 @@ class AdminOrdersListTest extends TestCase
         Event::fake();
 
         $driver = User::factory()->driver()->create();
+        // Назначение теперь требует водителя на линии (защита
+        // назначения, пакет 22.11.2026): свежая геопозиция.
+        DriverLocation::create([
+            'user_id' => $driver->id,
+            'lat' => 53.5191,
+            'lng' => 30.2415,
+        ]);
         $order = Order::factory()->create([
             'status' => Order::STATUS_PENDING,
             'driver_id' => null,

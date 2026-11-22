@@ -40,6 +40,7 @@ class AdminAlert implements ShouldBroadcastNow
         public ?string $toAddress = null,
         public ?int $waitingSeconds = null,
         public ?string $url = null,
+        public ?int $userId = null,
     ) {}
 
     /**
@@ -64,10 +65,29 @@ class AdminAlert implements ShouldBroadcastNow
     }
 
     /**
-     * Создан новый заказ (из приложения или диспетчером в админке).
+     * Создан новый заказ (из приложения, диспетчером в админке или
+     * водителем «от борта»). Заказ от борта - не «новый заказ» для
+     * диспетчера, а уже взятая поездка: заголовок и текст говорят,
+     * какой водитель его взял (замечание Кати 22.11.2026).
      */
     public static function newOrder(Order $order): self
     {
+        if ($order->source === Order::SOURCE_CURB) {
+            $driverName = self::userName($order->driver);
+
+            return new self(
+                type: self::TYPE_NEW_ORDER,
+                title: 'Заказ от борта',
+                text: "Водитель {$driverName} взял заказ от борта #{$order->id}: {$order->from_address} → {$order->to_address}",
+                orderId: $order->id,
+                driverName: $driverName,
+                clientName: self::fullName($order->client_first_name, $order->client_last_name),
+                fromAddress: $order->from_address,
+                toAddress: $order->to_address,
+                url: route('order.edit', $order->id),
+            );
+        }
+
         return new self(
             type: self::TYPE_NEW_ORDER,
             title: 'Новый заказ',
@@ -93,6 +113,7 @@ class AdminAlert implements ShouldBroadcastNow
             messageId: $message->id,
             clientName: self::userName($message->user),
             url: route('messenger'),
+            userId: $message->user_id,
         );
     }
 
@@ -142,6 +163,7 @@ class AdminAlert implements ShouldBroadcastNow
             'to_address' => $this->toAddress,
             'waiting_seconds' => $this->waitingSeconds,
             'url' => $this->url,
+            'user_id' => $this->userId,
         ];
     }
 

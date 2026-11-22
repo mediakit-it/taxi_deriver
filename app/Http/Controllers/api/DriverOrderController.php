@@ -4,7 +4,9 @@ namespace App\Http\Controllers\api;
 
 use App\Events\AdminAlert;
 use App\Events\OrderStatusChanged;
+use App\Events\UserOrderUpdate;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\DriverCancelOrderRequest;
 use App\Http\Requests\Api\DriverCurbOrderRequest;
 use App\Http\Requests\Api\DriverReleaseOrderRequest;
 use App\Models\Order;
@@ -23,6 +25,12 @@ use Illuminate\Http\JsonResponse;
 // водитель уже едет к клиенту, но вынужден отказаться. Заказ
 // возвращается в поиск другого водителя зеркально отказу от
 // предложенного заказа (OrderController::declineOrderByDriver).
+//
+// Третий сценарий - отмена заказа в поездке с причиной (cancel):
+// пассажир уже в машине, но поездка срывается. Водитель обязан
+// указать причину и комментарий; дальше заказ либо закрывается
+// отменённым, либо возвращается в поиск - решает пара
+// «источник + причина», см. метод cancel().
 class DriverOrderController extends Controller
 {
     public function store(DriverCurbOrderRequest $request): JsonResponse
@@ -165,6 +173,93 @@ class DriverOrderController extends Controller
                 'status' => $order->status,
                 'driver_id' => $order->driver_id,
                 'car_id' => $order->car_id,
+            ],
+        ]);
+    }
+
+    // Водитель отменяет заказ уже в поездке (статус in_progress):
+    // пассажир сел, но поездка срывается. В отличие от завершения
+    // с ценой, здесь обязательны причина и комментарий водителя -
+    // без них диспетчер не понимает, что произошло с заказом.
+    //
+    // Исход решает пара «источник + причина» (пакет замечаний
+    // 22.11.2026):
+    // - заказ «от борта» отменяется окончательно при любой причине:
+    //   клиента в системе у него нет, искать другого водителя
+    //   некому и незачем;
+    // - «Отказ клиента» - тоже окончательная отмена: пассажир сам
+    //   отказался от поездки;
+    // - остальные причины у заказов из приложения и по телефону:
+    //   поездка нужна, виноват не клиент - заказ возвращается в
+    //   поиск другого водителя зеркально отпущенному (release).
+    // Причина и комментарий сохраняются в заказе при любом исходе:
+    // диспетчер видит их в карточке заказа.
+    public function cancel(DriverCancelOrderRequest $request): JsonResponse
+    {
+        $driver = $request->user();
+
+        $order = Order::find($request->validated('order_id'));
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Заказ не найден.',
+            ], 404);
+        }
+
+        if ((int) $order->driver_id !== (int) $driver->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Отменить можно только свой заказ.',
+            ], 403);
+        }
+
+        if ($order->status !== Order::STATUS_IN_PROGRESS) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Отменить заказ с причиной можно только в поездке.',
+            ], 422);
+        }
+
+        $order->cancel_reason = $request->validated('reason');
+        $order->cancel_comment = $request->validated('comment');
+
+        if ($order->source === Order::SOURCE_CURB
+            || $order->cancel_reason === Order::CANCEL_REASON_CLIENT_REFUSAL) {
+            // Окончательная отмена: водитель и авто остаются в заказе
+            // (история поездки), статус - «Отменено».
+            $order->status = Order::STATUS_CANCELED;
+            $order->save();
+
+            // У заказа может не быть клиента (заказ «от борта» или
+            // клиент удалён) - уведомлять некого, а конструктор
+            // события требует int (как в OrderController::closeDriving).
+            if ($order->client_id) {
+                event(new UserOrderUpdate($order->client_id, 'Заказ отменен'));
+            }
+            event(new OrderStatusChanged($order, 'driver_canceled'));
+        } else {
+            // Сигнал диспетчеру собираем ДО снятия водителя: в нём
+            // имя отменяющего водителя (ровно как в отказе и в
+            // отпускании заказа).
+            $alert = AdminAlert::driverDeclined($order);
+
+            $order->status = Order::STATUS_SEARCHING_OTHER;
+            $order->driver_id = null;
+            $order->car_id = null;
+            $order->driver_offered_at = now();
+            $order->save();
+
+            event(new OrderStatusChanged($order, 'driver_declined'));
+            event($alert);
+        }
+
+        return response()->json([
+            'success' => true,
+            'order' => [
+                'id' => $order->id,
+                'status' => $order->status,
+                'cancel_reason' => $order->cancel_reason,
             ],
         ]);
     }

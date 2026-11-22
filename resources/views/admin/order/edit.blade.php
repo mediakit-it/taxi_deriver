@@ -41,6 +41,9 @@
 								<h4 class="mb-0">Информация о заказе</h4>
 							</div>
 							<div class="card-body p-0 task-edit-main">
+								@if(session('error'))
+									<div class="alert alert-danger m-4" role="alert">{{ session('error') }}</div>
+								@endif
 								<div class="row p-5 border-bottom">
 									<div class="col-md-12">
 										<h4>Информация о заказе:</h4>
@@ -58,6 +61,12 @@
 										<p><strong>Класс обслуживания:</strong> <span id="summary-tariff">{{$order->tariffClass?->label ?? '—'}}</span></p>
 										<p><strong>Автомобиль:</strong> <span id="summary-car">{{$order->car ? $order->car->label . ' (' . $order->car->number_plate . ')' : '—'}}</span></p>
 										<p><strong>Источник:</strong> <span id="summary-source">{{$order->source_label}}</span></p>
+										@if($order->status === 'canceled' && $order->cancel_reason)
+										<p><strong>Причина отмены:</strong> <span id="summary-cancel-reason">{{$order->cancel_reason_label}}</span></p>
+										@if($order->cancel_comment)
+										<p><strong>Комментарий водителя:</strong> <span id="summary-cancel-comment">{{$order->cancel_comment}}</span></p>
+										@endif
+										@endif
 									</div>
 									<div class="col-sm-12 col-md-12 col-xl-6">
 										<div class="form-group">
@@ -65,7 +74,9 @@
 											<select class="form-control form-select text-dark" value="{{old('driver_id')}}" name="driver_id" id="client-salution1" data-placeholder="Выберите водителя">
 												<option value="" @selected(old('driver_id', $order->driver_id) == '')>-</option>
 												@foreach ($users as $user)
-													<option value="{{ $user->id }}" @selected(old('driver_id', $order->driver_id) == $user->id)>{{ $user->first_name }} {{ $user->last_name }}</option>
+													@php($assignState = $user->assignment_state ?? 'free')
+													@php($assignBlocked = $assignState !== 'free' && $order->driver_id != $user->id)
+													<option value="{{ $user->id }}" @selected(old('driver_id', $order->driver_id) == $user->id) @disabled($assignBlocked)>{{ $user->first_name }} {{ $user->last_name }}@if($assignBlocked) ({{ $assignState === 'busy' ? 'занят' : 'не на линии' }})@endif</option>
 												@endforeach
 											</select>
 										</div>
