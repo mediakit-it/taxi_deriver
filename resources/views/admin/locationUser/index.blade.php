@@ -83,6 +83,15 @@
 
         fetchAndUpdateDrivers();
         setInterval(fetchAndUpdateDrivers, 10000);
+
+        // Живой сигнал смены статуса водителя (пакет №162):
+        // не ждём очередного опроса - перечитываем водителей
+        // сразу, метка перекрашивается в момент перехода.
+        if (typeof window.onDriverStatusChanged === 'function') {
+            window.onDriverStatusChanged(function () {
+                fetchAndUpdateDrivers();
+            });
+        }
     }
 
     const colors = [
@@ -97,6 +106,34 @@
 
     function getColorByUserId(user_id) {
         return colors[user_id % colors.length];
+    }
+
+    // Пресет метки по статусу работы (пакет №162): не на линии
+    // и не работает - серая метка, на линии - свой цвет водителя.
+    function getPresetByDriver(driver) {
+        if (driver.work_status === 'offline' || driver.work_status === 'not_working') {
+            return 'islands#grayIcon';
+        }
+        return getColorByUserId(driver.user_id);
+    }
+
+    // Длительность текущего статуса строкой из ISO-метки начала
+    // периода: «N мин» до часа, дальше «H ч MM мин».
+    function formatStatusDuration(iso) {
+        if (!iso) {
+            return '';
+        }
+        const t = Date.parse(iso);
+        if (isNaN(t)) {
+            return '';
+        }
+        const mins = Math.max(0, Math.floor((Date.now() - t) / 60000));
+        if (mins < 60) {
+            return mins + ' мин';
+        }
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return h + ' ч ' + (m < 10 ? '0' : '') + m + ' мин';
     }
 
     // Первичное позиционирование карты по точкам водителей -
@@ -159,25 +196,30 @@
                     const coords = [driver.lat, driver.lng];
                     const currentCar = driver.user.current_car;
                     const carLine = currentCar ? `<br>Авто: ${currentCar.brand} ${currentCar.model} · ${currentCar.number_plate}` : '';
+                    const statusDuration = formatStatusDuration(driver.status_since);
                     const balloonContent = `
                         <b>Водитель ID:${driver.user_id}. ФИО: ${driver.user.last_name} ${driver.user.first_name}</b><br>
-                        Статус: ${driver.is_zakaz ? 'Занят' : 'Свободен'}${carLine}<br>
-                        Заказ: ${driver.order_id ? '# '+driver.order_id : 'Нет'}
+                        Статус: ${driver.work_status_label}${statusDuration ? ' (' + statusDuration + ')' : ''}<br>
+                        Заказ: ${driver.is_zakaz && driver.order_id ? 'выполняет №' + driver.order_id : 'свободен'}${carLine}
                     `;
+                    // Подсказка при наведении: кто это и в каком
+                    // статусе, без клика и открытия балуна.
+                    const hintContent = `${driver.user.last_name} ${driver.user.first_name} - ${driver.work_status_label}${driver.is_zakaz && driver.order_id ? ' · заказ №' + driver.order_id : ''}`;
+                    const preset = getPresetByDriver(driver);
 
                     if (driverPlacemarks[driver.user_id]) {
                         driverPlacemarks[driver.user_id].geometry.setCoordinates(coords);
                         driverPlacemarks[driver.user_id].properties.set({
                             balloonContentBody: balloonContent,
-                            hintContent: `Водитель ID: ${driver.user_id}`
+                            hintContent: hintContent
                         });
+                        driverPlacemarks[driver.user_id].options.set('preset', preset);
                     } else {
-                        const colorPreset = getColorByUserId(driver.user_id);
                         const placemark = new ymaps.Placemark(coords, {
                             balloonContentBody: balloonContent,
-                            hintContent: `Водитель ID: ${driver.user_id}`
+                            hintContent: hintContent
                         }, {
-                            preset: colorPreset,
+                            preset: preset,
                             balloonPanelMaxMapArea: 0
                         });
 

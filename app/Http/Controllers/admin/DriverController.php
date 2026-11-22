@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\DriverLocation;
+use App\Models\DriverStatusPeriod;
 use App\Models\User;
 use Illuminate\View\View;
 
@@ -27,6 +28,13 @@ class DriverController extends Controller
             ->sortBy(fn (User $driver) => self::STATUS_ORDER[$driver->location?->work_status ?? DriverLocation::STATUS_NOT_WORKING])
             ->values();
 
-        return view('admin.drivers.index', compact('drivers'));
+        // Открытые периоды работы - одним запросом на весь список:
+        // вьюха показывает, с какого времени водитель в статусе.
+        $statusPeriods = DriverStatusPeriod::open()
+            ->whereIn('user_id', $drivers->pluck('id'))
+            ->get()
+            ->keyBy('user_id');
+
+        return view('admin.drivers.index', compact('drivers', 'statusPeriods'));
     }
 }

@@ -644,6 +644,31 @@
         });
     }
 
+    /* ---------- сигнал «статус водителя изменился» ---------- */
+
+    var driverStatusHandlers = [];
+
+    // Страницы водителей, заказов и карты (admin-orders-live.js,
+    // вьюхи водителей и карты) подписываются сюда, чтобы обновить
+    // статус водителя без перезагрузки. Событие driver.status
+    // приходит в тот же приватный канал admin.alerts
+    // (DriverWorkStatusChanged из пинга геопозиции, пакет №162).
+    window.onDriverStatusChanged = function (fn) {
+        if (typeof fn === "function") {
+            driverStatusHandlers.push(fn);
+        }
+    };
+
+    function handleDriverStatus(data) {
+        driverStatusHandlers.forEach(function (fn) {
+            try {
+                fn(data || {});
+            } catch (e) {
+                /* подписчик не должен ломать остальные сигналы */
+            }
+        });
+    }
+
     /* ---------- Pusher: единственная глобальная точка мастера ---------- */
 
     // Ключ/кластер - из meta-тегов мастера (конфиг вещания сервера):
@@ -735,6 +760,7 @@
         var alertsChannel = pusher.subscribe("private-admin.alerts");
         alertsChannel.bind("admin.alert", handleAlert);
         alertsChannel.bind("orders.changed", handleOrdersChanged);
+        alertsChannel.bind("driver.status", handleDriverStatus);
     }
 
     /* ---------- старт ---------- */

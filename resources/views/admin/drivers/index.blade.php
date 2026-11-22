@@ -44,8 +44,9 @@
                                         @php
                                             $location = $driver->location;
                                             $status = $location?->work_status ?? \App\Models\DriverLocation::STATUS_NOT_WORKING;
+                                            $period = $statusPeriods->get($driver->id);
                                         @endphp
-                                        <tr>
+                                        <tr data-driver-row="{{ $driver->id }}">
                                             <td>{{ trim($driver->first_name . ' ' . $driver->last_name) }}</td>
                                             <td>{{ $driver->phone }}</td>
                                             <td>
@@ -58,14 +59,16 @@
                                             </td>
                                             <td>
                                                 @if($status === \App\Models\DriverLocation::STATUS_ONLINE && $location?->is_zakaz)
-                                                    <span class="badge bg-success">На линии · на заказе</span>
+                                                    <span data-driver-status-badge class="badge bg-success">На линии · на заказе</span>
                                                 @elseif($status === \App\Models\DriverLocation::STATUS_ONLINE)
-                                                    <span class="badge bg-success">На линии</span>
+                                                    <span data-driver-status-badge class="badge bg-success">На линии</span>
                                                 @elseif($status === \App\Models\DriverLocation::STATUS_OFFLINE)
-                                                    <span class="badge bg-secondary">Не на линии</span>
+                                                    <span data-driver-status-badge class="badge bg-secondary">Не на линии</span>
                                                 @else
-                                                    <span class="badge bg-dark">Не работает</span>
+                                                    <span data-driver-status-badge class="badge bg-dark">Не работает</span>
                                                 @endif
+                                                <br>
+                                                <small class="text-muted" data-driver-status-since@if($period) data-status-since-at="{{ $period->started_at->toIso8601String() }}"@endif>@if($period)с {{ $period->started_at->format('H:i') }} · {{ $period->durationLabel() }}@endif</small>
                                             </td>
                                             <td>
                                                 @if($location?->updated_at)
@@ -99,4 +102,84 @@
 
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+/* Живой статус водителей (пакет №162): сигнал driver.status из
+   admin-alerts.js (window.onDriverStatusChanged) обновляет бейдж
+   и начало периода в строке водителя без перезагрузки; раз в
+   минуту длительности пересчитываются из data-status-since-at. */
+(function () {
+    "use strict";
+
+    function pad2(n) {
+        return (n < 10 ? "0" : "") + n;
+    }
+
+    function formatDuration(sinceMs) {
+        var mins = Math.max(0, Math.floor((Date.now() - sinceMs) / 60000));
+        if (mins < 60) {
+            return mins + " мин";
+        }
+        return Math.floor(mins / 60) + " ч " + pad2(mins % 60) + " мин";
+    }
+
+    function renderSince(el) {
+        var iso = el.getAttribute("data-status-since-at");
+        var t = iso ? Date.parse(iso) : NaN;
+        if (isNaN(t)) {
+            el.textContent = "";
+            return;
+        }
+        var d = new Date(t);
+        el.textContent = "с " + pad2(d.getHours()) + ":" + pad2(d.getMinutes())
+            + " · " + formatDuration(t);
+    }
+
+    function refreshDurations() {
+        document.querySelectorAll("[data-driver-status-since]").forEach(renderSince);
+    }
+
+    function applyStatus(data) {
+        if (!data || data.user_id == null) {
+            return;
+        }
+        var row = document.querySelector('[data-driver-row="' + data.user_id + '"]');
+        if (!row) {
+            return;
+        }
+        var badge = row.querySelector("[data-driver-status-badge]");
+        if (badge) {
+            var cls = "badge bg-dark";
+            var text = data.work_status_label || "";
+            if (data.work_status === "online") {
+                cls = "badge bg-success";
+                if (data.is_zakaz) {
+                    text += " · на заказе";
+                }
+            } else if (data.work_status === "offline") {
+                cls = "badge bg-secondary";
+            }
+            badge.className = cls;
+            badge.textContent = text;
+        }
+        var since = row.querySelector("[data-driver-status-since]");
+        if (since) {
+            if (data.status_since) {
+                since.setAttribute("data-status-since-at", data.status_since);
+            } else {
+                since.removeAttribute("data-status-since-at");
+            }
+            renderSince(since);
+        }
+    }
+
+    if (typeof window.onDriverStatusChanged === "function") {
+        window.onDriverStatusChanged(applyStatus);
+    }
+    refreshDurations();
+    setInterval(refreshDurations, 60000);
+})();
+</script>
 @endsection
