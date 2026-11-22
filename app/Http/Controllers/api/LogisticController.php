@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Actions\Driver\SyncWorkStatusPeriod;
 use App\Events\ClientDriverLocation;
+use App\Events\DriverWorkStatusChanged;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -43,16 +45,64 @@ class LogisticController extends Controller
                 $locationValues['is_online'] = $request->boolean('is_online');
             }
 
-            DriverLocation::updateOrCreate(
+            // Прежнее значение флага - ДО записи: переход статуса
+            // (пакет №162) ловится сравнением с новым, а не каждым
+            // пингом, иначе событие и периоды плодились бы каждые
+            // 10 секунд.
+            $previousIsOnline = null;
+            if ($request->has('is_online')) {
+                $previousFlag = DriverLocation::where('user_id', $userId)->value('is_online');
+                $previousIsOnline = $previousFlag === null ? null : (bool) $previousFlag;
+            }
+
+            $location = DriverLocation::updateOrCreate(
                 ['user_id' => $userId],
                 $locationValues
             );
+
+            if ($request->has('is_online')) {
+                $newIsOnline = $request->boolean('is_online');
+                if ($previousIsOnline === null || $previousIsOnline !== $newIsOnline) {
+                    $this->syncWorkStatusAndNotify($request, $location, $newIsOnline);
+                }
+            }
+
             $this->broadcastToActiveClient($request);
 
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
             // Просто возвращаем ошибку, чтобы не сломать клиента
             return response()->json(['status' => 'failed'], 500);
+        }
+    }
+
+    // Переход «на линии / не на линии» (пакет №162): период работы
+    // в новом статусе открывается/закрывается синхронно с флагом,
+    // а админка получает живой сигнал DriverWorkStatusChanged -
+    // список водителей, список заказов и карта обновляются без
+    // перезагрузки. Сбой учёта или рассылки пинг не роняет:
+    // геопозиция к этому моменту уже сохранена выше.
+    private function syncWorkStatusAndNotify(Request $request, DriverLocation $location, bool $isOnline): void
+    {
+        try {
+            $driver = $request->user() ?? User::find($location->user_id);
+
+            if (! $driver) {
+                return;
+            }
+
+            $period = app(SyncWorkStatusPeriod::class)->sync($driver, $isOnline);
+
+            event(new DriverWorkStatusChanged(
+                userId: $driver->id,
+                workStatus: $location->work_status,
+                workStatusLabel: $location->work_status_label,
+                statusSince: $period?->started_at?->toIso8601String()
+                    ?? $location->updated_at?->toIso8601String(),
+                isZakaz: (bool) $location->is_zakaz,
+            ));
+        } catch (\Exception $e) {
+            // Учёт периодов и живой сигнал - не критичный путь пинга.
         }
     }
 
