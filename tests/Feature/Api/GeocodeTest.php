@@ -19,6 +19,13 @@ class GeocodeTest extends TestCase
 
         config(['services.yandex.geocoder_key' => 'test-geocoder-key']);
 
+        // Класс проверяет только Яндекс: организации OSM покрыты
+        // отдельным GeocodeOrganizationsTest, а настоящий Nominatim
+        // протекает мимо Http::fake (фейк накрывает только хост
+        // Яндекса) и ломает счётчики результатов - та же изоляция,
+        // что в PR #75 для соседних геокод-сьютов.
+        config(['services.osm.enabled' => false]);
+
         $this->client = User::factory()->create(['role' => 'client']);
     }
 
