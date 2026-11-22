@@ -27,7 +27,7 @@ class DriverWorkStatusTest extends TestCase
 
     private function ping(User $driver, array $payload): void
     {
-        $this->postJson('/api/v1/location/update', array_merge([
+        $this->postJson('/api/location/update', array_merge([
             'lat' => 53.5191,
             'lng' => 30.2415,
             'isZakaz' => false,
