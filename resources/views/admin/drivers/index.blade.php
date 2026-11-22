@@ -68,7 +68,11 @@
                                                     <span data-driver-status-badge class="badge bg-dark">Не работает</span>
                                                 @endif
                                                 <br>
-                                                <small class="text-muted" data-driver-status-since@if($period) data-status-since-at="{{ $period->started_at->toIso8601String() }}"@endif>@if($period)с {{ $period->started_at->format('H:i') }} · {{ $period->durationLabel() }}@endif</small>
+                                                <small class="text-muted" data-driver-status-since @if($period) data-status-since-at="{{ $period->started_at->toIso8601String() }}" @endif>
+                                                    @if($period)
+                                                        с {{ $period->started_at->format('H:i') }} · {{ $period->durationLabel() }}
+                                                    @endif
+                                                </small>
                                             </td>
                                             <td>
                                                 @if($location?->updated_at)
