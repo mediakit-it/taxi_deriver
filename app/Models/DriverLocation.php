@@ -14,14 +14,17 @@ class DriverLocation extends Model
         'lat',
         'lng',
         'is_zakaz',
+        'is_online',
         'order_id'
     ];
 
     protected $casts = [
         'is_zakaz' => 'boolean',
+        'is_online' => 'boolean',
     ];
 
-    // Статусы работы водителя, выводятся из свежести последней геопозиции
+    // Статусы работы водителя: явный флаг ухода с линии (is_online),
+    // дальше - свежесть последней геопозиции
     const STATUS_ONLINE = 'online';
     const STATUS_OFFLINE = 'offline';
     const STATUS_NOT_WORKING = 'not_working';
@@ -36,6 +39,13 @@ class DriverLocation extends Model
     // старше суток или без времени - не работает
     public function getWorkStatusAttribute(): string
     {
+        // Явный уход с линии важнее свежести: водитель на перерыве
+        // может не слать пинги, и статус не должен «протухать»
+        // в «не работает» - он не на линии, пока сам не вернётся.
+        if ($this->is_online === false) {
+            return self::STATUS_OFFLINE;
+        }
+
         if ($this->updated_at === null) {
             return self::STATUS_NOT_WORKING;
         }
