@@ -69,6 +69,17 @@
 										@endif
 									</div>
 									<div class="col-sm-12 col-md-12 col-xl-6">
+										@if($order->status === 'completed' || $order->status === 'canceled')
+										<div class="form-group">
+											<label class="form-label text-muted">Водитель:</label>
+											<p class="form-control-plaintext text-dark">{{ $order->driver ? $order->driver->first_name . ' ' . $order->driver->last_name : 'не назначен' }}</p>
+											@if($order->status === 'completed')
+												<small class="text-muted">Заказ завершён - водителя менять нельзя.</small>
+											@else
+												<small class="text-muted">Заказ отменён - водителя менять нельзя.</small>
+											@endif
+										</div>
+										@else
 										<div class="form-group">
 											<label class="form-label text-muted">Выберите водителя(Не обязательно):</label>
 											<select class="form-control form-select text-dark" value="{{old('driver_id')}}" name="driver_id" id="client-salution1" data-placeholder="Выберите водителя">
@@ -80,6 +91,7 @@
 												@endforeach
 											</select>
 										</div>
+										@endif
 									</div>
 								</div>
 									<div class="col-sm-12 col-md-12 col-xl-6">
