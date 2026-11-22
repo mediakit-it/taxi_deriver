@@ -33,6 +33,8 @@ class Order extends Model
         'status',
         'tariff',
         'source',
+        'cancel_reason',
+        'cancel_comment',
     ];
 
     // Статусы
@@ -51,6 +53,29 @@ class Order extends Model
     const SOURCE_PHONE = 'phone';
     const SOURCE_APP = 'app';
     const SOURCE_CURB = 'curb';
+
+    // Причины отмены заказа в поездке водителем (пакет замечаний
+    // 22.11.2026): клиент отказался, технические неполадки, другое.
+    // Отмена с причиной - отдельный сценарий (DriverOrderController::
+    // cancel), а не отпускание заказа до посадки.
+    const CANCEL_REASON_CLIENT_REFUSAL = 'client_refusal';
+    const CANCEL_REASON_TECH_PROBLEMS = 'tech_problems';
+    const CANCEL_REASON_OTHER = 'other';
+
+    // Подписи причин отмены для админки
+    const CANCEL_REASON_LABELS = [
+        self::CANCEL_REASON_CLIENT_REFUSAL => 'Отказ клиента',
+        self::CANCEL_REASON_TECH_PROBLEMS => 'Технические неполадки',
+        self::CANCEL_REASON_OTHER => 'Другое',
+    ];
+
+    // Человекочитаемая подпись причины отмены текущего заказа
+    public function getCancelReasonLabelAttribute(): ?string
+    {
+        return $this->cancel_reason === null
+            ? null
+            : (self::CANCEL_REASON_LABELS[$this->cancel_reason] ?? $this->cancel_reason);
+    }
 
     // Подписи источников для админки
     const SOURCE_LABELS = [
