@@ -249,6 +249,16 @@
             });
         }
 
+        // Статус работы водителя рисуется прямо во фрагменте
+        // (суффиксы «(занят)» / «(не на линии)» в селектах
+        // назначения) - по живому сигналу смены статуса
+        // перечитываем фрагмент тем же путём, что и по заказам.
+        if (typeof window.onDriverStatusChanged === "function") {
+            window.onDriverStatusChanged(function () {
+                scheduleRefresh();
+            });
+        }
+
         setInterval(refresh, POLL_INTERVAL);
     }
 
