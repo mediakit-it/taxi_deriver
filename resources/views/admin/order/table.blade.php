@@ -54,7 +54,9 @@
                             <select name="driver_id" class="form-control form-control-sm" data-assign-select style="min-width:170px;">
                                 <option value="">Не назначен</option>
                                 @foreach($drivers as $driver)
-                                    <option value="{{$driver->id}}" @selected($order->driver_id == $driver->id)>{{ $driver->first_name }} {{ $driver->last_name }}</option>
+                                    @php($assignState = $driver->assignment_state ?? 'free')
+                                    @php($assignBlocked = $assignState !== 'free' && $order->driver_id != $driver->id)
+                                    <option value="{{$driver->id}}" @selected($order->driver_id == $driver->id) @disabled($assignBlocked)>{{ $driver->first_name }} {{ $driver->last_name }}@if($assignBlocked) ({{ $assignState === 'busy' ? 'занят' : 'не на линии' }})@endif</option>
                                 @endforeach
                             </select>
                         </form>

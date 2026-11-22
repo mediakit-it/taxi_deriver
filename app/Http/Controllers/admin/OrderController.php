@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Actions\Admin\AssignOrderDriver;
+use App\Exceptions\DriverAssignmentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AssignOrderDriverRequest;
 use App\Http\Requests\Admin\UpdateOrderPriceRequest;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Car;
 use App\Models\CostOfTrip;
+use App\Models\DriverLocation;
 use App\Models\User;
 use App\Models\Order;
 use App\Events\OrderSent;
@@ -64,11 +66,60 @@ class OrderController extends Controller
             'filters' => $query->filters(),
             'statusLabels' => Order::statusLabels(),
             'statusCounts' => AdminOrdersQuery::activeStatusCounts(),
-            'drivers' => User::where('role', 'driving')
-                ->orderBy('last_name')
-                ->orderBy('first_name')
-                ->get(),
+            'drivers' => $this->driversWithAssignmentStates(),
         ];
+    }
+
+    /**
+     * Водители для селектов назначения с пометкой доступности
+     * (assignment_state): 'busy' - есть активный заказ, 'offline' -
+     * не на линии, 'free' - можно назначать. Селекты в списке и в
+     * карточке заказа отключают недоступных (пакет замечаний
+     * 22.11.2026); сама защита назначения живёт в AssignOrderDriver,
+     * пометка - только подсказка диспетчеру. Занятость важнее
+     * линии: занятый водитель может одновременно быть офлайн по
+     * свежести геопозиции, но причина отказа для диспетчера - заказ.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, User>
+     */
+    private function driversWithAssignmentStates()
+    {
+        $drivers = User::where('role', 'driving')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+
+        $busyDriverIds = Order::query()
+            ->whereIn('status', [
+                Order::STATUS_ASSIGNED,
+                Order::STATUS_ON_PLACE,
+                Order::STATUS_IN_PROGRESS,
+            ])
+            ->whereNotNull('driver_id')
+            ->pluck('driver_id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->all();
+
+        $locations = DriverLocation::query()
+            ->whereIn('user_id', $drivers->pluck('id'))
+            ->get()
+            ->keyBy('user_id');
+
+        foreach ($drivers as $driver) {
+            if (in_array((int) $driver->id, $busyDriverIds, true)) {
+                $driver->assignment_state = 'busy';
+                continue;
+            }
+
+            $location = $locations->get($driver->id);
+            $driver->assignment_state = $location
+                && $location->work_status === DriverLocation::STATUS_ONLINE
+                ? 'free'
+                : 'offline';
+        }
+
+        return $drivers;
     }
 
     /**
@@ -78,7 +129,16 @@ class OrderController extends Controller
      */
     public function assignDriver(AssignOrderDriverRequest $request, Order $order, AssignOrderDriver $assignOrderDriver)
     {
-        $assignOrderDriver($order, $request->validated()['driver_id'] ?? null);
+        try {
+            $assignOrderDriver($order, $request->validated()['driver_id'] ?? null);
+        } catch (DriverAssignmentException $e) {
+            // Занятой или офлайн-водитель: назначение отклонено
+            // действием, текст отказа показываем диспетчеру как есть.
+            return response()->json([
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
 
         return response()->json([
             'ok' => true,
@@ -208,7 +268,7 @@ class OrderController extends Controller
      */
     public function edit(string $id)
     {
-        $users = User::where('role','driving')->get();
+        $users = $this->driversWithAssignmentStates();
         $tariffs = CostOfTrip::all();
         $sources = $this->orderSources();
         $order = Order::find($id);
@@ -239,7 +299,14 @@ class OrderController extends Controller
 
         $order->update($data);
 
-        $assignOrderDriver($order, $hasDriverField ? $driverId : ($order->driver_id !== null ? (int) $order->driver_id : null));
+        try {
+            $assignOrderDriver($order, $hasDriverField ? $driverId : ($order->driver_id !== null ? (int) $order->driver_id : null));
+        } catch (DriverAssignmentException $e) {
+            // Назначение отклонено (водитель занят или не на линии):
+            // возвращаем диспетчера в карточку с текстом отказа,
+            // остальные поля заказа при этом уже сохранены.
+            return redirect()->route('order.edit', $order->id)->with('error', $e->getMessage());
+        }
 
         return redirect(route('order.index'));
     }
