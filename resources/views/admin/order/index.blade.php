@@ -189,6 +189,6 @@
 			csrf: "{{ csrf_token() }}"
 		};
 	</script>
-	<script src="{{asset('assets/js/admin-orders-live.js')}}"></script>
+	<script src="{{asset('assets/js/admin-orders-live.js')}}?v={{ file_exists(public_path('assets/js/admin-orders-live.js')) ? filemtime(public_path('assets/js/admin-orders-live.js')) : 1 }}"></script>
 
 @endsection
