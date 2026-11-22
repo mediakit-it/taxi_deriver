@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Events\AdminAlert;
+use App\Models\DriverLocation;
 use App\Models\Message;
 use App\Models\Order;
 use App\Models\Setting;
@@ -162,6 +163,13 @@ class DispatcherAlertTest extends TestCase
             'driver_offered_at' => now()->subSeconds(120),
         ]);
         $newDriver = User::factory()->driver()->create();
+        // Переназначение теперь требует водителя на линии (защита
+        // назначения, пакет 22.11.2026): свежая геопозиция.
+        DriverLocation::create([
+            'user_id' => $newDriver->id,
+            'lat' => 53.5191,
+            'lng' => 30.2415,
+        ]);
 
         $response = $this->actingAs($this->admin(), 'web')->get('/admin/data/overdue-orders');
         $response->assertJsonCount(1);
@@ -203,6 +211,13 @@ class DispatcherAlertTest extends TestCase
         Event::fake();
         $driverA = User::factory()->driver()->create();
         $driverB = User::factory()->driver()->create();
+        // Водитель B должен быть на линии, иначе защита назначения
+        // (пакет 22.11.2026) переназначение отклонит.
+        DriverLocation::create([
+            'user_id' => $driverB->id,
+            'lat' => 53.5191,
+            'lng' => 30.2415,
+        ]);
         $offeredAt = now()->subHour();
         $order = Order::factory()->searching()->create([
             'driver_id' => $driverA->id,
