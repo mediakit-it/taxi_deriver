@@ -28,12 +28,37 @@ use App\Models\Order;
  * здесь, в единственной точке назначения: оба экрана админки
  * получают одинаковое поведение, отказ - DriverAssignmentException
  * с человекочитаемым текстом для диспетчера.
+ *
+ * Терминальные заказы (пакет замечаний Кати, 22.11.2026): у
+ * завершённого и отменённого заказа водителя менять нельзя.
+ * Попытка назначить другого водителя - DriverAssignmentException
+ * с текстом по статусу; сохранение формы с тем же водителем (или
+ * по-прежнему без водителя) - полный no-op: ни событий, ни смены
+ * статуса. Раньше сохранение карточки отменённого заказа без
+ * водителя заново анонсировало его всем водителям (OrderSent по
+ * роли), а смена водителя возвращала терминальный заказ обратно
+ * в searching и предлагала его заново.
  */
 class AssignOrderDriver
 {
     public function __invoke(Order $order, ?int $driverId): Order
     {
         $oldDriver = $order->driver_id !== null ? (int) $order->driver_id : null;
+
+        // Терминальный заказ: водителя не меняем. Другой водитель -
+        // отказ с текстом по статусу; тот же (или по-прежнему нет
+        // водителя) - тихий no-op без событий и смены статуса.
+        if (in_array($order->status, [Order::STATUS_COMPLETED, Order::STATUS_CANCELED], true)) {
+            if ($driverId !== $oldDriver) {
+                throw new DriverAssignmentException(
+                    $order->status === Order::STATUS_COMPLETED
+                        ? 'Заказ завершён - водителя менять нельзя.'
+                        : 'Заказ отменён - водителя менять нельзя.'
+                );
+            }
+
+            return $order;
+        }
 
         if ($driverId !== null && $driverId !== $oldDriver) {
             $this->guardDriverCanTakeOrder($order, $driverId);
