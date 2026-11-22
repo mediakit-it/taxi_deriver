@@ -30,7 +30,11 @@
                     @elseif($order->status=="completed")
                         <td style="background:green; color:white;">Завершено</td>
                     @elseif($order->status=="canceled")
-                        <td style="background:red; color:white;">Отменено</td>
+                        <td style="background:red; color:white;">Отменено
+                            @if($order->cancel_reason)
+                                <br><small style="white-space:normal; display:inline-block; max-width:200px;">{{ $order->cancel_reason_label }}@if($order->cancel_comment): {{ $order->cancel_comment }}@endif</small>
+                            @endif
+                        </td>
                     @elseif($order->status=="pending")
                         <td style="background:orange; color:white;">Ожидание</td>
                     @elseif($order->status=="searching")
